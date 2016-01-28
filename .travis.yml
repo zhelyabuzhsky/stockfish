@@ -8,8 +8,9 @@ install:
   - cd Stockfish/src
   - make build ARCH=x86-64
   - cd ../..
-  - cp Stockfish/src/stockfish stockfish
+  - cp Stockfish/src/stockfish stockfish.temp
   - rm -rf Stockfish
+  - mv stockfish.temp stockfish
 script:
   - python test_pystockfish.py
 notifications:
