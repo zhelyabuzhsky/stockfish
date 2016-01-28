@@ -1,0 +1,17 @@
+sudo: false
+language:
+  - python
+python:
+  - 3.5
+install:
+  - git clone --depth 1 https://github.com/mcostalba/Stockfish.git
+  - cd Stockfish/src
+  - make build ARCH=x86-64
+  - cd ../..
+  - cp Stockfish/src/stockfish stockfish
+  - rm -rf Stockfish
+script:
+  - python test_pystockfish.py
+notifications:
+  email:
+    - zhelyabuzhsky@gmail.com
