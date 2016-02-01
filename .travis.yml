@@ -5,6 +5,8 @@ python:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq stockfish
+before_script:
+  - export PATH=$PATH:/usr/games/
 script:
   - python test_pystockfish.py
 notifications:
