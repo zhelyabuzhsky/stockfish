@@ -1,5 +1,5 @@
 import unittest
-from pystockfish import *
+from stockfish import Stockfish
 
 
 class TestStockfish(unittest.TestCase):

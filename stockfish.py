@@ -2,16 +2,17 @@ import subprocess
 
 
 class Stockfish:
+
     def __init__(self, path=None, depth=2, param=None):
         if param is None:
             param = {}
         if path is None:
             path = 'stockfish'
         self.stockfish = subprocess.Popen(
-                path,
-                universal_newlines=True,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE
+            path,
+            universal_newlines=True,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE
         )
         self.depth = str(depth)
         self.__put('uci')
@@ -59,7 +60,8 @@ class Stockfish:
         """
         if moves is None:
             moves = []
-        self.__put('position startpos moves %s' % self.__convert_move_list_to_str(moves))
+        self.__put('position startpos moves %s' %
+                   self.__convert_move_list_to_str(moves))
         self.__isready()
 
     def __go(self):
@@ -68,8 +70,8 @@ class Stockfish:
     @staticmethod
     def __convert_move_list_to_str(moves):
         result = ''
-        for m in moves:
-            result += m + ' '
+        for move in moves:
+            result += move + ' '
         return result.strip()
 
     def get_best_move(self):

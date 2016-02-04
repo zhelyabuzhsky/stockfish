@@ -1,7 +1,13 @@
-# pystockfish
-[![Build Status](https://travis-ci.org/zhelyabuzhsky/pystockfish.svg?branch=master)](https://travis-ci.org/zhelyabuzhsky/pystockfish)
+# Stockfish
+[![Build Status](https://travis-ci.org/zhelyabuzhsky/pystockfish.svg?branch=master)](https://travis-ci.org/zhelyabuzhsky/pystockfish) [![PyPI Version](https://img.shields.io/pypi/v/stockfish.svg)](https://pypi.python.org/pypi/stockfish) [![PyPI Month Downloads](https://img.shields.io/pypi/dm/stockfish.svg)](https://pypi.python.org/pypi/stockfish)
 
 Implements an easy-to-use Stockfish class to integrates the Stockfish chess engine with Python.
+
+## Install
+
+```bash
+$ pip install stockfish
+```
 
 ## Features
 - set current position
