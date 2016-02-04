@@ -7,7 +7,7 @@ setup(
     version="0.1.2",
     license="GPL3",
     keywords="chess stockfish",
-    url='https://www.github.com/zhelyabuzhsky/stockfish/',
+    url='https://github.com/zhelyabuzhsky/stockfish',
     py_modules=["stockfish"],
     description="Wraps the open-source Stockfish chess engine for easy integration into python.",
     long_description='''
