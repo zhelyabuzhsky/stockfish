@@ -4,8 +4,8 @@ setup(
     name="stockfish",
     author='Ilya Zhelyabuzhsky',
     author_email="zhelyabuzhsky@gmail.com",
-    version="0.1.2",
-    license="GPL3",
+    version="1.0.1",
+    license="GPLv3",
     keywords="chess stockfish",
     url='https://github.com/zhelyabuzhsky/stockfish',
     py_modules=["stockfish"],
@@ -18,7 +18,7 @@ setup(
         "Programming Language :: Python",
         "Operating System :: Unix",
         "License :: OSI Approved :: GNU General Public License (GPL)",
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Games/Entertainment :: Board Games",
         "Topic :: Software Development :: Libraries :: Python Modules"
     ])
