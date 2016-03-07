@@ -9,7 +9,6 @@
     :license: GPLv3, see LICENSE for more details.
 """
 
-
 import subprocess
 
 
@@ -133,3 +132,6 @@ class Stockfish:
                     return False
                 else:
                     return True
+
+    def __del__(self):
+        self.stockfish.kill()
