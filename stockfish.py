@@ -98,6 +98,9 @@ class Stockfish:
             moves = []
         self.__put('position startpos moves %s' %
                    self.__convert_move_list_to_str(moves))
+    
+    def set_fen_position(self, fen):
+        self.__put('position fen ' + fen)
 
     def get_best_move(self):
         """Get best move with current position on the board.
