@@ -12,7 +12,7 @@ class TestStockfish(unittest.TestCase):
 
     def test_get_best_move(self):
         best_move = self.stockfish.get_best_move()
-        self.assertIn(best_move, ('e2e4', 'g1f3',))
+        self.assertIn(best_move, ('e2e4', 'g1f3', 'b1c3',))
 
         self.stockfish.set_position(['e2e4', 'e7e6'])
         best_move = self.stockfish.get_best_move()
