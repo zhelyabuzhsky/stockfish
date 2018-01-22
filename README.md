@@ -31,7 +31,7 @@ $ python test_stockfish.py
 ```
 
 ## Security
-If you discover any security related issues, please email zhelyabuzhsky@gmail.com instead of using the issue tracker.
+If you discover any security related issues, please email zhelyabuzhsky@icloud.com instead of using the issue tracker.
 
 ## Credits
 - [Ilya Zhelyabuzhsky](https://github.com/zhelyabuzhsky)

@@ -12,4 +12,4 @@ script:
   - python test_stockfish.py
 notifications:
   email:
-    - zhelyabuzhsky@gmail.com
+    - zhelyabuzhsky@icloud.com
