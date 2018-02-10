@@ -4,7 +4,7 @@ setup(
     name="stockfish",
     author='Ilya Zhelyabuzhsky',
     author_email="zhelyabuzhsky@icloud.com",
-    version="1.0.3",
+    version="1.0.4",
     license="GPLv3",
     keywords="chess stockfish",
     url='https://github.com/zhelyabuzhsky/stockfish',
