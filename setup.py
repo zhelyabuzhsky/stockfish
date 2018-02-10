@@ -3,8 +3,8 @@ from setuptools import setup
 setup(
     name="stockfish",
     author='Ilya Zhelyabuzhsky',
-    author_email="zhelyabuzhsky@gmail.com",
-    version="1.0.2",
+    author_email="zhelyabuzhsky@icloud.com",
+    version="1.0.3",
     license="GPLv3",
     keywords="chess stockfish",
     url='https://github.com/zhelyabuzhsky/stockfish',
