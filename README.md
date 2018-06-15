@@ -18,7 +18,7 @@ $ pip install stockfish
 ```python
 from stockfish import Stockfish
 
-stockfish = Stockfish() # if stockfish install globally, otherwise stockfish = Stockfish('/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64')
+stockfish = Stockfish('/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64')
 
 # set position by moves:
 stockfish.set_position(['e2e4', 'e7e6'])
