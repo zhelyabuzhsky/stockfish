@@ -1,5 +1,5 @@
 # Stockfish
-[![Build Status](https://travis-ci.org/zhelyabuzhsky/stockfish.svg?branch=master)](https://travis-ci.org/zhelyabuzhsky/stockfish) [![PyPI Version](https://img.shields.io/pypi/v/stockfish.svg)](https://pypi.python.org/pypi/stockfish)
+[![Build Status](https://travis-ci.org/zhelyabuzhsky/stockfish.svg?branch=master)](https://travis-ci.org/zhelyabuzhsky/stockfish)
 
 Implements an easy-to-use Stockfish class to integrates the Stockfish chess engine with Python.
 
