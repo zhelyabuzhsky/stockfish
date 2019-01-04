@@ -18,6 +18,7 @@ $ pip install stockfish
 ```python
 from stockfish import Stockfish
 
+# you should install the stockfish engine in your operating system globally or specify path to binary file in class constructor
 stockfish = Stockfish('/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64')
 
 # set position by moves:
