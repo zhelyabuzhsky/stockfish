@@ -1,5 +1,3 @@
 .DS_Store
 *.pyc
-/dist
-/stockfish.egg-info
-/build
+.idea/
