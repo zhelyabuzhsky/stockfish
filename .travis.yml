@@ -9,7 +9,7 @@ before_install:
 before_script:
   - export PATH=$PATH:/usr/games/
 script:
-  - python test_stockfish.py
+  - python setup.py test
 notifications:
   email:
     - zhelyabuzhsky@icloud.com
