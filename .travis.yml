@@ -3,6 +3,13 @@ language: python
 cache: pip
 python:
   - '3.7'
+deploy:
+  provider: pypi
+  on:
+    tags: true
+  user: zhelyabuzhsky
+  password:
+    secure: spfcSj6fLn8JY0UuEKBBD6vhKXYDyd1B7JLQ9Ta8lMrrDU/d0PHE6z2zROQEMo33XIrGKUSPXr8Hxwb9RgsxIf9bKGSSonVS7LQhL6fDTKQn7LQ91+OOVJQqxKW7vbWoaPJOQMj63eLWP9QueF63AAeIR4k5Br3NaWRr0pyXgyJhGT/trdJv2DuYjQdeQtPPckaUw3PL9E55qUuGv8tjd7Z2z1puOnU9QWVtYwQ0xmWYtPaBunMpV8wHVYgocwVqIy7lNiOlyPfMGsoZ4wbMUeOcDmk3zllpU54RdZaoC7d5isTM327o7+lHx8p2Iw5/jHzHUrVWG0xz/ofKlvWyffrDXqsAB7Xise+vhl/BK/W5OERGDkFkOAcOqO8nzsSUt2Tyr4KNdt5cCGwRkzTwI6NIcL4J/QcyVhWPyy/OGDyL+HUKKlO0T0YTVJof+nnZSDdLzke7xx4KQfXVccPOms6w/TV+Y4SZA6XYBsDiWWzjCPlSSlTU4Hm4CDex12Wqy9ePzCXQhwb+8BT5PpCO9Qs30q2L7Tizycw8jFAL/MIe85jUM6aPSZGJmdU9EAMjdqqMlWlBdUCSzyovb6A1IuL7TY918k3tq7RW7GRjAzx5lTV2MqWNP+ouWMe4kN2l0IqEaCvWp+neyArTKQGWbEVKez5QRWi4+7l3KGtdwkM=
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq stockfish
