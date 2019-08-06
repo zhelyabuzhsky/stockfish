@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
     stockfish.stockfish
     ~~~~~~~~~~~~~~~~~~~
@@ -19,29 +18,26 @@ class Stockfish:
         if param is None:
             param = {}
         if path is None:
-            path = 'stockfish'
+            path = "stockfish"
         self.stockfish = subprocess.Popen(
-            path,
-            universal_newlines=True,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE
+            path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
         )
         self.depth = str(depth)
-        self.__put('uci')
+        self.__put("uci")
 
         default_param = {
-            'Write Debug Log': 'false',
-            'Contempt': 0,
-            'Min Split Depth': 0,
-            'Threads': 1,
-            'Ponder': 'false',
-            'Hash': 16,
-            'MultiPV': 1,
-            'Skill Level': 20,
-            'Move Overhead': 30,
-            'Minimum Thinking Time': 20,
-            'Slow Mover': 80,
-            'UCI_Chess960': 'false'
+            "Write Debug Log": "false",
+            "Contempt": 0,
+            "Min Split Depth": 0,
+            "Threads": 1,
+            "Ponder": "false",
+            "Hash": 16,
+            "MultiPV": 1,
+            "Skill Level": 20,
+            "Move Overhead": 30,
+            "Minimum Thinking Time": 20,
+            "Slow Mover": 80,
+            "UCI_Chess960": "false",
         }
 
         default_param.update(param)
@@ -52,34 +48,34 @@ class Stockfish:
         self.__start_new_game()
 
     def __start_new_game(self):
-        self.__put('ucinewgame')
+        self.__put("ucinewgame")
         self.__isready()
 
     def __put(self, command):
-        self.stockfish.stdin.write(command + '\n')
+        self.stockfish.stdin.write(command + "\n")
         self.stockfish.stdin.flush()
 
     def __set_option(self, optionname, value):
-        self.__put('setoption name %s value %s' % (optionname, str(value)))
+        self.__put("setoption name %s value %s" % (optionname, str(value)))
         stdout = self.__isready()
-        if stdout.find('No such') >= 0:
-            print('stockfish was unable to set option %s' % optionname)
+        if stdout.find("No such") >= 0:
+            print("stockfish was unable to set option %s" % optionname)
 
     def __isready(self):
-        self.__put('isready')
+        self.__put("isready")
         while True:
             text = self.stockfish.stdout.readline().strip()
-            if text == 'readyok':
+            if text == "readyok":
                 return text
 
     def __go(self):
-        self.__put('go depth %s' % self.depth)
+        self.__put("go depth %s" % self.depth)
 
     @staticmethod
     def __convert_move_list_to_str(moves):
-        result = ''
+        result = ""
         for move in moves:
-            result += move + ' '
+            result += move + " "
         return result.strip()
 
     def set_position(self, moves=None):
@@ -96,11 +92,12 @@ class Stockfish:
         """
         if moves is None:
             moves = []
-        self.__put('position startpos moves %s' %
-                   self.__convert_move_list_to_str(moves))
-    
+        self.__put(
+            "position startpos moves %s" % self.__convert_move_list_to_str(moves)
+        )
+
     def set_fen_position(self, fen_position):
-        self.__put('position fen ' + fen_position)
+        self.__put("position fen " + fen_position)
 
     def get_best_move(self):
         """Get best move with current position on the board.
@@ -111,9 +108,9 @@ class Stockfish:
         self.__go()
         while True:
             text = self.stockfish.stdout.readline().strip()
-            split_text = text.split(' ')
-            if split_text[0] == 'bestmove':
-                if split_text[1] == '(none)':
+            split_text = text.split(" ")
+            if split_text[0] == "bestmove":
+                if split_text[1] == "(none)":
                     return False
                 return split_text[1]
 
@@ -126,12 +123,12 @@ class Stockfish:
         Returns:
             True, if new move is correct, else False.
         """
-        self.__put('go depth 1 searchmoves %s' % move_value)
+        self.__put("go depth 1 searchmoves %s" % move_value)
         while True:
             text = self.stockfish.stdout.readline().strip()
-            split_text = text.split(' ')
-            if split_text[0] == 'bestmove':
-                if split_text[1] == '(none)':
+            split_text = text.split(" ")
+            if split_text[0] == "bestmove":
+                if split_text[1] == "(none)":
                     return False
                 else:
                     return True

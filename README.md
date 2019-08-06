@@ -34,7 +34,7 @@ print(stockfish.is_move_correct('a2a3')) # True
 ## Testing
 
 ```bash
-$ python test_stockfish.py
+$ python setup.py test
 ```
 
 ## Security
