@@ -13,6 +13,7 @@ setup(
     version=package_version,
     license="GPLv3",
     keywords="chess stockfish",
+    python_requires='>=3.7',
     url="https://github.com/zhelyabuzhsky/stockfish",
     description="Wraps the open-source Stockfish chess engine for easy integration into python.",
     long_description=long_description,
@@ -28,5 +29,6 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Topic :: Games/Entertainment :: Board Games",
         "Topic :: Software Development :: Libraries :: Python Modules",
+        'Programming Language :: Python :: 3.7',
     ],
 )
