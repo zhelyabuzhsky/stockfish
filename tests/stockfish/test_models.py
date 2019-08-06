@@ -1,40 +1,39 @@
 """Tests for Stockfish."""
 
-
-import unittest
+import pytest
 from stockfish import Stockfish
 
 
-class TestStockfish(unittest.TestCase):
-    def setUp(self):
-        self.stockfish = Stockfish()
+class TestStockfish:
+    @pytest.fixture
+    def stockfish(self):
+        return Stockfish()
 
-    def test_get_best_move(self):
-        best_move = self.stockfish.get_best_move()
-        self.assertIn(best_move, ("e2e4", "g1f3", "b1c3"))
+    def test_get_best_move_first_move(self, stockfish):
+        best_move = stockfish.get_best_move()
+        assert best_move in ("e2e4", "g1f3", "b1c3")
 
-        self.stockfish.set_position(["e2e4", "e7e6"])
-        best_move = self.stockfish.get_best_move()
-        self.assertIn(best_move, ("d2d4", "g1f3"))
+    def test_get_best_move_not_first_move(self, stockfish):
+        stockfish.set_position(["e2e4", "e7e6"])
+        best_move = stockfish.get_best_move()
+        assert best_move in ("d2d4", "g1f3")
 
-        # mate
-        self.stockfish.set_position(["f2f3", "e7e5", "g2g4", "d8h4"])
-        self.assertFalse(self.stockfish.get_best_move())
+    def test_get_best_move_mate(self, stockfish):
+        stockfish.set_position(["f2f3", "e7e5", "g2g4", "d8h4"])
+        assert stockfish.get_best_move() is False
 
-    def test_set_fen_position(self):
-        self.stockfish.set_fen_position(
+    def test_set_fen_position(self, stockfish):
+        stockfish.set_fen_position(
             "7r/1pr1kppb/2n1p2p/2NpP2P/5PP1/1P6/P6K/R1R2B2 w - - 1 27"
         )
-        self.assertTrue(self.stockfish.is_move_correct("f4f5"))
-        self.assertFalse(self.stockfish.is_move_correct("a1c1"))
+        assert stockfish.is_move_correct("f4f5") is True
+        assert stockfish.is_move_correct("a1c1") is False
 
-    def test_is_move_correct(self):
-        self.assertFalse(self.stockfish.is_move_correct("e2e1"))
-        self.assertTrue(self.stockfish.is_move_correct("a2a3"))
-        self.stockfish.set_position(["e2e4", "e7e6"])
-        self.assertFalse(self.stockfish.is_move_correct("e2e1"))
-        self.assertTrue(self.stockfish.is_move_correct("a2a3"))
+    def test_is_move_correct_first_move(self, stockfish):
+        assert stockfish.is_move_correct("e2e1") is False
+        assert stockfish.is_move_correct("a2a3") is True
 
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_is_move_correct_not_first_move(self, stockfish):
+        stockfish.set_position(["e2e4", "e7e6"])
+        assert stockfish.is_move_correct("e2e1") is False
+        assert stockfish.is_move_correct("a2a3") is True
