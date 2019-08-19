@@ -24,6 +24,7 @@ class Stockfish:
         )
         self.depth = str(depth)
         self.__put("uci")
+        self.info = ''
 
         default_param = {
             "Write Debug Log": "false",
@@ -112,7 +113,7 @@ class Stockfish:
             if split_text[0] == "bestmove":
                 if split_text[1] == "(none)":
                     return False
-                self.stockfish.info = last_text
+                self.info = last_text
                 return split_text[1]
             last_text = split_text
 
