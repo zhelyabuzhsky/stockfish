@@ -37,3 +37,10 @@ class TestStockfish:
         stockfish.set_position(["e2e4", "e7e6"])
         assert stockfish.is_move_correct("e2e1") is False
         assert stockfish.is_move_correct("a2a3") is True
+    
+    def test_last_info(self, stockfish):
+        stockfish.set_fen_position(
+            "r6k/6b1/2b1Q3/p6p/1p5q/3P2PP/5r1K/8 w - - 1 31"
+        )
+        best_move = stockfish.get_best_move()
+        assert self.info == 'info depth 2 seldepth 3 multipv 1 score mate -1 nodes 11 nps 5500 tbhits 0 time 2 pv h2g1 h4g3'
