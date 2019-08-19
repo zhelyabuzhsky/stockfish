@@ -43,4 +43,24 @@ class TestStockfish:
             "r6k/6b1/2b1Q3/p6p/1p5q/3P2PP/5r1K/8 w - - 1 31"
         )
         best_move = stockfish.get_best_move()
-        assert stockfish.info == 'info depth 2 seldepth 3 multipv 1 score mate -1 nodes 11 nps 5500 tbhits 0 time 2 pv h2g1 h4g3'
+        assert stockfish.info == ['info',
+                                  'depth',
+                                  '2',
+                                  'seldepth',
+                                  '3',
+                                  'multipv',
+                                  '1',
+                                  'score',
+                                  'mate',
+                                  '-1',
+                                  'nodes',
+                                  '11',
+                                  'nps',
+                                  '5500',
+                                  'tbhits',
+                                  '0',
+                                  'time',
+                                  '2',
+                                  'pv',
+                                  'h2g1',
+                                  'h4g3']
