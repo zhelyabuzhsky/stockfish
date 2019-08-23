@@ -1,6 +1,7 @@
 """Tests for Stockfish."""
 
 import pytest
+
 from stockfish import Stockfish
 
 
@@ -20,7 +21,7 @@ class TestStockfish:
 
     def test_get_best_move_mate(self, stockfish):
         stockfish.set_position(["f2f3", "e7e5", "g2g4", "d8h4"])
-        assert stockfish.get_best_move() is False
+        assert stockfish.get_best_move() is None
 
     def test_set_fen_position(self, stockfish):
         stockfish.set_fen_position(
