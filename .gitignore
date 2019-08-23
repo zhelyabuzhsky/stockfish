@@ -3,3 +3,4 @@
 .idea/
 .eggs/
 stockfish.egg-info/
+.mypy_cache/
