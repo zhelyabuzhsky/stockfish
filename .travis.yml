@@ -17,6 +17,7 @@ before_script:
   - export PATH=$PATH:/usr/games/
 script:
   - python setup.py test
+  - mypy stockfish tests
 notifications:
   email:
     - zhelyabuzhsky@icloud.com

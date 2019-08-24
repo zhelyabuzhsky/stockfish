@@ -2,19 +2,20 @@
     stockfish.stockfish
     ~~~~~~~~~~~~~~~~~~~
 
-    This module implemets ths Stockfish class.
+    This module implemets the Stockfish class.
 
     :copyright: (c) 2016 by Ilya Zhelyabuzhsky.
     :license: GPLv3, see LICENSE for more details.
 """
 
 import subprocess
+from typing import Any, List, Optional
 
 
 class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
-    def __init__(self, path=None, depth=2, param=None):
+    def __init__(self, path: str = None, depth: int = 2, param: dict = None) -> None:
         if param is None:
             param = {}
         if path is None:
@@ -48,38 +49,38 @@ class Stockfish:
 
         self.__start_new_game()
 
-    def __start_new_game(self):
+    def __start_new_game(self) -> None:
         self.__put("ucinewgame")
         self.__isready()
 
-    def __put(self, command):
+    def __put(self, command: str) -> None:
         self.stockfish.stdin.write(command + "\n")
         self.stockfish.stdin.flush()
 
-    def __set_option(self, optionname, value):
+    def __set_option(self, optionname: str, value: Any) -> None:
         self.__put("setoption name %s value %s" % (optionname, str(value)))
         stdout = self.__isready()
         if stdout.find("No such") >= 0:
             print("stockfish was unable to set option %s" % optionname)
 
-    def __isready(self):
+    def __isready(self) -> str:
         self.__put("isready")
         while True:
             text = self.stockfish.stdout.readline().strip()
             if text == "readyok":
                 return text
 
-    def __go(self):
+    def __go(self) -> None:
         self.__put("go depth %s" % self.depth)
 
     @staticmethod
-    def __convert_move_list_to_str(moves):
+    def __convert_move_list_to_str(moves: List[str]) -> str:
         result = ""
         for move in moves:
             result += move + " "
         return result.strip()
 
-    def set_position(self, moves=None):
+    def set_position(self, moves: List[str] = None) -> None:
         """Sets current board positions.
 
         Args:
@@ -97,10 +98,10 @@ class Stockfish:
             "position startpos moves %s" % self.__convert_move_list_to_str(moves)
         )
 
-    def set_fen_position(self, fen_position):
+    def set_fen_position(self, fen_position: str) -> None:
         self.__put("position fen " + fen_position)
 
-    def get_best_move(self):
+    def get_best_move(self) -> Optional[str]:
         """Get best move with current position on the board.
 
         Returns:
@@ -112,12 +113,12 @@ class Stockfish:
             split_text = text.split(" ")
             if split_text[0] == "bestmove":
                 if split_text[1] == "(none)":
-                    return False
+                    return None
                 self.info = last_text
                 return split_text[1]
             last_text = split_text
 
-    def is_move_correct(self, move_value):
+    def is_move_correct(self, move_value: str) -> bool:
         """Checks new move.
 
         Args:
@@ -136,5 +137,5 @@ class Stockfish:
                 else:
                     return True
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.stockfish.kill()
