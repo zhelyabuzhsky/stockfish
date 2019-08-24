@@ -29,6 +29,9 @@ stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQ
 
 print(stockfish.get_best_move()) # d2d4
 print(stockfish.is_move_correct('a2a3')) # True
+
+# get last move info:
+print(stockfish.info) # e.g. 'info depth 2 seldepth 3 multipv 1 score mate -1 nodes 11 nps 5500 tbhits 0 time 2 pv h2g1 h4g3'
 ```
 
 ## Testing
