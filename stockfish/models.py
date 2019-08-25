@@ -108,6 +108,7 @@ class Stockfish:
             A string of move in algebraic notation or False, if it's a mate now.
         """
         self.__go()
+        last_text = []
         while True:
             text = self.stockfish.stdout.readline().strip()
             split_text = text.split(" ")
