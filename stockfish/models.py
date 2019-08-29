@@ -25,6 +25,7 @@ class Stockfish:
         )
         self.depth = str(depth)
         self.__put("uci")
+        self.info: str = ""
 
         default_param = {
             "Write Debug Log": "false",
@@ -107,13 +108,16 @@ class Stockfish:
             A string of move in algebraic notation or False, if it's a mate now.
         """
         self.__go()
+        last_text: str = ""
         while True:
             text = self.stockfish.stdout.readline().strip()
             split_text = text.split(" ")
             if split_text[0] == "bestmove":
                 if split_text[1] == "(none)":
                     return None
+                self.info = last_text
                 return split_text[1]
+            last_text = split_text
 
     def is_move_correct(self, move_value: str) -> bool:
         """Checks new move.
