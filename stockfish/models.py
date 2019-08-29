@@ -117,7 +117,7 @@ class Stockfish:
                     return None
                 self.info = last_text
                 return split_text[1]
-            last_text = split_text
+            last_text = text
 
     def is_move_correct(self, move_value: str) -> bool:
         """Checks new move.
