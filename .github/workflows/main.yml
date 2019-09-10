@@ -14,11 +14,10 @@ jobs:
           python-version: 3.7
       - name: Install dependencies
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -qq stockfish
+          sudo apt-get install stockfish
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          export PATH=$PATH:/usr/games/
+          export PATH="/usr/games:$PATH"
       - name: Lint with black
         run: |
           pip install black
@@ -30,4 +29,4 @@ jobs:
       - name: Test with pytest
         run: |
           pip install pytest
-          python setup.py test
+          pytest
