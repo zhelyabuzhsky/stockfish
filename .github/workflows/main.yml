@@ -9,25 +9,25 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python 3.7
-          uses: actions/setup-python@v1
-          with:
-            python-version: 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
       - name: Install dependencies
-          run: |
-            sudo apt-get update -qq
-            sudo apt-get install -qq stockfish
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-            export PATH=$PATH:/usr/games/
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq stockfish
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          export PATH=$PATH:/usr/games/
       - name: Lint with black
-          run: |
-            pip install black
-            black --check .
+        run: |
+          pip install black
+          black --check .
       - name: Check type annotations with mypy
-          run: |
-            pip install mypy
-            mypy stockfish tests
+        run: |
+          pip install mypy
+          mypy stockfish tests
       - name: Test with pytest
-          run: |
-            pip install pytest
-            pytest
+        run: |
+          pip install pytest
+          pytest
