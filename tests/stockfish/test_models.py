@@ -6,7 +6,7 @@ from stockfish import Stockfish
 class TestStockfish:
     @pytest.fixture
     def stockfish(self):
-        return Stockfish("/usr/games/stockfish")
+        return Stockfish()
 
     def test_get_best_move_first_move(self, stockfish):
         best_move = stockfish.get_best_move()
