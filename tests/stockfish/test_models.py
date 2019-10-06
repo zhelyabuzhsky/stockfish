@@ -32,9 +32,7 @@ class TestStockfish:
         stockfish.set_fen_position(
             "7r/1pr1kppb/2n1p2p/2NpP2P/5PP1/1P6/P6K/R1R2B2 w - - 1 27"
         )
-        stockfish.set_fen_position(
-            "3kn3/p5rp/1p3p2/3B4/3P1P2/2P5/1P3K2/8 w - - 0 53"
-        )
+        stockfish.set_fen_position("3kn3/p5rp/1p3p2/3B4/3P1P2/2P5/1P3K2/8 w - - 0 53")
         assert stockfish.is_move_correct("d5a8") is True
         assert stockfish.is_move_correct("f2a2") is False
 
