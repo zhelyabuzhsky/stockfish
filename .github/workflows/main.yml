@@ -1,0 +1,31 @@
+name: Stockfish
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          sudo apt-get install stockfish
+      - name: Lint with black
+        run: |
+          pip install black
+          black --check .
+      - name: Check type annotations with mypy
+        run: |
+          pip install mypy
+          mypy stockfish tests
+      - name: Test with pytest
+        run: |
+          pip install pytest
+          export PATH=$PATH:/usr/games/
+          pytest
