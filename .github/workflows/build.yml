@@ -1,4 +1,4 @@
-name: Stockfish
+name: Build package
 
 on: [push]
 

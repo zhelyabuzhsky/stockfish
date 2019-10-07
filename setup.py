@@ -7,7 +7,7 @@ setup(
     name="stockfish",
     author="Ilya Zhelyabuzhsky",
     author_email="zhelyabuzhsky@icloud.com",
-    version="3.1.0",
+    version="3.1.1",
     license="GPLv3",
     keywords="chess stockfish",
     python_requires=">=3.7",

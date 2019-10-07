@@ -1,12 +1,19 @@
 # Stockfish
-[![Build Status](https://travis-ci.org/zhelyabuzhsky/stockfish.svg?branch=master)](https://travis-ci.org/zhelyabuzhsky/stockfish)
-
 Implements an easy-to-use Stockfish class to integrates the Stockfish chess engine with Python.
 
 ## Install
-
 ```bash
 $ pip install stockfish
+```
+
+#### Ubuntu or Debian
+```bash
+# apt install stockfish
+``` 
+
+#### Mac OS
+```bash
+$ brew install stockfish
 ```
 
 ## Features
