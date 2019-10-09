@@ -55,8 +55,8 @@ class Stockfish:
         self.stockfish.stdin.write(command + "\n")
         self.stockfish.stdin.flush()
 
-    def __set_option(self, optionname: str, value: Any) -> None:
-        self.__put("setoption name %s value %s" % (optionname, str(value)))
+    def __set_option(self, name: str, value: Any) -> None:
+        self.__put(f"setoption name {name} value {value}")
         self.__is_ready()
 
     def __is_ready(self) -> None:
