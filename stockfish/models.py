@@ -95,7 +95,7 @@ class Stockfish:
 
     def set_fen_position(self, fen_position: str) -> None:
         self.__start_new_game()
-        self.__put("position fen " + fen_position)
+        self.__put(f"position fen {fen_position}")
 
     def get_best_move(self) -> Optional[str]:
         """Get best move with current position on the board.
