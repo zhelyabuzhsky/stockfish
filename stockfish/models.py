@@ -127,9 +127,9 @@ class Stockfish:
         self.__put("go depth 1 searchmoves %s" % move_value)
         while True:
             text = self.stockfish.stdout.readline().strip()
-            split_text = text.split(" ")
-            if split_text[0] == "bestmove":
-                if split_text[1] == "(none)":
+            splitted_text = text.split(" ")
+            if splitted_text[0] == "bestmove":
+                if splitted_text[1] == "(none)":
                     return False
                 else:
                     return True
