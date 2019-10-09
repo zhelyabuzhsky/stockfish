@@ -34,8 +34,10 @@ class Stockfish:
         self.stockfish = subprocess.Popen(
             path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
         )
-        self.depth = str(depth)
+
         self.__put("uci")
+
+        self.depth = str(depth)
         self.info: str = ""
 
         if params is None:
