@@ -72,7 +72,7 @@ class Stockfish:
     def __convert_move_list_to_str(moves: List[str]) -> str:
         result = ""
         for move in moves:
-            result += move + " "
+            result += f"{move} "
         return result.strip()
 
     def set_position(self, moves: List[str] = None) -> None:
