@@ -107,12 +107,12 @@ class Stockfish:
         last_text: str = ""
         while True:
             text = self.stockfish.stdout.readline().strip()
-            split_text = text.split(" ")
-            if split_text[0] == "bestmove":
-                if split_text[1] == "(none)":
+            splitted_text = text.split(" ")
+            if splitted_text[0] == "bestmove":
+                if splitted_text[1] == "(none)":
                     return None
                 self.info = last_text
-                return split_text[1]
+                return splitted_text[1]
             last_text = text
 
     def is_move_correct(self, move_value: str) -> bool:
