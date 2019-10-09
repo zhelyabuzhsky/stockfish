@@ -66,7 +66,7 @@ class Stockfish:
                 return
 
     def __go(self) -> None:
-        self.__put("go depth %s" % self.depth)
+        self.__put(f"go depth {self.depth}")
 
     @staticmethod
     def __convert_move_list_to_str(moves: List[str]) -> str:
