@@ -11,13 +11,26 @@
 import subprocess
 from typing import Any, List, Optional
 
+DEFAULT_STOCKFISH_PARAMS = {
+    "Write Debug Log": "false",
+    "Contempt": 0,
+    "Min Split Depth": 0,
+    "Threads": 1,
+    "Ponder": "false",
+    "Hash": 16,
+    "MultiPV": 1,
+    "Skill Level": 20,
+    "Move Overhead": 30,
+    "Minimum Thinking Time": 20,
+    "Slow Mover": 80,
+    "UCI_Chess960": "false",
+}
+
 
 class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
-    def __init__(self, path: str = None, depth: int = 2, param: dict = None) -> None:
-        if param is None:
-            param = {}
+    def __init__(self, path: str = None, depth: int = 2, params: dict = None) -> None:
         if path is None:
             path = "stockfish"
         self.stockfish = subprocess.Popen(
@@ -27,24 +40,11 @@ class Stockfish:
         self.__put("uci")
         self.info: str = ""
 
-        default_param = {
-            "Write Debug Log": "false",
-            "Contempt": 0,
-            "Min Split Depth": 0,
-            "Threads": 1,
-            "Ponder": "false",
-            "Hash": 16,
-            "MultiPV": 1,
-            "Skill Level": 20,
-            "Move Overhead": 30,
-            "Minimum Thinking Time": 20,
-            "Slow Mover": 80,
-            "UCI_Chess960": "false",
-        }
-
-        default_param.update(param)
-        self.param = default_param
-        for name, value in list(default_param.items()):
+        if params is None:
+            params = {}
+        self.params = DEFAULT_STOCKFISH_PARAMS
+        self.params.update(params)
+        for name, value in list(self.params.items()):
             self.__set_option(name, value)
 
         self.__start_new_game()
