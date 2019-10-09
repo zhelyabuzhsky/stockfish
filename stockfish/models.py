@@ -90,7 +90,7 @@ class Stockfish:
         if moves is None:
             moves = []
         self.__put(
-            "position startpos moves %s" % self.__convert_move_list_to_str(moves)
+            f"position startpos moves {self.__convert_move_list_to_str(moves)}"
         )
 
     def set_fen_position(self, fen_position: str) -> None:
