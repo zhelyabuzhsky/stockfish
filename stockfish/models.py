@@ -52,7 +52,7 @@ class Stockfish:
         self.__is_ready()
 
     def __put(self, command: str) -> None:
-        self.stockfish.stdin.write(command + "\n")
+        self.stockfish.stdin.write(f"{command}\n")
         self.stockfish.stdin.flush()
 
     def __set_option(self, name: str, value: Any) -> None:
