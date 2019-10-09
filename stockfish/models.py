@@ -1,7 +1,4 @@
 """
-    stockfish.stockfish
-    ~~~~~~~~~~~~~~~~~~~
-
     This module implements the Stockfish class.
 
     :copyright: (c) 2016 by Ilya Zhelyabuzhsky.
