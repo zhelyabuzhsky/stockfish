@@ -62,8 +62,7 @@ class Stockfish:
     def __is_ready(self) -> None:
         self.__put("isready")
         while True:
-            text = self.stockfish.stdout.readline().strip()
-            if text == "readyok":
+            if self.stockfish.stdout.readline().strip() == "readyok":
                 return
 
     def __go(self) -> None:
