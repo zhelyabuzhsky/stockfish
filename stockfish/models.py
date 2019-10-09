@@ -49,7 +49,7 @@ class Stockfish:
 
     def __start_new_game(self) -> None:
         self.__put("ucinewgame")
-        self.__isready()
+        self.__is_ready()
 
     def __put(self, command: str) -> None:
         self.stockfish.stdin.write(command + "\n")
@@ -57,16 +57,14 @@ class Stockfish:
 
     def __set_option(self, optionname: str, value: Any) -> None:
         self.__put("setoption name %s value %s" % (optionname, str(value)))
-        stdout = self.__isready()
-        if stdout.find("No such") >= 0:
-            print("stockfish was unable to set option %s" % optionname)
+        self.__is_ready()
 
-    def __isready(self) -> str:
+    def __is_ready(self) -> None:
         self.__put("isready")
         while True:
             text = self.stockfish.stdout.readline().strip()
             if text == "readyok":
-                return text
+                return
 
     def __go(self) -> None:
         self.__put("go depth %s" % self.depth)
