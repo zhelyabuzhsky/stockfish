@@ -79,7 +79,7 @@ class Stockfish:
         return result.strip()
 
     def set_position(self, moves: List[str] = None) -> None:
-        """Sets current board positions.
+        """Sets current board position.
 
         Args:
             moves: A list of moves to set this position on the board.
