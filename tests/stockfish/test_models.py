@@ -28,7 +28,7 @@ class TestStockfish:
         assert stockfish.is_move_correct("f4f5") is True
         assert stockfish.is_move_correct("a1c1") is False
 
-    def test_set_fen_position_reset(self, stockfish):
+    def test_set_fen_position_resets_board(self, stockfish):
         stockfish.set_fen_position(
             "7r/1pr1kppb/2n1p2p/2NpP2P/5PP1/1P6/P6K/R1R2B2 w - - 1 27"
         )
