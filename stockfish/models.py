@@ -2,7 +2,7 @@
     stockfish.stockfish
     ~~~~~~~~~~~~~~~~~~~
 
-    This module implemets the Stockfish class.
+    This module implements the Stockfish class.
 
     :copyright: (c) 2016 by Ilya Zhelyabuzhsky.
     :license: GPLv3, see LICENSE for more details.
