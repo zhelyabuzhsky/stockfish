@@ -30,7 +30,9 @@ DEFAULT_STOCKFISH_PARAMS = {
 class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
-    def __init__(self, path: str = "stockfish", depth: int = 2, params: dict = None) -> None:
+    def __init__(
+            self, path: str = "stockfish", depth: int = 2, params: dict = None
+    ) -> None:
         self.stockfish = subprocess.Popen(
             path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
         )
@@ -91,9 +93,7 @@ class Stockfish:
         """
         if moves is None:
             moves = []
-        self.__put(
-            f"position startpos moves {self.__convert_move_list_to_str(moves)}"
-        )
+        self.__put(f"position startpos moves {self.__convert_move_list_to_str(moves)}")
 
     def set_fen_position(self, fen_position: str) -> None:
         self.__start_new_game()
