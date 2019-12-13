@@ -19,7 +19,7 @@ $ brew install stockfish
 ## Features
 - set current position
 - get best move
-- change engine skill level
+- change engine's skill level
 
 ## Usage
 
