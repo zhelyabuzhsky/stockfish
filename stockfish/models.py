@@ -92,6 +92,17 @@ class Stockfish:
             moves = []
         self.__put(f"position startpos moves {self.__convert_move_list_to_str(moves)}")
 
+    def set_skill_level(self, skill_level: int = 20) -> None:
+        """Sets current skill level of stockfish engine.
+
+        Args:
+            skill_level: Skill Level option between 0 (weakest level) and 20 (full strength)
+
+        Returns:
+            None
+        """
+        self.__set_option("Skill Level", skill_level)
+
     def set_fen_position(self, fen_position: str) -> None:
         self.__start_new_game()
         self.__put(f"position fen {fen_position}")

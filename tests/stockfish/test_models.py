@@ -69,3 +69,14 @@ class TestStockfish:
         stockfish.set_fen_position("r6k/6b1/2b1Q3/p6p/1p5q/3P2PP/5r1K/8 w - - 1 31")
         stockfish.get_best_move()
         assert value in stockfish.info
+
+    def test_set_skill_level(self, stockfish):
+        stockfish.set_fen_position(
+            "rnbqkbnr/ppp2ppp/3pp3/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1"
+        )
+
+        stockfish.set_skill_level(1)
+        assert stockfish.get_best_move() in ("b2b3", "b2b3", "d2d3", "d2d4")
+
+        stockfish.set_skill_level(20)
+        assert stockfish.get_best_move() in ("d2d4",)
