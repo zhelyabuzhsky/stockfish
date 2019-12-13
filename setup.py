@@ -22,7 +22,7 @@ setup(
     classifiers=[
         "Programming Language :: Python",
         "Operating System :: Unix",
-        'License :: OSI Approved :: MIT License',
+        "License :: OSI Approved :: MIT License",
         "Development Status :: 5 - Production/Stable",
         "Topic :: Games/Entertainment :: Board Games",
         "Topic :: Software Development :: Libraries :: Python Modules",

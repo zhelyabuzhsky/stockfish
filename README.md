@@ -56,4 +56,4 @@ If you discover any security related issues, please email zhelyabuzhsky@icloud.c
 - [All Contributors](../../contributors)
 
 ## License
-GNU General Public License, version 3. Please see [License File](LICENSE) for more information.
+MIT License. Please see [License File](LICENSE) for more information.
