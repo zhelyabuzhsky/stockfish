@@ -28,7 +28,7 @@ class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
     def __init__(
-        self, path: str = "stockfish", depth: int = 2, params: dict = None
+        self, path: str = "stockfish", depth: int = 2, parameters: dict = None
     ) -> None:
         self.stockfish = subprocess.Popen(
             path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
@@ -39,14 +39,22 @@ class Stockfish:
         self.depth = str(depth)
         self.info: str = ""
 
-        if params is None:
-            params = {}
-        self.params = DEFAULT_STOCKFISH_PARAMS
-        self.params.update(params)
-        for name, value in list(self.params.items()):
+        if parameters is None:
+            parameters = {}
+        self._parameters = DEFAULT_STOCKFISH_PARAMS
+        self._parameters.update(parameters)
+        for name, value in list(self._parameters.items()):
             self.__set_option(name, value)
 
         self.__start_new_game()
+
+    def get_parameters(self) -> dict:
+        """Returns current board position.
+
+        Returns:
+            Dictionary of current Stockfish engine's parameters.
+        """
+        return self._parameters
 
     def __start_new_game(self) -> None:
         self.__put("ucinewgame")
@@ -102,6 +110,7 @@ class Stockfish:
             None
         """
         self.__set_option("Skill Level", skill_level)
+        self._parameters.update({"Skill Level": skill_level})
 
     def set_fen_position(self, fen_position: str) -> None:
         """Sets current board position in Forsyth–Edwards notation (FEN).
@@ -142,7 +151,7 @@ class Stockfish:
         Returns:
             True, if new move is correct, else False.
         """
-        self.__put("go depth 1 searchmoves %s" % move_value)
+        self.__put(f"go depth 1 searchmoves {move_value}")
         while True:
             text = self.stockfish.stdout.readline().strip()
             splitted_text = text.split(" ")

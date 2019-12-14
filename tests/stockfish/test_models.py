@@ -75,8 +75,36 @@ class TestStockfish:
             "rnbqkbnr/ppp2ppp/3pp3/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1"
         )
 
+        assert stockfish.get_parameters()["Skill Level"] == 20
+
         stockfish.set_skill_level(1)
-        assert stockfish.get_best_move() in ("b2b3", "b2b3", "d2d3", "d2d4")
+        assert stockfish.get_best_move() in (
+            "b2b3",
+            "b2b3",
+            "d2d3",
+            "d2d4",
+            "b1c3",
+            "d1e2",
+        )
+        assert stockfish.get_parameters()["Skill Level"] == 1
 
         stockfish.set_skill_level(20)
         assert stockfish.get_best_move() in ("d2d4",)
+        assert stockfish.get_parameters()["Skill Level"] == 20
+
+    def test_stockfish_constructor_with_custom_params(self):
+        stockfish = Stockfish(parameters={"Skill Level": 1})
+        assert stockfish.get_parameters() == {
+            "Write Debug Log": "false",
+            "Contempt": 0,
+            "Min Split Depth": 0,
+            "Threads": 1,
+            "Ponder": "false",
+            "Hash": 16,
+            "MultiPV": 1,
+            "Skill Level": 1,
+            "Move Overhead": 30,
+            "Minimum Thinking Time": 20,
+            "Slow Mover": 80,
+            "UCI_Chess960": "false",
+        }
