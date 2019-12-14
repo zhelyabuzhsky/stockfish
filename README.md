@@ -29,10 +29,10 @@ from stockfish import Stockfish
 # you should install the stockfish engine in your operating system globally or specify path to binary file in class constructor
 stockfish = Stockfish('/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64')
 
-# set position by moves:
+# set position by sequence of moves:
 stockfish.set_position(['e2e4', 'e7e6'])
 
-# set position by FEN:
+# set position by Forsyth–Edwards Notation (FEN):
 stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
 
 print(stockfish.get_best_move()) # d2d4

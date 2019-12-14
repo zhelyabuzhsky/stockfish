@@ -1,8 +1,8 @@
 """
     This module implements the Stockfish class.
 
-    :copyright: (c) 2016 by Ilya Zhelyabuzhsky.
-    :license: GPLv3, see LICENSE for more details.
+    :copyright: (c) 2016-2019 by Ilya Zhelyabuzhsky.
+    :license: MIT, see LICENSE for more details.
 """
 
 import subprocess
@@ -104,6 +104,14 @@ class Stockfish:
         self.__set_option("Skill Level", skill_level)
 
     def set_fen_position(self, fen_position: str) -> None:
+        """Sets current board position in Forsyth–Edwards notation (FEN).
+
+        Args:
+            fen_position: FEN string of board position.
+
+        Returns:
+            None
+        """
         self.__start_new_game()
         self.__put(f"position fen {fen_position}")
 
