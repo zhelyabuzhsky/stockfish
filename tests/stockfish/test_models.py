@@ -78,7 +78,7 @@ class TestStockfish:
         assert stockfish.get_parameters()["Skill Level"] == 20
 
         stockfish.set_skill_level(1)
-        assert stockfish.get_best_move() in ("b2b3", "b2b3", "d2d3", "d2d4", "b1c3")
+        assert stockfish.get_best_move() in ("b2b3", "b2b3", "d2d3", "d2d4", "b1c3", "d1e2")
         assert stockfish.get_parameters()["Skill Level"] == 1
 
         stockfish.set_skill_level(20)
