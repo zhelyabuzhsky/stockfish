@@ -10,7 +10,7 @@ class TestStockfish:
 
     def test_get_best_move_first_move(self, stockfish):
         best_move = stockfish.get_best_move()
-        assert best_move in ("e2e4", "g1f3", "b1c3")
+        assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3")
 
     def test_get_best_move_not_first_move(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6"])
