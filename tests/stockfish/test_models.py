@@ -28,6 +28,13 @@ class TestStockfish:
         assert stockfish.is_move_correct("f4f5") is True
         assert stockfish.is_move_correct("a1c1") is False
 
+    def test_set_fen_position_mate(self, stockfish):
+        stockfish.set_fen_position(
+            '8/8/8/6pp/8/4k1PP/8/r3K3 w - - 12 53'
+        )
+        assert stockfish.get_best_move() is None
+        assert stockfish.info == ''
+
     def test_set_fen_position_resets_board(self, stockfish):
         # Check test, passes even if removed __start_new_game
         stockfish.set_fen_position(
