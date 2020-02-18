@@ -59,6 +59,7 @@ class Stockfish:
     def __start_new_game(self) -> None:
         self.__put("ucinewgame")
         self.__is_ready()
+        self.info = ""
 
     def __put(self, command: str) -> None:
         self.stockfish.stdin.write(f"{command}\n")
