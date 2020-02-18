@@ -29,6 +29,8 @@ class TestStockfish:
         assert stockfish.is_move_correct("a1c1") is False
 
     def test_set_fen_position_mate(self, stockfish):
+        stockfish.set_fen_position('8/8/8/6pp/8/4k1PP/r7/4K3 b - - 11 52')
+        stockfish.get_best_move()
         stockfish.set_fen_position("8/8/8/6pp/8/4k1PP/8/r3K3 w - - 12 53")
         assert stockfish.get_best_move() is None
         assert stockfish.info == ""
