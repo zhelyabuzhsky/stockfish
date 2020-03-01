@@ -1,7 +1,7 @@
 """
     This module implements the Stockfish class.
 
-    :copyright: (c) 2016-2019 by Ilya Zhelyabuzhsky.
+    :copyright: (c) 2016-2020 by Ilya Zhelyabuzhsky.
     :license: MIT, see LICENSE for more details.
 """
 
@@ -97,6 +97,7 @@ class Stockfish:
         Returns:
             None
         """
+        self.__start_new_game()
         if moves is None:
             moves = []
         self.__put(f"position startpos moves {self.__convert_move_list_to_str(moves)}")
