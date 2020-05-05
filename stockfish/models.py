@@ -102,7 +102,7 @@ class Stockfish:
             moves = []
         self.__put(f"position startpos moves {self.__convert_move_list_to_str(moves)}")
 
-    def get_board_visual(self) -> None:
+    def get_board_visual(self) -> str:
         """ Get a visual representation of the current board position 
             Note: "d" is a stockfish only command
 
@@ -110,12 +110,17 @@ class Stockfish:
             None
 
         Returns:
-            None
+            String of visual representation of the chessboard with its pieces in current position
         """
         self.__put("d")
-        for _ in range(18):
-            print(self.stockfish.stdout.readline(), end = " ")
-        print("\n")
+        board_rep = ""
+        count_lines = 0
+        while count_lines < 17:
+            board_str = self.stockfish.stdout.readline()
+            if "+" in board_str or "|" in board_str:
+                count_lines += 1
+                board_rep += board_str
+        return board_rep
 
     def get_fen_position(self, moves: List[str] = None) -> str:
         """ Get current board position in Forsyth–Edwards notation (FEN).
