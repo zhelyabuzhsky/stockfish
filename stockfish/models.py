@@ -34,7 +34,7 @@ class Stockfish:
             path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
         )
 
-        self.__put("uci")
+        self._put("uci")
 
         self.depth = str(depth)
         self.info: str = ""
@@ -44,9 +44,9 @@ class Stockfish:
         self._parameters = DEFAULT_STOCKFISH_PARAMS
         self._parameters.update(parameters)
         for name, value in list(self._parameters.items()):
-            self.__set_option(name, value)
+            self._set_option(name, value)
 
-        self.__start_new_game()
+        self._start_new_game()
 
     def get_parameters(self) -> dict:
         """Returns current board position.
@@ -56,30 +56,37 @@ class Stockfish:
         """
         return self._parameters
 
-    def __start_new_game(self) -> None:
-        self.__put("ucinewgame")
-        self.__is_ready()
+    def _start_new_game(self) -> None:
+        self._put("ucinewgame")
+        self._is_ready()
         self.info = ""
 
-    def __put(self, command: str) -> None:
+    def _put(self, command: str) -> None:
+        if not self.stockfish.stdin:
+            raise BrokenPipeError()
         self.stockfish.stdin.write(f"{command}\n")
         self.stockfish.stdin.flush()
 
-    def __set_option(self, name: str, value: Any) -> None:
-        self.__put(f"setoption name {name} value {value}")
-        self.__is_ready()
+    def _read_line(self) -> str:
+        if not self.stockfish.stdout:
+            raise BrokenPipeError()
+        return self.stockfish.stdout.readline().strip()
 
-    def __is_ready(self) -> None:
-        self.__put("isready")
+    def _set_option(self, name: str, value: Any) -> None:
+        self._put(f"setoption name {name} value {value}")
+        self._is_ready()
+
+    def _is_ready(self) -> None:
+        self._put("isready")
         while True:
-            if self.stockfish.stdout.readline().strip() == "readyok":
+            if self._read_line() == "readyok":
                 return
 
-    def __go(self) -> None:
-        self.__put(f"go depth {self.depth}")
+    def _go(self) -> None:
+        self._put(f"go depth {self.depth}")
 
     @staticmethod
-    def __convert_move_list_to_str(moves: List[str]) -> str:
+    def _convert_move_list_to_str(moves: List[str]) -> str:
         result = ""
         for move in moves:
             result += f"{move} "
@@ -97,10 +104,10 @@ class Stockfish:
         Returns:
             None
         """
-        self.__start_new_game()
+        self._start_new_game()
         if moves is None:
             moves = []
-        self.__put(f"position startpos moves {self.__convert_move_list_to_str(moves)}")
+        self._put(f"position startpos moves {self._convert_move_list_to_str(moves)}")
 
     def get_board_visual(self) -> str:
         """ Get a visual representation of the current board position 
@@ -112,14 +119,14 @@ class Stockfish:
         Returns:
             String of visual representation of the chessboard with its pieces in current position
         """
-        self.__put("d")
+        self._put("d")
         board_rep = ""
         count_lines = 0
         while count_lines < 17:
-            board_str = self.stockfish.stdout.readline()
+            board_str = self._read_line()
             if "+" in board_str or "|" in board_str:
                 count_lines += 1
-                board_rep += board_str
+                board_rep += f"{board_str}\n"
         return board_rep
 
     def get_fen_position(self, moves: List[str] = None) -> str:
@@ -136,9 +143,9 @@ class Stockfish:
 
         """
         self.set_position(moves)
-        self.__put("d")
+        self._put("d")
         while True:
-            text = self.stockfish.stdout.readline().strip()
+            text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "Fen:":
                 return " ".join(splitted_text[1:])
@@ -152,7 +159,7 @@ class Stockfish:
         Returns:
             None
         """
-        self.__set_option("Skill Level", skill_level)
+        self._set_option("Skill Level", skill_level)
         self._parameters.update({"Skill Level": skill_level})
 
     def set_fen_position(self, fen_position: str) -> None:
@@ -164,8 +171,8 @@ class Stockfish:
         Returns:
             None
         """
-        self.__start_new_game()
-        self.__put(f"position fen {fen_position}")
+        self._start_new_game()
+        self._put(f"position fen {fen_position}")
 
     def get_best_move(self) -> Optional[str]:
         """Get best move with current position on the board.
@@ -173,10 +180,10 @@ class Stockfish:
         Returns:
             A string of move in algebraic notation or False, if it's a mate now.
         """
-        self.__go()
+        self._go()
         last_text: str = ""
         while True:
-            text = self.stockfish.stdout.readline().strip()
+            text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "bestmove":
                 if splitted_text[1] == "(none)":
@@ -194,9 +201,9 @@ class Stockfish:
         Returns:
             True, if new move is correct, else False.
         """
-        self.__put(f"go depth 1 searchmoves {move_value}")
+        self._put(f"go depth 1 searchmoves {move_value}")
         while True:
-            text = self.stockfish.stdout.readline().strip()
+            text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "bestmove":
                 if splitted_text[1] == "(none)":
