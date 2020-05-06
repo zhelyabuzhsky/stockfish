@@ -62,8 +62,15 @@ class Stockfish:
         self.info = ""
 
     def __put(self, command: str) -> None:
+        if not self.stockfish.stdin:
+            raise BrokenPipeError()
         self.stockfish.stdin.write(f"{command}\n")
         self.stockfish.stdin.flush()
+
+    def __read_line(self) -> str:
+        if not self.stockfish.stdout:
+            raise BrokenPipeError()
+        return self.stockfish.stdout.readline().strip()
 
     def __set_option(self, name: str, value: Any) -> None:
         self.__put(f"setoption name {name} value {value}")
@@ -72,7 +79,7 @@ class Stockfish:
     def __is_ready(self) -> None:
         self.__put("isready")
         while True:
-            if self.stockfish.stdout.readline().strip() == "readyok":
+            if self.__read_line() == "readyok":
                 return
 
     def __go(self) -> None:
@@ -116,7 +123,7 @@ class Stockfish:
         board_rep = ""
         count_lines = 0
         while count_lines < 17:
-            board_str = self.stockfish.stdout.readline()
+            board_str = self.__read_line()
             if "+" in board_str or "|" in board_str:
                 count_lines += 1
                 board_rep += board_str
@@ -138,7 +145,7 @@ class Stockfish:
         self.set_position(moves)
         self.__put("d")
         while True:
-            text = self.stockfish.stdout.readline().strip()
+            text = self.__read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "Fen:":
                 return " ".join(splitted_text[1:])
@@ -176,7 +183,7 @@ class Stockfish:
         self.__go()
         last_text: str = ""
         while True:
-            text = self.stockfish.stdout.readline().strip()
+            text = self.__read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "bestmove":
                 if splitted_text[1] == "(none)":
@@ -196,7 +203,7 @@ class Stockfish:
         """
         self.__put(f"go depth 1 searchmoves {move_value}")
         while True:
-            text = self.stockfish.stdout.readline().strip()
+            text = self.__read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "bestmove":
                 if splitted_text[1] == "(none)":
