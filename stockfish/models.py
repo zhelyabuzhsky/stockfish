@@ -114,7 +114,6 @@ class Stockfish:
             Note: "d" is a stockfish only command
 
         Args:
-            None
 
         Returns:
             String of visual representation of the chessboard with its pieces in current position
@@ -129,20 +128,14 @@ class Stockfish:
                 board_rep += f"{board_str}\n"
         return board_rep
 
-    def get_fen_position(self, moves: List[str] = None) -> str:
+    def get_fen_position(self) -> str:
         """ Get current board position in Forsyth–Edwards notation (FEN).
 
         Args:
-            moves: A list of moves to set this position on the board.
-                Must be in full algebraic notation.
-                example:
-                ['e2e4', 'e7e5']
 
         Returns:
-            None
-
+            String with current position in Forsyth–Edwards notation (FEN)
         """
-        self.set_position(moves)
         self._put("d")
         while True:
             text = self._read_line()

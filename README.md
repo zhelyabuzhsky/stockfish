@@ -16,42 +16,90 @@ $ pip install stockfish
 $ brew install stockfish
 ```
 
-## Features
-- set current position
-- get best move
-- change engine's skill level
-- get current engine's parameters
+## Features and usage examples
 
-## Usage
+### Initialize Stockfish class
+
+You should install the stockfish engine in your operating system globally or specify path to binary file in class constructor
 
 ```python
 from stockfish import Stockfish
 
-# you should install the stockfish engine in your operating system globally or specify path to binary file in class constructor
-stockfish = Stockfish('/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64')
+stockfish = Stockfish("/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64")
+```
 
-# set position by sequence of moves:
-stockfish.set_position(['e2e4', 'e7e6'])
+### Set position by sequence of moves:
+```python
+stockfish.set_position(["e2e4", "e7e6"])
+```
 
-# set position by Forsyth–Edwards Notation (FEN):
+### Set position by Forsyth–Edwards Notation (FEN):
+```python
 stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
+```
 
-print(stockfish.get_best_move()) # d2d4
-print(stockfish.is_move_correct('a2a3')) # True
+### Get best move
+```python
+stockfish.get_best_move()
+```
+```text
+d2d4
+```
 
-# get last move info:
-print(stockfish.info)
-# e.g. 'info depth 2 seldepth 3 multipv 1 score mate -1 nodes 11 nps 5500 tbhits 0 time 2 pv h2g1 h4g3'
+### Check is move correct with current position
+```python
+stockfish.is_move_correct('a2a3')
+```
+```text
+True
+```
 
-# set current engine's skill level:
+### Set current engine's skill level:
+```python
 stockfish.set_skill_level(15)
+```
 
-# get current engine's parameters:
+### Get current engine's parameters:
+```python
 stockfish.get_parameters()
+```
+```text
+{'Write Debug Log': 'false', 'Contempt': 0, 'Min Split Depth': 0, 'Threads': 1, 'Ponder': 'false', 'Hash': 16, 'MultiPV': 1, 'Skill Level': 20, 'Move Overhead': 30, 'Minimum Thinking Time': 20, 'Slow Mover': 80, 'UCI_Chess960': 'false'}
+```
+
+### Get current board position in Forsyth–Edwards notation (FEN):
+```python
+stockfish.get_fen_position()
+```
+```text
+rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+```
+
+### Get current board visual
+```python 
+stockfish.get_board_visual()
+```
+```text
++---+---+---+---+---+---+---+---+
+| r | n | b | q | k | b | n | r |
++---+---+---+---+---+---+---+---+
+| p | p | p | p | p | p | p | p |
++---+---+---+---+---+---+---+---+
+|   |   |   |   |   |   |   |   |
++---+---+---+---+---+---+---+---+
+|   |   |   |   |   |   |   |   |
++---+---+---+---+---+---+---+---+
+|   |   |   |   |   |   |   |   |
++---+---+---+---+---+---+---+---+
+|   |   |   |   |   |   |   |   |
++---+---+---+---+---+---+---+---+
+| P | P | P | P | P | P | P | P |
++---+---+---+---+---+---+---+---+
+| R | N | B | Q | K | B | N | R |
++---+---+---+---+---+---+---+---+
 ```
 
 ## Testing
-
 ```bash
 $ python setup.py test
 ```

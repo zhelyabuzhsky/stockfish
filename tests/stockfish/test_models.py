@@ -152,6 +152,6 @@ class TestStockfish:
 
     def test_get_fen_position(self, stockfish):
         assert (
-            stockfish.get_fen_position(["e2e4", "e7e6", "d2d4", "d7d5"])
-            == "rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3"
+            stockfish.get_fen_position()
+            == "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         )
