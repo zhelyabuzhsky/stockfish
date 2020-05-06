@@ -102,6 +102,47 @@ class Stockfish:
             moves = []
         self.__put(f"position startpos moves {self.__convert_move_list_to_str(moves)}")
 
+    def get_board_visual(self) -> str:
+        """ Get a visual representation of the current board position 
+            Note: "d" is a stockfish only command
+
+        Args:
+            None
+
+        Returns:
+            String of visual representation of the chessboard with its pieces in current position
+        """
+        self.__put("d")
+        board_rep = ""
+        count_lines = 0
+        while count_lines < 17:
+            board_str = self.stockfish.stdout.readline()
+            if "+" in board_str or "|" in board_str:
+                count_lines += 1
+                board_rep += board_str
+        return board_rep
+
+    def get_fen_position(self, moves: List[str] = None) -> str:
+        """ Get current board position in Forsyth–Edwards notation (FEN).
+
+        Args:
+            moves: A list of moves to set this position on the board.
+                Must be in full algebraic notation.
+                example:
+                ['e2e4', 'e7e5']
+
+        Returns:
+            None
+
+        """
+        self.set_position(moves)
+        self.__put("d")
+        while True:
+            text = self.stockfish.stdout.readline().strip()
+            splitted_text = text.split(" ")
+            if splitted_text[0] == "Fen:":
+                return " ".join(splitted_text[1:])
+
     def set_skill_level(self, skill_level: int = 20) -> None:
         """Sets current skill level of stockfish engine.
 

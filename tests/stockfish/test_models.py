@@ -126,3 +126,14 @@ class TestStockfish:
             "Slow Mover": 80,
             "UCI_Chess960": "false",
         }
+
+    def test_get_board_visual(self, stockfish):
+        stockfish.set_position(["e2e4", "e7e6", "d2d4", "d7d5"])
+        expected_result = " +---+---+---+---+---+---+---+---+\n | r | n | b | q | k | b | n | r |\n +---+---+---+---+---+---+---+---+\n | p | p | p |   |   | p | p | p |\n +---+---+---+---+---+---+---+---+\n |   |   |   |   | p |   |   |   |\n +---+---+---+---+---+---+---+---+\n |   |   |   | p |   |   |   |   |\n +---+---+---+---+---+---+---+---+\n |   |   |   | P | P |   |   |   |\n +---+---+---+---+---+---+---+---+\n |   |   |   |   |   |   |   |   |\n +---+---+---+---+---+---+---+---+\n | P | P | P |   |   | P | P | P |\n +---+---+---+---+---+---+---+---+\n | R | N | B | Q | K | B | N | R |\n +---+---+---+---+---+---+---+---+\n"
+        assert stockfish.get_board_visual() == expected_result
+
+    def test_get_fen_position(self, stockfish):
+        assert (
+            stockfish.get_fen_position(["e2e4", "e7e6", "d2d4", "d7d5"])
+            == "rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3"
+        )
