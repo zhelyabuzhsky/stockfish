@@ -126,7 +126,7 @@ class Stockfish:
             board_str = self.__read_line()
             if "+" in board_str or "|" in board_str:
                 count_lines += 1
-                board_rep += board_str
+                board_rep += f"{board_str}\n"
         return board_rep
 
     def get_fen_position(self, moves: List[str] = None) -> str:
