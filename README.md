@@ -28,6 +28,29 @@ from stockfish import Stockfish
 stockfish = Stockfish("/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64")
 ```
 
+There are some default engine's settings:
+```python
+{
+    "Write Debug Log": "false",
+    "Contempt": 0,
+    "Min Split Depth": 0,
+    "Threads": 1,
+    "Ponder": "false",
+    "Hash": 16,
+    "MultiPV": 1,
+    "Skill Level": 20,
+    "Move Overhead": 30,
+    "Minimum Thinking Time": 20,
+    "Slow Mover": 80,
+    "UCI_Chess960": "false",
+}
+```
+
+You can change them during your Stockfish class initialization:
+```python
+stockfish = Stockfish(parameters={"Threads": 2, "Minimum Thinking Time": 30})
+```
+
 ### Set position by sequence of moves:
 ```python
 stockfish.set_position(["e2e4", "e7e6"])
