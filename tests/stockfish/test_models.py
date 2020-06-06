@@ -157,27 +157,19 @@ class TestStockfish:
         )
 
     def test_get_evalution_mate(self, stockfish):
-        stockfish.set_fen_position(
-            "6k1/p4p1p/6p1/5r2/3b4/6PP/4qP2/5RK1 b - - 14 36"
-        )
-        assert (
-            stockfish.get_evaluation()
-            == {'type': 'mate', 'value': -3}
-        )
+        stockfish.set_fen_position("6k1/p4p1p/6p1/5r2/3b4/6PP/4qP2/5RK1 b - - 14 36")
+        assert stockfish.get_evaluation() == {"type": "mate", "value": -3}
 
     def test_get_evalution_cp(self, stockfish):
         stockfish.set_fen_position(
             "r4rk1/pppb1p1p/2nbpqp1/8/3P4/3QBN2/PPP1BPPP/R4RK1 w - - 0 11"
         )
-        evaluation = stockfish.get_evaluation() #slight changes due to hash-tables
+        evaluation = stockfish.get_evaluation()  # slight changes due to hash-tables
         assert (
-            evaluation == {'type': 'cp', 'value': 84}
-            or
-            evaluation == {'type': 'cp', 'value': 99}
-            or
-            evaluation == {'type': 'cp', 'value': 110}
-            or
-            evaluation == {'type': 'cp', 'value': 120}
+            evaluation == {"type": "cp", "value": 84}
+            or evaluation == {"type": "cp", "value": 99}
+            or evaluation == {"type": "cp", "value": 110}
+            or evaluation == {"type": "cp", "value": 120}
         )
 
     def test_set_depth(self, stockfish):
@@ -185,7 +177,4 @@ class TestStockfish:
             "r4rk1/pppb1p1p/2nbpqp1/8/3P4/3QBN2/PPP1BPPP/R4RK1 w - - 0 11"
         )
         stockfish.set_depth(10)
-        assert (
-            stockfish.get_best_move()
-            == "c2c4"
-        )
+        assert stockfish.get_best_move() == "c2c4"
