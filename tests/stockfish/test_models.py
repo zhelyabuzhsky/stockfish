@@ -165,11 +165,11 @@ class TestStockfish:
             "r4rk1/pppb1p1p/2nbpqp1/8/3P4/3QBN2/PPP1BPPP/R4RK1 w - - 0 11"
         )
         evaluation = stockfish.get_evaluation()  # value changes due to hash-tables
-        assert evaluation["type"] == "cp" and evaluation["value"] < 0
+        assert evaluation["type"] == "cp" and evaluation["value"] > 0
 
     def test_set_depth(self, stockfish):
         stockfish.set_fen_position(
             "r4rk1/pppb1p1p/2nbpqp1/8/3P4/3QBN2/PPP1BPPP/R4RK1 w - - 0 11"
         )
-        stockfish.set_depth(10)
+        stockfish.set_depth(20)
         assert stockfish.get_best_move() == "c2c4"
