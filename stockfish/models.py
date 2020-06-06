@@ -240,7 +240,7 @@ class Stockfish:
         Returns:
             None
         """
-        self.depth = depth_value
+        self.depth = str(depth_value)
 
     def __del__(self) -> None:
         self.stockfish.kill()
