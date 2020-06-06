@@ -204,5 +204,31 @@ class Stockfish:
                 else:
                     return True
 
+
+    def get_evaluation(self) -> dict:
+        """Evaluates current position
+
+        Returns:
+            A dictionary of the current advantage with "type" as "cp" (centipawns) or "mate" (checkmate in)
+
+        """
+        self._put("position " + self.get_fen_position() + "\n go")
+        last_text: str = ""
+        score = "0"
+        if "w" in self.get_fen_position(): #w can only be in FEN if it is whites move
+            compare = 1
+        else: #stockfish shows advantage relative to current player, convention is to do white positive
+            compare = -1
+        while True:
+            text = self._read_line()
+            splitted_text = text.split(" ")
+            if splitted_text[0] == "info":
+                if splitted_text[7] == "score":
+                    score = {"type":splitted_text[8], "value":int(splitted_text[9])*compare}
+            elif splitted_text[0] == "bestmove":
+                return score
+            last_text = text
+
+
     def __del__(self) -> None:
         self.stockfish.kill()

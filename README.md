@@ -122,6 +122,17 @@ stockfish.get_board_visual()
 +---+---+---+---+---+---+---+---+
 ```
 
+
+### Get current board evaluation in centipawns or mate in x
+```python 
+stockfish.get_evaluation()
+```
+Positive is advantage white, negative is advantage black
+```text
+{"type":"cp", "value":12}
+{"type":"mate", "value":-3}
+```
+
 ## Testing
 ```bash
 $ python setup.py test
