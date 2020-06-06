@@ -82,6 +82,11 @@ True
 stockfish.set_skill_level(15)
 ```
 
+### Set current engine's depth:
+```python
+stockfish.set_depth(15)
+```
+
 ### Get current engine's parameters:
 ```python
 stockfish.get_parameters()
@@ -121,7 +126,6 @@ stockfish.get_board_visual()
 | R | N | B | Q | K | B | N | R |
 +---+---+---+---+---+---+---+---+
 ```
-
 
 ### Get current board evaluation in centipawns or mate in x
 ```python 
