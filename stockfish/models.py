@@ -204,5 +204,43 @@ class Stockfish:
                 else:
                     return True
 
+    def get_evaluation(self) -> dict:
+        """Evaluates current position
+
+        Returns:
+            A dictionary of the current advantage with "type" as "cp" (centipawns) or "mate" (checkmate in)
+        """
+
+        fen = self.get_fen_position()
+        if "w" in fen:  # w can only be in FEN if it is whites move
+            compare = 1
+        else:  # stockfish shows advantage relative to current player, convention is to do white positive
+            compare = -1
+        self._put("position " + fen + "\n go")
+        last_text: str = ""
+        while True:
+            text = self._read_line()
+            splitted_text = text.split(" ")
+            if splitted_text[0] == "info":
+                if splitted_text[7] == "score":
+                    evaluation = {
+                        "type": splitted_text[8],
+                        "value": int(splitted_text[9]) * compare,
+                    }
+            elif splitted_text[0] == "bestmove":
+                return evaluation
+            last_text = text
+
+    def set_depth(self, depth_value: int = 2) -> None:
+        """Sets current depth of stockfish engine.
+
+        Args:
+            depth_value: Depth option higher than 1
+
+        Returns:
+            None
+        """
+        self.depth = str(depth_value)
+
     def __del__(self) -> None:
         self.stockfish.kill()

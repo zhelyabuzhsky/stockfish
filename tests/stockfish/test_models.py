@@ -155,3 +155,18 @@ class TestStockfish:
             stockfish.get_fen_position()
             == "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         )
+
+    def test_get_evalution_mate(self, stockfish):
+        stockfish.set_fen_position("6k1/p4p1p/6p1/5r2/3b4/6PP/4qP2/5RK1 b - - 14 36")
+        assert stockfish.get_evaluation() == {"type": "mate", "value": -3}
+
+    def test_get_evalution_cp(self, stockfish):
+        stockfish.set_fen_position(
+            "r4rk1/pppb1p1p/2nbpqp1/8/3P4/3QBN2/PPP1BPPP/R4RK1 w - - 0 11"
+        )
+        evaluation = stockfish.get_evaluation()  # value changes due to hash-tables
+        assert evaluation["type"] == "cp" and evaluation["value"] > 0
+
+    def test_set_depth(self, stockfish):
+        stockfish.set_depth(10)
+        assert stockfish.depth == "10"
