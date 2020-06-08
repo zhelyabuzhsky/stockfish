@@ -71,7 +71,7 @@ d2d4
 
 ### Get best move based on a time constraint
 ```python
-stockfish.get_best_move_time('1000')
+stockfish.get_best_move_time(1000)
 ```
 Time constraint is in milliseconds
 ```text

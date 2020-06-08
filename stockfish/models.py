@@ -85,7 +85,7 @@ class Stockfish:
     def _go(self) -> None:
         self._put(f"go depth {self.depth}")
 
-    def _go_time(self, time) -> None:
+    def _go_time(self, time: int) -> None:
         self._put(f"go movetime {time}")
 
     @staticmethod
@@ -188,8 +188,11 @@ class Stockfish:
                 return splitted_text[1]
             last_text = text
 
-    def get_best_move_time(self, time) -> Optional[str]:
-        """Get best move with current position on the board after x milliseconds
+    def get_best_move_time(self, time: int = 1000) -> Optional[str]:
+        """Get best move with current position on the board after a determined time
+
+        Args:
+            time: Time for stockfish to determine best move in milliseconds (int)
 
         Returns:
             A string of move in algebraic notation or False, if it's a mate now.
