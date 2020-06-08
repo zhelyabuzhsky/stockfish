@@ -69,6 +69,16 @@ stockfish.get_best_move()
 d2d4
 ```
 
+### Get best move based on a time constraint
+```python
+stockfish.get_best_move_time('1000')
+```
+Time constraint is in milliseconds
+```text
+e2e4
+```
+
+
 ### Check is move correct with current position
 ```python
 stockfish.is_move_correct('a2a3')
