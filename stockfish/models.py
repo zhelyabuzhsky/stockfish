@@ -85,6 +85,9 @@ class Stockfish:
     def _go(self) -> None:
         self._put(f"go depth {self.depth}")
 
+    def _go_time(self, time: int) -> None:
+        self._put(f"go movetime {time}")
+
     @staticmethod
     def _convert_move_list_to_str(moves: List[str]) -> str:
         result = ""
@@ -174,6 +177,27 @@ class Stockfish:
             A string of move in algebraic notation or False, if it's a mate now.
         """
         self._go()
+        last_text: str = ""
+        while True:
+            text = self._read_line()
+            splitted_text = text.split(" ")
+            if splitted_text[0] == "bestmove":
+                if splitted_text[1] == "(none)":
+                    return None
+                self.info = last_text
+                return splitted_text[1]
+            last_text = text
+
+    def get_best_move_time(self, time: int = 1000) -> Optional[str]:
+        """Get best move with current position on the board after a determined time
+
+        Args:
+            time: Time for stockfish to determine best move in milliseconds (int)
+
+        Returns:
+            A string of move in algebraic notation or False, if it's a mate now.
+        """
+        self._go_time(time)
         last_text: str = ""
         while True:
             text = self._read_line()
