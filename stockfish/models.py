@@ -246,11 +246,12 @@ class Stockfish:
             text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "info":
-                if splitted_text[7] == "score":
-                    evaluation = {
-                        "type": splitted_text[8],
-                        "value": int(splitted_text[9]) * compare,
-                    }
+                for n in range(len(splitted_text)):
+                    if splitted_text[n] == "score":
+                        evaluation = {
+                            "type": splitted_text[n + 1],
+                            "value": int(splitted_text[n + 2]) * compare,
+                        }
             elif splitted_text[0] == "bestmove":
                 return evaluation
             last_text = text
