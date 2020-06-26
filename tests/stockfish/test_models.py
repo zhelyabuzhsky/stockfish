@@ -180,6 +180,14 @@ class TestStockfish:
         evaluation = stockfish.get_evaluation()  # value changes due to hash-tables
         assert evaluation["type"] == "cp" and evaluation["value"] > 0
 
+    def test_get_evalution_checkmate(self, stockfish):
+        stockfish.set_fen_position("1nb1k1n1/pppppppp/8/6r1/5bqK/6r1/8/8 w - - 2 2")
+        assert stockfish.get_evaluation() == {"type": "mate", "value": 0}
+
+    def test_get_evalution_stalemate(self, stockfish):
+        stockfish.set_fen_position("1nb1kqn1/pppppppp/8/6r1/5b1K/6r1/8/8 w - - 2 2")
+        assert stockfish.get_evaluation() == {"type": "cp", "value": 0}
+
     def test_set_depth(self, stockfish):
         stockfish.set_depth(10)
         assert stockfish.depth == "10"
