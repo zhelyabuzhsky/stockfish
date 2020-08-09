@@ -60,7 +60,7 @@ class TestStockfish:
         assert stockfish.info == ""
 
     def test_set_fen_position_resets_board(self, stockfish):
-        # Check test, passes even if removed __start_new_game
+        # TODO: check test, passes even if remove __start_new_game
         stockfish.set_fen_position(
             "7r/1pr1kppb/2n1p2p/2NpP2P/5PP1/1P6/P6K/R1R2B2 w - - 1 27"
         )
@@ -169,22 +169,22 @@ class TestStockfish:
             == "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         )
 
-    def test_get_evalution_mate(self, stockfish):
+    def test_get_evaluation_mate(self, stockfish):
         stockfish.set_fen_position("6k1/p4p1p/6p1/5r2/3b4/6PP/4qP2/5RK1 b - - 14 36")
         assert stockfish.get_evaluation() == {"type": "mate", "value": -3}
 
-    def test_get_evalution_cp(self, stockfish):
+    def test_get_evaluation_cp(self, stockfish):
         stockfish.set_fen_position(
             "r4rk1/pppb1p1p/2nbpqp1/8/3P4/3QBN2/PPP1BPPP/R4RK1 w - - 0 11"
         )
-        evaluation = stockfish.get_evaluation()  # value changes due to hash-tables
+        evaluation = stockfish.get_evaluation()
         assert evaluation["type"] == "cp" and evaluation["value"] > 0
 
-    def test_get_evalution_checkmate(self, stockfish):
+    def test_get_evaluation_checkmate(self, stockfish):
         stockfish.set_fen_position("1nb1k1n1/pppppppp/8/6r1/5bqK/6r1/8/8 w - - 2 2")
         assert stockfish.get_evaluation() == {"type": "mate", "value": 0}
 
-    def test_get_evalution_stalemate(self, stockfish):
+    def test_get_evaluation_stalemate(self, stockfish):
         stockfish.set_fen_position("1nb1kqn1/pppppppp/8/6r1/5b1K/6r1/8/8 w - - 2 2")
         assert stockfish.get_evaluation() == {"type": "cp", "value": 0}
 
