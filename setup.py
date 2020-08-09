@@ -21,11 +21,14 @@ setup(
     tests_require=["pytest"],
     classifiers=[
         "Programming Language :: Python",
+        "Natural Language :: English",
         "Operating System :: Unix",
         "License :: OSI Approved :: MIT License",
         "Development Status :: 5 - Production/Stable",
         "Topic :: Games/Entertainment :: Board Games",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: Implementation :: CPython",
     ],
 )
