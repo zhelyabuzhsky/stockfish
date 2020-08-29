@@ -205,4 +205,7 @@ class TestStockfish:
         wrong_fen = "3kk3/8/8/8/8/8/8/3KK3 w - - 0 0"
         s = Stockfish()
         s.set_fen_position(wrong_fen)
-        assert s.get_best_move() in ("d1e2", "d1c1",)
+        assert s.get_best_move() in (
+            "d1e2",
+            "d1c1",
+        )

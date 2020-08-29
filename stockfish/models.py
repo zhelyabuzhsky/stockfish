@@ -113,7 +113,7 @@ class Stockfish:
         self._put(f"position startpos moves {self._convert_move_list_to_str(moves)}")
 
     def get_board_visual(self) -> str:
-        """ Get a visual representation of the current board position 
+        """Get a visual representation of the current board position
             Note: "d" is a stockfish only command
 
         Args:
@@ -132,7 +132,7 @@ class Stockfish:
         return board_rep
 
     def get_fen_position(self) -> str:
-        """ Get current board position in Forsyth–Edwards notation (FEN).
+        """Get current board position in Forsyth–Edwards notation (FEN).
 
         Args:
 
