@@ -196,8 +196,10 @@ class TestStockfish:
         assert stockfish.get_evaluation() == {"type": "cp", "value": 0}
 
     def test_set_depth(self, stockfish):
-        stockfish.set_depth(10)
-        assert stockfish.depth == "10"
+        stockfish.set_depth(12)
+        assert stockfish.depth == "12"
+        stockfish.get_best_move()
+        assert "depth 12" in stockfish.info
 
     def test_get_best_move_wrong_position(self):
         wrong_fen = "3kk3/8/8/8/8/8/8/3KK3 w - - 0 0"
