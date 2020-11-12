@@ -48,6 +48,13 @@ class TestStockfish:
         assert stockfish.is_move_correct("f4f5") is True
         assert stockfish.is_move_correct("a1c1") is False
 
+    def test_castling(self, stockfish):
+        assert stockfish.is_move_correct("e1g1") is False
+        stockfish.set_fen_position(
+            "rnbqkbnr/ppp3pp/3ppp2/8/4P3/5N2/PPPPBPPP/RNBQK2R w KQkq - 0 4"
+        )
+        assert stockfish.is_move_correct("e1g1") is True
+
     def test_set_fen_position_mate(self, stockfish):
         stockfish.set_fen_position("8/8/8/6pp/8/4k1PP/8/r3K3 w - - 12 53")
         assert stockfish.get_best_move() is None
