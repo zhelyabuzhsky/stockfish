@@ -282,4 +282,5 @@ class Stockfish:
         return self._stockfish_major_version
 
     def __del__(self) -> None:
+        self._put("quit")
         self.stockfish.kill()
