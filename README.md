@@ -147,6 +147,14 @@ Positive is advantage white, negative is advantage black
 {"type":"mate", "value":-3}
 ```
 
+### Get current major version of stockfish engine
+```python 
+stockfish.get_stockfish_major_version()
+```
+```text
+11
+```
+
 ## Testing
 ```bash
 $ python setup.py test

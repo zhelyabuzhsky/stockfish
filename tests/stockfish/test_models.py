@@ -183,6 +183,14 @@ class TestStockfish:
             == "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"
         )
 
+    def test_get_stockfish_major_version(self, stockfish):
+        assert stockfish.get_stockfish_major_version() in (
+            8,
+            9,
+            10,
+            11,
+        )
+
     def test_get_evaluation_mate(self, stockfish):
         stockfish.set_fen_position("6k1/p4p1p/6p1/5r2/3b4/6PP/4qP2/5RK1 b - - 14 36")
         assert stockfish.get_evaluation() == {"type": "mate", "value": -3}

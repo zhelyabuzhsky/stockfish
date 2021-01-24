@@ -1,7 +1,7 @@
 """
     This module implements the Stockfish class.
 
-    :copyright: (c) 2016-2020 by Ilya Zhelyabuzhsky.
+    :copyright: (c) 2016-2021 by Ilya Zhelyabuzhsky.
     :license: MIT, see LICENSE for more details.
 """
 
@@ -33,6 +33,8 @@ class Stockfish:
         self.stockfish = subprocess.Popen(
             path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
         )
+
+        self._stockfish_major_version: int = int(self._read_line().split(" ")[1])
 
         self._put("uci")
 
@@ -265,6 +267,18 @@ class Stockfish:
             None
         """
         self.depth = str(depth_value)
+
+    def get_stockfish_major_version(self):
+        """Get Stockfish engine major version.
+
+        Args:
+            None
+
+        Returns:
+            Current stockfish major version
+        """
+
+        return self._stockfish_major_version
 
     def __del__(self) -> None:
         self.stockfish.kill()
