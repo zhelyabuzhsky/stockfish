@@ -238,12 +238,13 @@ class Stockfish:
         """
 
         evaluation = dict()
-        fen = self.get_fen_position()
-        if "w" in fen:  # w can only be in FEN if it is whites move
+        fen_position = self.get_fen_position()
+        if "w" in fen_position:  # w can only be in FEN if it is whites move
             compare = 1
         else:  # stockfish shows advantage relative to current player, convention is to do white positive
             compare = -1
-        self._put("position " + fen + "\n go")
+        self._put(f"position {fen_position}")
+        self._go()
         while True:
             text = self._read_line()
             splitted_text = text.split(" ")

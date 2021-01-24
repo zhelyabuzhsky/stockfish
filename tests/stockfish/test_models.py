@@ -10,7 +10,13 @@ class TestStockfish:
 
     def test_get_best_move_first_move(self, stockfish):
         best_move = stockfish.get_best_move()
-        assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3")
+        assert best_move in (
+            "e2e3",
+            "e2e4",
+            "g1f3",
+            "b1c3",
+            "d2d4",
+        )
 
     def test_get_best_move_time_first_move(self, stockfish):
         best_move = stockfish.get_best_move_time(1000)
@@ -123,6 +129,7 @@ class TestStockfish:
             "d2d4",
             "b1c3",
             "d1e2",
+            "g2g3",
         )
         assert stockfish.get_parameters()["Skill Level"] == 1
 
@@ -189,11 +196,8 @@ class TestStockfish:
             9,
             10,
             11,
+            12,
         )
-
-    def test_get_evaluation_mate(self, stockfish):
-        stockfish.set_fen_position("6k1/p4p1p/6p1/5r2/3b4/6PP/4qP2/5RK1 b - - 14 36")
-        assert stockfish.get_evaluation() == {"type": "mate", "value": -3}
 
     def test_get_evaluation_cp(self, stockfish):
         stockfish.set_fen_position(
