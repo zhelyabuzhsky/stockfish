@@ -55,5 +55,5 @@ jobs:
           architecture: x64
       - name: Check import
         run: |
-          python -c "from stockfish import Stockfish1"
+          python -c "from stockfish import Stockfish"
 
