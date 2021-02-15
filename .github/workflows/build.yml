@@ -9,12 +9,12 @@ on:
       - 'master'
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8']
-    name: Python ${{ matrix.python-version }}
+        python-version: [3.6, 3.7, 3.8, 3.9]
+    name: Python Linux ${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python
@@ -39,3 +39,21 @@ jobs:
           pip install pytest
           export PATH=$PATH:/usr/games/
           pytest
+
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9]
+    name: Python Windows ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Check import
+        run: |
+          python -c "from stockfish import Stockfish"
+
