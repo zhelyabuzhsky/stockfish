@@ -101,13 +101,10 @@ class Stockfish:
         """Sets current board position.
 
         Args:
-            moves: A list of moves to set this position on the board.
-                Must be in full algebraic notation.
-                example:
-                ['e2e4', 'e7e5']
-
-        Returns:
-            None
+            moves:
+              A list of moves to set this position on the board.
+              Must be in full algebraic notation.
+              example: ['e2e4', 'e7e5']
         """
         self._start_new_game()
         if moves is None:
@@ -115,13 +112,10 @@ class Stockfish:
         self._put(f"position startpos moves {self._convert_move_list_to_str(moves)}")
 
     def get_board_visual(self) -> str:
-        """Get a visual representation of the current board position
-            Note: "d" is a stockfish only command
-
-        Args:
+        """Returns a visual representation of the current board position.
 
         Returns:
-            String of visual representation of the chessboard with its pieces in current position
+            String of visual representation of the chessboard with its pieces in current position.
         """
         self._put("d")
         board_rep = ""
@@ -134,9 +128,7 @@ class Stockfish:
         return board_rep
 
     def get_fen_position(self) -> str:
-        """Get current board position in Forsyth–Edwards notation (FEN).
-
-        Args:
+        """Returns current board position in Forsyth–Edwards notation (FEN).
 
         Returns:
             String with current position in Forsyth–Edwards notation (FEN)
@@ -152,7 +144,8 @@ class Stockfish:
         """Sets current skill level of stockfish engine.
 
         Args:
-            skill_level: Skill Level option between 0 (weakest level) and 20 (full strength)
+            skill_level:
+              Skill Level option between 0 (weakest level) and 20 (full strength)
 
         Returns:
             None
@@ -164,7 +157,8 @@ class Stockfish:
         """Sets current board position in Forsyth–Edwards notation (FEN).
 
         Args:
-            fen_position: FEN string of board position.
+            fen_position:
+              FEN string of board position.
 
         Returns:
             None
@@ -173,10 +167,10 @@ class Stockfish:
         self._put(f"position fen {fen_position}")
 
     def get_best_move(self) -> Optional[str]:
-        """Get best move with current position on the board.
+        """Returns best move with current position on the board.
 
         Returns:
-            A string of move in algebraic notation or False, if it's a mate now.
+            A string of move in algebraic notation or None, if it's a mate now.
         """
         self._go()
         last_text: str = ""
@@ -191,13 +185,14 @@ class Stockfish:
             last_text = text
 
     def get_best_move_time(self, time: int = 1000) -> Optional[str]:
-        """Get best move with current position on the board after a determined time
+        """Returns best move with current position on the board after a determined time
 
         Args:
-            time: Time for stockfish to determine best move in milliseconds (int)
+            time:
+              Time for stockfish to determine best move in milliseconds (int)
 
         Returns:
-            A string of move in algebraic notation or False, if it's a mate now.
+            A string of move in algebraic notation or None, if it's a mate now.
         """
         self._go_time(time)
         last_text: str = ""
@@ -215,7 +210,8 @@ class Stockfish:
         """Checks new move.
 
         Args:
-            move_value: New move value in algebraic notation.
+            move_value:
+              New move value in algebraic notation.
 
         Returns:
             True, if new move is correct, else False.
@@ -263,17 +259,11 @@ class Stockfish:
 
         Args:
             depth_value: Depth option higher than 1
-
-        Returns:
-            None
         """
         self.depth = str(depth_value)
 
     def get_stockfish_major_version(self):
-        """Get Stockfish engine major version.
-
-        Args:
-            None
+        """Returns Stockfish engine major version.
 
         Returns:
             Current stockfish major version
