@@ -137,6 +137,29 @@ class TestStockfish:
         assert stockfish.get_best_move() in ("d2d4",)
         assert stockfish.get_parameters()["Skill Level"] == 20
 
+    def test_set_elo_rating(self, stockfish):
+        stockfish.set_fen_position(
+            "rnbqkbnr/ppp2ppp/3pp3/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1"
+        )
+
+        assert stockfish.get_parameters()["UCI_Elo"] == 1350
+
+        stockfish.set_elo_rating(2000)
+        assert stockfish.get_best_move() in (
+            "b2b3",
+            "b2b3",
+            "d2d3",
+            "d2d4",
+            "b1c3",
+            "d1e2",
+            "g2g3",
+        )
+        assert stockfish.get_parameters()["UCI_Elo"] == 2000
+
+        stockfish.set_elo_rating(1350)
+        assert stockfish.get_best_move() in ("d2d4",)
+        assert stockfish.get_parameters()["UCI_Elo"] == 1350
+
     def test_stockfish_constructor_with_custom_params(self):
         stockfish = Stockfish(parameters={"Skill Level": 1})
         assert stockfish.get_parameters() == {
@@ -152,6 +175,8 @@ class TestStockfish:
             "Minimum Thinking Time": 20,
             "Slow Mover": 80,
             "UCI_Chess960": "false",
+            "UCI_LimitStrength": "false",
+            "UCI_Elo": 1350,
         }
 
     def test_get_board_visual(self, stockfish):
@@ -197,6 +222,7 @@ class TestStockfish:
             10,
             11,
             12,
+            13,
         )
 
     def test_get_evaluation_cp(self, stockfish):
