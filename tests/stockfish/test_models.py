@@ -39,11 +39,11 @@ class TestStockfish:
         best_move = stockfish.get_best_move_time(1000)
         assert best_move in ("d2d4", "g1f3")
 
-    def test_get_best_move_mate(self, stockfish):
+    def test_get_best_move_checkmate(self, stockfish):
         stockfish.set_position(["f2f3", "e7e5", "g2g4", "d8h4"])
         assert stockfish.get_best_move() is None
 
-    def test_get_best_move_time_mate(self, stockfish):
+    def test_get_best_move_time_checkmate(self, stockfish):
         stockfish.set_position(["f2f3", "e7e5", "g2g4", "d8h4"])
         assert stockfish.get_best_move_time(1000) is None
 
