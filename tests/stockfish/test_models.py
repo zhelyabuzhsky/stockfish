@@ -158,6 +158,7 @@ class TestStockfish:
 
         stockfish.set_elo_rating(1350)
         assert stockfish.get_best_move() in (
+            "d1e2",
             "b1c3",
             "d2d3",
             "d2d4",
