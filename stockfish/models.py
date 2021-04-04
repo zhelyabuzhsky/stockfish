@@ -159,12 +159,12 @@ class Stockfish:
     def set_elo_rating(self, elo_rating: int = 1350) -> None:
         """Sets current elo rating of stockfish engine, ignoring skill level.
 
-                Args:
-                    elo_rating: Aim for an engine strength of the given Elo
+        Args:
+            elo_rating: Aim for an engine strength of the given Elo
 
-                Returns:
-                    None
-                """
+        Returns:
+            None
+        """
         self._set_option("UCI_LimitStrength", "true")
         self._set_option("UCI_Elo", elo_rating)
         self._parameters.update({"UCI_Elo": elo_rating})
