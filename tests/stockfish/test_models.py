@@ -157,7 +157,10 @@ class TestStockfish:
         assert stockfish.get_parameters()["UCI_Elo"] == 2000
 
         stockfish.set_elo_rating(1350)
-        assert stockfish.get_best_move() in ("d2d4",)
+        assert stockfish.get_best_move() in (
+            "d2d3",
+            "d2d4",
+        )
         assert stockfish.get_parameters()["UCI_Elo"] == 1350
 
     def test_stockfish_constructor_with_custom_params(self):
