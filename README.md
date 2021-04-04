@@ -87,9 +87,14 @@ stockfish.is_move_correct('a2a3')
 True
 ```
 
-### Set current engine's skill level:
+### Set current engine's skill level (ignoring ELO rating):
 ```python
 stockfish.set_skill_level(15)
+```
+
+### Set current engine's ELO rating (ignoring skill level):
+```python
+stockfish.set_elo_rating(1350)
 ```
 
 ### Set current engine's depth:

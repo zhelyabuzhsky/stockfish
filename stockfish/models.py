@@ -21,6 +21,8 @@ DEFAULT_STOCKFISH_PARAMS = {
     "Minimum Thinking Time": 20,
     "Slow Mover": 80,
     "UCI_Chess960": "false",
+    "UCI_LimitStrength": "false",
+    "UCI_Elo": 1350,
 }
 
 
@@ -150,8 +152,22 @@ class Stockfish:
         Returns:
             None
         """
+        self._set_option("UCI_LimitStrength", "false")
         self._set_option("Skill Level", skill_level)
         self._parameters.update({"Skill Level": skill_level})
+
+    def set_elo_rating(self, elo_rating: int = 1350) -> None:
+        """Sets current elo rating of stockfish engine, ignoring skill level.
+
+        Args:
+            elo_rating: Aim for an engine strength of the given Elo
+
+        Returns:
+            None
+        """
+        self._set_option("UCI_LimitStrength", "true")
+        self._set_option("UCI_Elo", elo_rating)
+        self._parameters.update({"UCI_Elo": elo_rating})
 
     def set_fen_position(self, fen_position: str) -> None:
         """Sets current board position in Forsyth–Edwards notation (FEN).
