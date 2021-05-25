@@ -9,7 +9,6 @@ import subprocess
 from typing import Any, List, Optional
 
 
-
 class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
@@ -61,7 +60,7 @@ class Stockfish:
         return self._parameters
 
     def reset_parameters(self) -> None:
-        """ Resets the stockfish parameters.
+        """Resets the stockfish parameters.
 
         Returns:
             None
