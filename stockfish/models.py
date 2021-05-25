@@ -8,22 +8,6 @@
 import subprocess
 from typing import Any, List, Optional
 
-DEFAULT_STOCKFISH_PARAMS = {
-    "Write Debug Log": "false",
-    "Contempt": 0,
-    "Min Split Depth": 0,
-    "Threads": 1,
-    "Ponder": "false",
-    "Hash": 16,
-    "MultiPV": 1,
-    "Skill Level": 20,
-    "Move Overhead": 30,
-    "Minimum Thinking Time": 20,
-    "Slow Mover": 80,
-    "UCI_Chess960": "false",
-    "UCI_LimitStrength": "false",
-    "UCI_Elo": 1350,
-}
 
 
 class Stockfish:
@@ -32,6 +16,22 @@ class Stockfish:
     def __init__(
         self, path: str = "stockfish", depth: int = 2, parameters: dict = None
     ) -> None:
+        self.default_stockfish_params = {
+            "Write Debug Log": "false",
+            "Contempt": 0,
+            "Min Split Depth": 0,
+            "Threads": 1,
+            "Ponder": "false",
+            "Hash": 16,
+            "MultiPV": 1,
+            "Skill Level": 20,
+            "Move Overhead": 30,
+            "Minimum Thinking Time": 20,
+            "Slow Mover": 80,
+            "UCI_Chess960": "false",
+            "UCI_LimitStrength": "false",
+            "UCI_Elo": 1350,
+        }
         self.stockfish = subprocess.Popen(
             path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
         )
@@ -45,7 +45,7 @@ class Stockfish:
 
         if parameters is None:
             parameters = {}
-        self._parameters = DEFAULT_STOCKFISH_PARAMS
+        self._parameters = self.default_stockfish_params
         self._parameters.update(parameters)
         for name, value in list(self._parameters.items()):
             self._set_option(name, value)
@@ -59,6 +59,16 @@ class Stockfish:
             Dictionary of current Stockfish engine's parameters.
         """
         return self._parameters
+
+    def reset_parameters(self) -> None:
+        """ Resets the stockfish parameters.
+
+        Returns:
+            None
+        """
+        self._parameters = self.default_stockfish_params
+        for name, value in list(self._parameters.items()):
+            self._set_option(name, value)
 
     def _start_new_game(self) -> None:
         self._put("ucinewgame")
