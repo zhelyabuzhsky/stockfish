@@ -259,6 +259,7 @@ class TestStockfish:
             "d1e2",
             "d1c1",
         )
+
     def test_get_parameters(self):
         s1 = Stockfish()
         s2 = Stockfish()
