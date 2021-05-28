@@ -259,3 +259,14 @@ class TestStockfish:
             "d1e2",
             "d1c1",
         )
+
+    def test_get_parameters(self):
+        s1 = Stockfish()
+        s2 = Stockfish()
+        arg1 = s1.get_parameters()
+        arg2 = s2.get_parameters()
+        assert arg1 == arg2
+        s1.set_skill_level(1)
+        arg1 = s1.get_parameters()
+        arg2 = s2.get_parameters()
+        assert arg1 != arg2
