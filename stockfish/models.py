@@ -296,7 +296,7 @@ class Stockfish:
         """
         
         if num_top_moves > self._parameters["MultiPV"] or num_top_moves <= 0:
-            raise ValueError('bad value for num_top_moves')
+            raise ValueError("num_top_moves is either greater than MultiPV or not a positive number.")
         self._go()
         lines = []
         while True:
