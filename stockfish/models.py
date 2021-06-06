@@ -7,6 +7,7 @@
 
 import subprocess
 from typing import Any, List, Optional
+import copy
 
 
 class Stockfish:
@@ -44,7 +45,7 @@ class Stockfish:
 
         if parameters is None:
             parameters = {}
-        self._parameters = self.default_stockfish_params
+        self._parameters = copy.deepcopy(self.default_stockfish_params)
         self._parameters.update(parameters)
         for name, value in list(self._parameters.items()):
             self._set_option(name, value)
@@ -65,7 +66,7 @@ class Stockfish:
         Returns:
             None
         """
-        self._parameters = self.default_stockfish_params
+        self._parameters = copy.deepcopy(self.default_stockfish_params)
         for name, value in list(self._parameters.items()):
             self._set_option(name, value)
 
