@@ -286,7 +286,7 @@ class Stockfish:
         Args:
             num_top_moves:
                 The number of moves to return info on, assuming there are at least
-                those many legal moves.
+                those many legal moves. num_top_moves must not exceed the MultiPV parameter.
         
         Returns:
             A dictionary where the keys are the PV number, and the values
@@ -313,8 +313,8 @@ class Stockfish:
                     return None
             elif (("multipv" in current_line) and ("depth" in current_line) and 
                   current_line[current_line.index("depth") + 1] == self.depth):
-                multiPV_number = current_line[current_line.index("multipv") + 1]
-                if int(multiPV_number) <= num_top_moves:
+                multiPV_number = int(current_line[current_line.index("multipv") + 1])
+                if multiPV_number <= num_top_moves:
                     has_centipawn_value = ("cp" in current_line)
                     has_mate_value = ("mate" in current_line)
                     if has_centipawn_value == has_mate_value:
@@ -322,9 +322,7 @@ class Stockfish:
                     first_moves_of_PVs[multiPV_number] = {
                         "Move": current_line[current_line.index("pv") + 1],
                         "Centipawn": int(current_line[current_line.index("cp") + 1]) * multiplier if has_centipawn_value else None,
-                        "Mate": int(current_line[current_line.index("mate") + 1]) * multiplier if has_mate_value else None,
-                        "Depth": int(current_line[current_line.index("depth") + 1]),
-                        "Seldepth": int(current_line[current_line.index("seldepth") + 1])
+                        "Mate": int(current_line[current_line.index("mate") + 1]) * multiplier if has_mate_value else None
                     }
             else:
                 return first_moves_of_PVs
