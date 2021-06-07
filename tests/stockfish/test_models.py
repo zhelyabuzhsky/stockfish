@@ -272,21 +272,19 @@ class TestStockfish:
         assert arg1 != arg2
 
     def test_get_top_moves(self):
-        stockfish = Stockfish(depth = 15, parameters = {"MultiPV": 2})
-        stockfish.set_fen_position("b5k1/1q3p1p/6p1/8/8/2Q3P1/1B3P1P/6K1 w - - 0 1")
-        top_moves = stockfish.get_top_moves()
-        assert ((top_moves[0]["Move"] == "c3g7" and top_moves[1]["Move"] == "c3h8") or
-               (top_moves[0]["Move"] == "c3h8" and top_moves[1]["Move"] == "c3g7"))
-        assert top_moves[2]["Move"] == "f2f3" or top_moves[2]["Move"] == "g1f1"
-        assert top_moves[0]["Centipawn"] == None and top_moves[0]["Mate"] == 1
-        assert top_moves[1]["Centipawn"] == None and top_moves[1]["Mate"] == 1
-        assert top_moves[2]["Centipawn"] < 50 and top_moves[2]["Mate"] == None
-        assert len(top_moves) == 5
+        stockfish = Stockfish(depth = 15, parameters = {"MultiPV": 4})
+        stockfish.set_fen_position("1rQ1r1k1/5ppp/8/8/1R6/8/2r2PPP/4R1K1 w - - 0 1")
+        assert stockfish.get_top_moves(2) == [{"Move": "e1e8", "Centipawn": None, "Mate": 1},
+                                              {"Move": "c8e8", "Centipawn": None, "Mate": 2}]
+        stockfish.set_fen_position("8/8/8/8/8/3r2k1/8/6K1 w - - 0 1")
+        assert stockfish.get_top_moves(2) == [{"Move": "g1f1", "Centipawn": None, "Mate": -2},
+                                              {"Move": "g1h1", "Centipawn": None, "Mate": -1}]
     
     def test_get_top_moves_mate(self):
         stockfish = Stockfish(depth = 10, parameters = {"MultiPV": 3})
         stockfish.set_fen_position("8/8/8/8/8/6k1/8/3r2K1 w - - 0 1")
-        assert stockfish.get_top_moves(2) == []
+        assert stockfish.get_top_moves() == []
+        assert stockfish.get_parameters()["MultiPV"] == 3
     
     def test_get_top_moves_raising_error(self):
         stockfish = Stockfish()
