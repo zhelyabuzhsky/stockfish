@@ -272,15 +272,16 @@ class TestStockfish:
         assert arg1 != arg2
 
     def test_get_top_moves(self):
-        stockfish = Stockfish(depth = 15, parameters = {"MultiPV": 3})
+        stockfish = Stockfish(depth = 15, parameters = {"MultiPV": 2})
         stockfish.set_fen_position("b5k1/1q3p1p/6p1/8/8/2Q3P1/1B3P1P/6K1 w - - 0 1")
-        top_moves = stockfish.get_top_moves(3)
+        top_moves = stockfish.get_top_moves()
         assert ((top_moves[0]["Move"] == "c3g7" and top_moves[1]["Move"] == "c3h8") or
                (top_moves[0]["Move"] == "c3h8" and top_moves[1]["Move"] == "c3g7"))
         assert top_moves[2]["Move"] == "f2f3" or top_moves[2]["Move"] == "g1f1"
         assert top_moves[0]["Centipawn"] == None and top_moves[0]["Mate"] == 1
         assert top_moves[1]["Centipawn"] == None and top_moves[1]["Mate"] == 1
         assert top_moves[2]["Centipawn"] == 0 and top_moves[2]["Mate"] == None
+        assert len(top_moves) == 5
     
     def test_get_top_moves_mate(self):
         stockfish = Stockfish(depth = 10, parameters = {"MultiPV": 3})
@@ -289,14 +290,15 @@ class TestStockfish:
     
     def test_get_top_moves_raising_error(self):
         stockfish = Stockfish()
-        num_errors_raised = 0
         stockfish.set_fen_position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+        raised_error = False
         try:
             stockfish.get_top_moves(0)
         except ValueError:
-            num_errors_raised += 1
+            raised_error = True
+        assert(raised_error)
         try:
             stockfish.get_top_moves(2)
         except ValueError:
-            num_errors_raised += 1 # error should be raised since MultiPV = 1
-        assert num_errors_raised == 2
+            assert(False) # Error should not be raised this time.
+        assert stockfish.get_parameters()["MultiPV"] == 1
