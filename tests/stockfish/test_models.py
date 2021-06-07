@@ -292,11 +292,11 @@ class TestStockfish:
         num_errors_raised = 0
         stockfish.set_fen_position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
         try:
-            print(stockfish.get_top_moves(0))
+            stockfish.get_top_moves(0)
         except ValueError:
             num_errors_raised += 1
         try:
-            print(stockfish.get_top_moves(2))
+            stockfish.get_top_moves(2)
         except ValueError:
             num_errors_raised += 1 # error should be raised since MultiPV = 1
         assert num_errors_raised == 2
