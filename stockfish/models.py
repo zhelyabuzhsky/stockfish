@@ -279,17 +279,17 @@ class Stockfish:
                         }
             elif splitted_text[0] == "bestmove":
                 return evaluation
-    
+
     def get_top_moves(self, num_top_moves: int = 5) -> List[dict]:
         """Returns info on the top moves in the position.
-        
+
         Args:
             num_top_moves:
                 The number of moves to return info on, assuming there are at least
                 those many legal moves.
-        
+
         Returns:
-            A list of dictionaries. In each dictionary, there are keys for Move, Centipawn, and Mate; 
+            A list of dictionaries. In each dictionary, there are keys for Move, Centipawn, and Mate;
             the corresponding value for either the Centipawn or Mate key will be None.
             If there are no moves in the position, an empty list is returned.
         """
@@ -315,19 +315,33 @@ class Stockfish:
                 if current_line[1] == "(none)":
                     top_moves = []
                     break
-            elif (("multipv" in current_line) and ("depth" in current_line) and 
-                  current_line[current_line.index("depth") + 1] == self.depth):
+            elif (
+                ("multipv" in current_line)
+                and ("depth" in current_line)
+                and current_line[current_line.index("depth") + 1] == self.depth
+            ):
                 multiPV_number = int(current_line[current_line.index("multipv") + 1])
                 if multiPV_number <= num_top_moves:
-                    has_centipawn_value = ("cp" in current_line)
-                    has_mate_value = ("mate" in current_line)
+                    has_centipawn_value = "cp" in current_line
+                    has_mate_value = "mate" in current_line
                     if has_centipawn_value == has_mate_value:
-                        raise RuntimeError("Having a centipawn value and mate value should be mutually exclusive.")
-                    top_moves.insert(0, {
-                        "Move": current_line[current_line.index("pv") + 1],
-                        "Centipawn": int(current_line[current_line.index("cp") + 1]) * multiplier if has_centipawn_value else None,
-                        "Mate": int(current_line[current_line.index("mate") + 1]) * multiplier if has_mate_value else None
-                    })
+                        raise RuntimeError(
+                            "Having a centipawn value and mate value should be mutually exclusive."
+                        )
+                    top_moves.insert(
+                        0,
+                        {
+                            "Move": current_line[current_line.index("pv") + 1],
+                            "Centipawn": int(current_line[current_line.index("cp") + 1])
+                            * multiplier
+                            if has_centipawn_value
+                            else None,
+                            "Mate": int(current_line[current_line.index("mate") + 1])
+                            * multiplier
+                            if has_mate_value
+                            else None,
+                        },
+                    )
             else:
                 break
         if old_MultiPV_value != self._parameters["MultiPV"]:
