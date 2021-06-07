@@ -280,7 +280,7 @@ class TestStockfish:
         assert top_moves[2]["Move"] == "f2f3" or top_moves[2]["Move"] == "g1f1"
         assert top_moves[0]["Centipawn"] == None and top_moves[0]["Mate"] == 1
         assert top_moves[1]["Centipawn"] == None and top_moves[1]["Mate"] == 1
-        assert top_moves[2]["Centipawn"] < 0.5 and top_moves[2]["Mate"] == None
+        assert top_moves[2]["Centipawn"] < 50 and top_moves[2]["Mate"] == None
         assert len(top_moves) == 5
     
     def test_get_top_moves_mate(self):
