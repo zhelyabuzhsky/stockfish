@@ -295,14 +295,7 @@ class TestStockfish:
         stockfish.set_fen_position(
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         )
-        raised_error = False
-        try:
+        with pytest.raises(ValueError):
             stockfish.get_top_moves(0)
-        except ValueError:
-            raised_error = True
-        assert raised_error
-        try:
-            stockfish.get_top_moves(2)
-        except ValueError:
-            assert False  # Error should not be raised this time.
+        assert len(stockfish.get_top_moves(2)) == 2
         assert stockfish.get_parameters()["MultiPV"] == 1
