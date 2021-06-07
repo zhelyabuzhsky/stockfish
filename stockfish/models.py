@@ -280,7 +280,7 @@ class Stockfish:
             elif splitted_text[0] == "bestmove":
                 return evaluation
     
-    def get_top_moves(self, num_top_moves: int) -> dict:
+    def get_top_moves(self, num_top_moves: int) -> List[dict]:
         """Returns info on the top moves/PVs in the position.
         
         Args:
@@ -289,10 +289,9 @@ class Stockfish:
                 those many legal moves. num_top_moves must not exceed the MultiPV parameter.
         
         Returns:
-            A dictionary where the keys are the PV number, and the values
-            are sub-dictionaries with keys for Move, Centipawn, and Mate. The corresponding
-            value for either Centipawn or Mate will be None.
-            If there are no moves in the position, None is returned.
+            A list of dictionaries. In each dictionary, there are keys for Move, Centipawn, and Mate; 
+            the corresponding value for either the Centipawn or Mate key will be None.
+            If there are no moves in the position, an empty list is returned.
         """
         
         if num_top_moves > self._parameters["MultiPV"] or num_top_moves <= 0:
@@ -305,12 +304,12 @@ class Stockfish:
             lines.append(splitted_text)
             if splitted_text[0] == "bestmove":
                 break
-        first_moves_of_PVs = {}
+        top_moves = []
         multiplier = 1 if ("w" in self.get_fen_position()) else -1
         for current_line in reversed(lines):
             if current_line[0] == "bestmove":
                 if current_line[1] == "(none)":
-                    return None
+                    return []
             elif (("multipv" in current_line) and ("depth" in current_line) and 
                   current_line[current_line.index("depth") + 1] == self.depth):
                 multiPV_number = int(current_line[current_line.index("multipv") + 1])
@@ -319,13 +318,13 @@ class Stockfish:
                     has_mate_value = ("mate" in current_line)
                     if has_centipawn_value == has_mate_value:
                         raise RuntimeError("Having a centipawn value and mate value should be mutually exclusive.")
-                    first_moves_of_PVs[multiPV_number] = {
+                    top_moves.insert(0, {
                         "Move": current_line[current_line.index("pv") + 1],
                         "Centipawn": int(current_line[current_line.index("cp") + 1]) * multiplier if has_centipawn_value else None,
                         "Mate": int(current_line[current_line.index("mate") + 1]) * multiplier if has_mate_value else None
-                    }
+                    })
             else:
-                return first_moves_of_PVs
+                return top_moves
         raise RuntimeError("Reached the end of get_top_moves without returning anything.")
 
     def set_depth(self, depth_value: int = 2) -> None:
