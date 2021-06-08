@@ -87,6 +87,14 @@ stockfish.is_move_correct('a2a3')
 True
 ```
 
+### Get info on the top n moves
+```python
+stockfish.get_top_moves(3)
+```
+```text
+[{'Move': 'f5h7', 'Centipawn': None, 'Mate': 1}, {'Move': 'f5d7', 'Centipawn': 713, 'Mate': None}, {'Move': 'f5h5', 'Centipawn': -31, 'Mate': None}]
+```
+
 ### Set current engine's skill level (ignoring ELO rating):
 ```python
 stockfish.set_skill_level(15)
