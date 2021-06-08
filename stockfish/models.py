@@ -308,7 +308,7 @@ class Stockfish:
             lines.append(splitted_text)
             if splitted_text[0] == "bestmove":
                 break
-        top_moves = []
+        top_moves: List[dict] = []
         multiplier = 1 if ("w" in self.get_fen_position()) else -1
         for current_line in reversed(lines):
             if current_line[0] == "bestmove":
