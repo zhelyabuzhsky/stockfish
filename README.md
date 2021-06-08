@@ -6,9 +6,9 @@ Implements an easy-to-use Stockfish class to integrates the Stockfish chess engi
 $ pip install stockfish
 ```
 
-#### Ubuntu or Debian
+#### Ubuntu
 ```bash
-# apt install stockfish
+$ sudo apt install stockfish
 ``` 
 
 #### Mac OS
@@ -92,7 +92,11 @@ True
 stockfish.get_top_moves(3)
 ```
 ```text
-[{'Move': 'f5h7', 'Centipawn': None, 'Mate': 1}, {'Move': 'f5d7', 'Centipawn': 713, 'Mate': None}, {'Move': 'f5h5', 'Centipawn': -31, 'Mate': None}]
+[
+    {'Move': 'f5h7', 'Centipawn': None, 'Mate': 1},
+    {'Move': 'f5d7', 'Centipawn': 713, 'Mate': None},
+    {'Move': 'f5h5', 'Centipawn': -31, 'Mate': None}
+]
 ```
 
 ### Set current engine's skill level (ignoring ELO rating):
@@ -115,7 +119,20 @@ stockfish.set_depth(15)
 stockfish.get_parameters()
 ```
 ```text
-{'Write Debug Log': 'false', 'Contempt': 0, 'Min Split Depth': 0, 'Threads': 1, 'Ponder': 'false', 'Hash': 16, 'MultiPV': 1, 'Skill Level': 20, 'Move Overhead': 30, 'Minimum Thinking Time': 20, 'Slow Mover': 80, 'UCI_Chess960': 'false'}
+{
+    'Write Debug Log': 'false',
+    'Contempt': 0,
+    'Min Split Depth': 0,
+    'Threads': 1,
+    'Ponder': 'false',
+    'Hash': 16,
+    'MultiPV': 1,
+    'Skill Level': 20,
+    'Move Overhead': 30,
+    'Minimum Thinking Time': 20,
+    'Slow Mover': 80,
+    'UCI_Chess960': 'false'
+}
 ```
 
 ### Get current board position in Forsyth–Edwards notation (FEN):
