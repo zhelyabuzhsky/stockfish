@@ -300,7 +300,7 @@ class TestStockfish:
         assert len(stockfish.get_top_moves(2)) == 2
         assert stockfish.get_parameters()["MultiPV"] == 1
 
-    def test_make_moves(self):
+    def test_make_moves_from_current_position(self):
         stockfish = Stockfish()
         stockfish.set_fen_position(
             "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"

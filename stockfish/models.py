@@ -124,13 +124,13 @@ class Stockfish:
         self._put(f"position startpos moves {self._convert_move_list_to_str(moves)}")
 
     def make_moves_from_current_position(self, moves: List[str]) -> None:
-        """Sets the board position by making the moves from the current position.
+        """Sets a new position by playing the moves from the current position.
 
         Args:
             moves:
               A list of moves to play in the current position, in order to reach a new position.
               Must be in full algebraic notation.
-              Example: ['g4d7', 'a8b8', 'f1d1']
+              Example: ["g4d7", "a8b8", "f1d1"]
         """
         if moves == []:
             raise ValueError(
