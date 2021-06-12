@@ -122,10 +122,10 @@ class Stockfish:
         if moves is None:
             moves = []
         self._put(f"position startpos moves {self._convert_move_list_to_str(moves)}")
-    
+
     def make_moves_from_current_position(self, moves: List[str]) -> None:
         """Sets the board position by making the moves from the current position.
-        
+
         Args:
             moves:
               A list of moves to play in the current position, in order to reach a new position.
@@ -133,10 +133,14 @@ class Stockfish:
               Example: ['g4d7', 'a8b8', 'f1d1']
         """
         if moves == []:
-            raise ValueError("No moves sent in to the make_moves_from_current_position function.")
+            raise ValueError(
+                "No moves sent in to the make_moves_from_current_position function."
+            )
         fen_position = self.get_fen_position()
         self._start_new_game()
-        self._put(f"position fen {fen_position} moves {self._convert_move_list_to_str(moves)}")
+        self._put(
+            f"position fen {fen_position} moves {self._convert_move_list_to_str(moves)}"
+        )
 
     def get_board_visual(self) -> str:
         """Returns a visual representation of the current board position.
