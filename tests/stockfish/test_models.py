@@ -305,10 +305,6 @@ class TestStockfish:
         stockfish.set_fen_position(
             "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"
         )
-        assert (
-            stockfish.get_fen_position()
-            == "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"
-        )
         with pytest.raises(ValueError):
             stockfish.make_moves_from_current_position([])
         stockfish.make_moves_from_current_position(["e1g1"])
@@ -324,26 +320,9 @@ class TestStockfish:
             == "r1bqkb1r/ppp2ppp/2p5/4Pn2/8/5N2/PPP2PPP/RNBQ1RK1 w kq - 1 5"
         )
         stockfish.make_moves_from_current_position(
-            ["d1d8", "e8d8", "b1c3", "d8e8", "f1d1", "f5e7"]
+            ["d1d8", "e8d8", "b1c3", "d8e8", "f1d1", "f5e7", "h2h3", "f7f5"]
         )
-        assert (
-            stockfish.get_fen_position()
-            == "r1b1kb1r/ppp1nppp/2p5/4P3/8/2N2N2/PPP2PPP/R1BR2K1 w - - 4 8"
-        )
-        stockfish.make_moves_from_current_position(["h2h3", "f7f5"])
         assert (
             stockfish.get_fen_position()
             == "r1b1kb1r/ppp1n1pp/2p5/4Pp2/8/2N2N1P/PPP2PP1/R1BR2K1 w - f6 0 9"
-        )
-        stockfish.make_moves_from_current_position(["e5f6"])
-        assert (
-            stockfish.get_fen_position()
-            == "r1b1kb1r/ppp1n1pp/2p2P2/8/8/2N2N1P/PPP2PP1/R1BR2K1 b - - 0 9"
-        )
-        stockfish.set_fen_position(
-            "r1b1kb1r/ppp1n1pp/2p5/4Pp2/8/2N2N1P/PPP2PP1/R1BR2K1 w - - 0 1"
-        )
-        assert (
-            stockfish.get_fen_position()
-            == "r1b1kb1r/ppp1n1pp/2p5/4Pp2/8/2N2N1P/PPP2PP1/R1BR2K1 w - - 0 1"
         )
