@@ -197,7 +197,7 @@ class Stockfish:
         self._set_option("UCI_Elo", elo_rating)
         self._parameters.update({"UCI_Elo": elo_rating})
 
-    def set_fen_position(self, fen_position: str) -> None:
+    def set_fen_position(self, fen_position: str, reset_TT: bool = True) -> None:
         """Sets current board position in Forsyth–Edwards notation (FEN).
 
         Args:
@@ -207,7 +207,10 @@ class Stockfish:
         Returns:
             None
         """
-        self._start_new_game()
+        if reset_TT:
+            self._start_new_game()
+        else:
+            self._is_ready()
         self._put(f"position fen {fen_position}")
 
     def get_best_move(self) -> Optional[str]:
