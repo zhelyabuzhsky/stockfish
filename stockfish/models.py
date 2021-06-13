@@ -137,6 +137,7 @@ class Stockfish:
                 "No moves sent in to the make_moves_from_current_position function."
             )
         self._is_ready()
+        self.info = ""
         self._put(
             f"position fen {self.get_fen_position()} moves {self._convert_move_list_to_str(moves)}"
         )
