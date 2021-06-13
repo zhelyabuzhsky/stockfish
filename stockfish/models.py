@@ -50,7 +50,7 @@ class Stockfish:
         for name, value in list(self._parameters.items()):
             self._set_option(name, value)
 
-        self._start_new_game()
+        self._prep_for_new_position(True)
 
     def get_parameters(self) -> dict:
         """Returns current board position.
@@ -75,9 +75,6 @@ class Stockfish:
             self._put("ucinewgame")
         self._is_ready()
         self.info = ""
-
-    def _start_new_game(self) -> None:
-        self._prep_for_new_position(True)
 
     def _put(self, command: str) -> None:
         if not self.stockfish.stdin:
@@ -122,7 +119,7 @@ class Stockfish:
               Must be in full algebraic notation.
               example: ['e2e4', 'e7e5']
         """
-        self._start_new_game()
+        self._prep_for_new_position(True)
         if moves is None:
             moves = []
         self._put(f"position startpos moves {self._convert_move_list_to_str(moves)}")
