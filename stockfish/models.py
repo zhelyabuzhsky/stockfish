@@ -70,10 +70,14 @@ class Stockfish:
         for name, value in list(self._parameters.items()):
             self._set_option(name, value)
 
-    def _start_new_game(self) -> None:
-        self._put("ucinewgame")
+    def _prep_for_new_position(self, do_ucinewgame: bool) -> None:
+        if do_ucinewgame:
+            self._put("ucinewgame")
         self._is_ready()
         self.info = ""
+
+    def _start_new_game(self) -> None:
+        self._prep_for_new_position(True)
 
     def _put(self, command: str) -> None:
         if not self.stockfish.stdin:
@@ -136,8 +140,7 @@ class Stockfish:
             raise ValueError(
                 "No moves sent in to the make_moves_from_current_position function."
             )
-        self._is_ready()
-        self.info = ""
+        self._prep_for_new_position(False)
         self._put(
             f"position fen {self.get_fen_position()} moves {self._convert_move_list_to_str(moves)}"
         )
@@ -208,12 +211,7 @@ class Stockfish:
         Returns:
             None
         """
-        if reset_TT:
-            self._start_new_game()
-        else:
-            self._is_ready()
-            self.info = ""
-            # Same behaviour as start_new_game, except without the self._put("ucinewgame") call.
+        self._prep_for_new_position(reset_TT)
         self._put(f"position fen {fen_position}")
 
     def get_best_move(self) -> Optional[str]:
