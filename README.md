@@ -63,7 +63,7 @@ stockfish.make_moves_from_current_position(["g4d7", "a8b8", "f1d1"])
 
 ### Set position by Forsyth–Edwards Notation (FEN):
 ```python
-stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
+stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2", True)
 ```
 
 ### Get best move
