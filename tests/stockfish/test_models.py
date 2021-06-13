@@ -1,4 +1,5 @@
 import pytest
+from timeit import default_timer
 
 from stockfish import Stockfish
 
@@ -326,3 +327,27 @@ class TestStockfish:
             stockfish.get_fen_position()
             == "r1b1kb1r/ppp1n1pp/2p5/4Pp2/8/2N2N1P/PPP2PP1/R1BR2K1 w - f6 0 9"
         )
+
+    def test_make_moves_TT_speed(self):
+        stockfish = Stockfish(depth=16)
+        positions_considered = []
+        stockfish.set_fen_position(
+            "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2"
+        )
+
+        total_time_calculating_first = 0.0
+        for i in range(5):
+            start = default_timer()
+            chosen_move = stockfish.get_best_move()
+            total_time_calculating_first += default_timer() - start
+            positions_considered.append(stockfish.get_fen_position())
+            stockfish.make_moves_from_current_position([chosen_move])
+
+        total_time_calculating_second = 0.0
+        for i in range(len(positions_considered)):
+            stockfish.set_fen_position(positions_considered[i])
+            start = default_timer()
+            stockfish.get_best_move()
+            total_time_calculating_second += default_timer() - start
+
+        assert total_time_calculating_first < total_time_calculating_second
