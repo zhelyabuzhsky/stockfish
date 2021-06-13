@@ -82,6 +82,21 @@ class TestStockfish:
         stockfish.set_fen_position("3kn3/p5rp/1p3p2/3B4/3P1P2/2P5/1P3K2/8 w - - 0 53")
         assert stockfish.info == ""
 
+    def test_set_fen_position_second_argument(self):
+        stockfish = Stockfish(depth=16)
+        stockfish.set_fen_position(
+            "rnbqk2r/pppp1ppp/3bpn2/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 1", True
+        )
+        assert stockfish.get_best_move() == "e4e5"
+        stockfish.set_fen_position(
+            "rnbqk2r/pppp1ppp/3bpn2/4P3/3P4/2N5/PPP2PPP/R1BQKBNR b KQkq - 0 1", False
+        )
+        assert stockfish.get_best_move() == "d6e7"
+        stockfish.set_fen_position(
+            "rnbqk2r/pppp1ppp/3bpn2/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 1", False
+        )
+        assert stockfish.get_best_move() == "e4e5"
+
     def test_is_move_correct_first_move(self, stockfish):
         assert stockfish.is_move_correct("e2e1") is False
         assert stockfish.is_move_correct("a2a3") is True

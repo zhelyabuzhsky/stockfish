@@ -211,6 +211,8 @@ class Stockfish:
             self._start_new_game()
         else:
             self._is_ready()
+            self.info = ""
+            # Same behaviour as start_new_game, except without the self._put("ucinewgame") call.
         self._put(f"position fen {fen_position}")
 
     def get_best_move(self) -> Optional[str]:
