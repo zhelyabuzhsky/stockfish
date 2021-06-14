@@ -353,14 +353,16 @@ class TestStockfish:
         )
 
     def test_make_moves_transposition_table_speed(self):
-        # make_moves_from_current_position won't send the "ucinewgame" token to Stockfish, since it
-        # will reach a new position similar to the current one. Meanwhile, set_fen_position will send this
-        # token (unless the user specifies otherwise), since it could be going to a completely new position.
+        """
+        make_moves_from_current_position won't send the "ucinewgame" token to Stockfish, since it
+        will reach a new position similar to the current one. Meanwhile, set_fen_position will send this
+        token (unless the user specifies otherwise), since it could be going to a completely new position.
 
-        # A big effect of sending this token is that it resets SF's transposition table. If the
-        # new position is similar to the current one, this will affect SF's speed. This function tests
-        # that make_moves_from_current_position doesn't reset the transposition table, by verifying SF is faster in
-        # evaluating a consecutive set of positions when the make_moves_from_current_position function is used.
+        A big effect of sending this token is that it resets SF's transposition table. If the
+        new position is similar to the current one, this will affect SF's speed. This function tests
+        that make_moves_from_current_position doesn't reset the transposition table, by verifying SF is faster in
+        evaluating a consecutive set of positions when the make_moves_from_current_position function is used.
+        """
 
         stockfish = Stockfish(depth=16)
         positions_considered = []
