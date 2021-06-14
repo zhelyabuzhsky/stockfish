@@ -70,8 +70,8 @@ class Stockfish:
         for name, value in list(self._parameters.items()):
             self._set_option(name, value)
 
-    def _prepare_for_new_position(self, do_ucinewgame: bool = True) -> None:
-        if do_ucinewgame:
+    def _prepare_for_new_position(self, send_ucinewgame_token: bool = True) -> None:
+        if send_ucinewgame_token:
             self._put("ucinewgame")
         self._is_ready()
         self.info = ""
@@ -208,7 +208,7 @@ class Stockfish:
               FEN string of board position.
 
             send_ucinewgame_token:
-              Whether to send the ucinewgame token to the Stockfish engine.
+              Whether to send the "ucinewgame" token to the Stockfish engine.
               The most prominent effect this will have is clearing Stockfish's transposition table,
               which should be done if the new position is unrelated to the current position.
 
