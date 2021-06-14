@@ -50,7 +50,7 @@ class Stockfish:
         for name, value in list(self._parameters.items()):
             self._set_option(name, value)
 
-        self._prep_for_new_position(True)
+        self._prepare_for_new_position(True)
 
     def get_parameters(self) -> dict:
         """Returns current board position.
@@ -70,7 +70,7 @@ class Stockfish:
         for name, value in list(self._parameters.items()):
             self._set_option(name, value)
 
-    def _prep_for_new_position(self, do_ucinewgame: bool) -> None:
+    def _prepare_for_new_position(self, do_ucinewgame: bool = True) -> None:
         if do_ucinewgame:
             self._put("ucinewgame")
         self._is_ready()
@@ -119,7 +119,7 @@ class Stockfish:
               Must be in full algebraic notation.
               example: ['e2e4', 'e7e5']
         """
-        self._prep_for_new_position(True)
+        self._prepare_for_new_position(True)
         if moves is None:
             moves = []
         self._put(f"position startpos moves {self._convert_move_list_to_str(moves)}")
@@ -137,7 +137,7 @@ class Stockfish:
             raise ValueError(
                 "No moves sent in to the make_moves_from_current_position function."
             )
-        self._prep_for_new_position(False)
+        self._prepare_for_new_position(False)
         self._put(
             f"position fen {self.get_fen_position()} moves {self._convert_move_list_to_str(moves)}"
         )
@@ -199,7 +199,7 @@ class Stockfish:
         self._parameters.update({"UCI_Elo": elo_rating})
 
     def set_fen_position(
-        self, fen_position: str, reset_transposition_table: bool = True
+        self, fen_position: str, send_ucinewgame_token: bool = True
     ) -> None:
         """Sets current board position in Forsyth–Edwards notation (FEN).
 
@@ -207,10 +207,15 @@ class Stockfish:
             fen_position:
               FEN string of board position.
 
+            send_ucinewgame_token:
+              Whether to send the ucinewgame token to the Stockfish engine.
+              The most prominent effect this will have is clearing Stockfish's transposition table,
+              which should be done if the new position is unrelated to the current position.
+
         Returns:
             None
         """
-        self._prep_for_new_position(reset_transposition_table)
+        self._prepare_for_new_position(send_ucinewgame_token)
         self._put(f"position fen {fen_position}")
 
     def get_best_move(self) -> Optional[str]:
