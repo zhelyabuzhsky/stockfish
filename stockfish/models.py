@@ -50,7 +50,7 @@ class Stockfish:
         for name, value in list(self._parameters.items()):
             self._set_option(name, value)
 
-        self._start_new_game()
+        self._prepare_for_new_position(True)
 
     def get_parameters(self) -> dict:
         """Returns current board position.
@@ -70,8 +70,9 @@ class Stockfish:
         for name, value in list(self._parameters.items()):
             self._set_option(name, value)
 
-    def _start_new_game(self) -> None:
-        self._put("ucinewgame")
+    def _prepare_for_new_position(self, send_ucinewgame_token: bool = True) -> None:
+        if send_ucinewgame_token:
+            self._put("ucinewgame")
         self._is_ready()
         self.info = ""
 
@@ -118,10 +119,28 @@ class Stockfish:
               Must be in full algebraic notation.
               example: ['e2e4', 'e7e5']
         """
-        self._start_new_game()
+        self._prepare_for_new_position(True)
         if moves is None:
             moves = []
         self._put(f"position startpos moves {self._convert_move_list_to_str(moves)}")
+
+    def make_moves_from_current_position(self, moves: List[str]) -> None:
+        """Sets a new position by playing the moves from the current position.
+
+        Args:
+            moves:
+              A list of moves to play in the current position, in order to reach a new position.
+              Must be in full algebraic notation.
+              Example: ["g4d7", "a8b8", "f1d1"]
+        """
+        if moves == []:
+            raise ValueError(
+                "No moves sent in to the make_moves_from_current_position function."
+            )
+        self._prepare_for_new_position(False)
+        self._put(
+            f"position fen {self.get_fen_position()} moves {self._convert_move_list_to_str(moves)}"
+        )
 
     def get_board_visual(self) -> str:
         """Returns a visual representation of the current board position.
@@ -179,17 +198,24 @@ class Stockfish:
         self._set_option("UCI_Elo", elo_rating)
         self._parameters.update({"UCI_Elo": elo_rating})
 
-    def set_fen_position(self, fen_position: str) -> None:
+    def set_fen_position(
+        self, fen_position: str, send_ucinewgame_token: bool = True
+    ) -> None:
         """Sets current board position in Forsyth–Edwards notation (FEN).
 
         Args:
             fen_position:
               FEN string of board position.
 
+            send_ucinewgame_token:
+              Whether to send the "ucinewgame" token to the Stockfish engine.
+              The most prominent effect this will have is clearing Stockfish's transposition table,
+              which should be done if the new position is unrelated to the current position.
+
         Returns:
             None
         """
-        self._start_new_game()
+        self._prepare_for_new_position(send_ucinewgame_token)
         self._put(f"position fen {fen_position}")
 
     def get_best_move(self) -> Optional[str]:

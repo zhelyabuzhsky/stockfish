@@ -1,4 +1,5 @@
 import pytest
+from timeit import default_timer
 
 from stockfish import Stockfish
 
@@ -72,6 +73,11 @@ class TestStockfish:
         stockfish.set_fen_position("8/8/8/6pp/8/4k1PP/8/r3K3 w - - 12 53")
         assert stockfish.info == ""
 
+        stockfish.set_fen_position("8/8/8/6pp/8/4k1PP/r7/4K3 b - - 11 52")
+        stockfish.get_best_move()
+        stockfish.set_fen_position("8/8/8/6pp/8/4k1PP/8/r3K3 w - - 12 53", False)
+        assert stockfish.info == ""
+
     def test_set_fen_position_starts_new_game(self, stockfish):
         stockfish.set_fen_position(
             "7r/1pr1kppb/2n1p2p/2NpP2P/5PP1/1P6/P6K/R1R2B2 w - - 1 27"
@@ -80,6 +86,23 @@ class TestStockfish:
         assert stockfish.info != ""
         stockfish.set_fen_position("3kn3/p5rp/1p3p2/3B4/3P1P2/2P5/1P3K2/8 w - - 0 53")
         assert stockfish.info == ""
+
+    def test_set_fen_position_second_argument(self):
+        stockfish = Stockfish(depth=16)
+        stockfish.set_fen_position(
+            "rnbqk2r/pppp1ppp/3bpn2/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 1", True
+        )
+        assert stockfish.get_best_move() == "e4e5"
+
+        stockfish.set_fen_position(
+            "rnbqk2r/pppp1ppp/3bpn2/4P3/3P4/2N5/PPP2PPP/R1BQKBNR b KQkq - 0 1", False
+        )
+        assert stockfish.get_best_move() == "d6e7"
+
+        stockfish.set_fen_position(
+            "rnbqk2r/pppp1ppp/3bpn2/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 1", False
+        )
+        assert stockfish.get_best_move() == "e4e5"
 
     def test_is_move_correct_first_move(self, stockfish):
         assert stockfish.is_move_correct("e2e1") is False
@@ -299,3 +322,67 @@ class TestStockfish:
             stockfish.get_top_moves(0)
         assert len(stockfish.get_top_moves(2)) == 2
         assert stockfish.get_parameters()["MultiPV"] == 1
+
+    def test_make_moves_from_current_position(self, stockfish):
+        stockfish.set_fen_position(
+            "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"
+        )
+        with pytest.raises(ValueError):
+            stockfish.make_moves_from_current_position([])
+
+        stockfish.make_moves_from_current_position(["e1g1"])
+        assert (
+            stockfish.get_fen_position()
+            == "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 1 1"
+        )
+
+        stockfish.make_moves_from_current_position(
+            ["f6e4", "d2d4", "e4d6", "b5c6", "d7c6", "d4e5", "d6f5"]
+        )
+        assert (
+            stockfish.get_fen_position()
+            == "r1bqkb1r/ppp2ppp/2p5/4Pn2/8/5N2/PPP2PPP/RNBQ1RK1 w kq - 1 5"
+        )
+
+        stockfish.make_moves_from_current_position(
+            ["d1d8", "e8d8", "b1c3", "d8e8", "f1d1", "f5e7", "h2h3", "f7f5"]
+        )
+        assert (
+            stockfish.get_fen_position()
+            == "r1b1kb1r/ppp1n1pp/2p5/4Pp2/8/2N2N1P/PPP2PP1/R1BR2K1 w - f6 0 9"
+        )
+
+    def test_make_moves_transposition_table_speed(self):
+        """
+        make_moves_from_current_position won't send the "ucinewgame" token to Stockfish, since it
+        will reach a new position similar to the current one. Meanwhile, set_fen_position will send this
+        token (unless the user specifies otherwise), since it could be going to a completely new position.
+
+        A big effect of sending this token is that it resets SF's transposition table. If the
+        new position is similar to the current one, this will affect SF's speed. This function tests
+        that make_moves_from_current_position doesn't reset the transposition table, by verifying SF is faster in
+        evaluating a consecutive set of positions when the make_moves_from_current_position function is used.
+        """
+
+        stockfish = Stockfish(depth=16)
+        positions_considered = []
+        stockfish.set_fen_position(
+            "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2"
+        )
+
+        total_time_calculating_first = 0.0
+        for i in range(5):
+            start = default_timer()
+            chosen_move = stockfish.get_best_move()
+            total_time_calculating_first += default_timer() - start
+            positions_considered.append(stockfish.get_fen_position())
+            stockfish.make_moves_from_current_position([chosen_move])
+
+        total_time_calculating_second = 0.0
+        for i in range(len(positions_considered)):
+            stockfish.set_fen_position(positions_considered[i])
+            start = default_timer()
+            stockfish.get_best_move()
+            total_time_calculating_second += default_timer() - start
+
+        assert total_time_calculating_first < total_time_calculating_second
