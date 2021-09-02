@@ -83,6 +83,14 @@ Time constraint is in milliseconds
 e2e4
 ```
 
+### Get best move based on a nodes constraint
+```python
+stockfish.get_best_move_nodes(100_000)
+```
+Search 100_000 nodes only
+```text
+d2d4
+```
 
 ### Check is move correct with current position
 ```python

@@ -102,6 +102,9 @@ class Stockfish:
 
     def _go_time(self, time: int) -> None:
         self._put(f"go movetime {time}")
+    
+    def _go_nodes(self, nodes: int) -> None:
+        self._put(f"go nodes {nodes}")
 
     @staticmethod
     def _convert_move_list_to_str(moves: List[str]) -> str:
@@ -247,6 +250,19 @@ class Stockfish:
             A string of move in algebraic notation or None, if it's a mate now.
         """
         self._go_time(time)
+        last_text: str = ""
+        while True:
+            text = self._read_line()
+            splitted_text = text.split(" ")
+            if splitted_text[0] == "bestmove":
+                if splitted_text[1] == "(none)":
+                    return None
+                self.info = last_text
+                return splitted_text[1]
+            last_text = text
+    
+    def get_best_move_nodes(self, nodes: int = 100_000):    
+        self._go_nodes(nodes)
         last_text: str = ""
         while True:
             text = self._read_line()

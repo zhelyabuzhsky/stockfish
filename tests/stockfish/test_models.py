@@ -23,6 +23,10 @@ class TestStockfish:
         best_move = stockfish.get_best_move_time(1000)
         assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3")
 
+    def test_get_best_move_nodes_first_move(self, stockfish):
+        best_move = stockfish.get_best_move_nodes(100_000)
+        assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3", "d2d4", "c2c4")
+
     def test_set_position_resets_info(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6"])
         stockfish.get_best_move()
