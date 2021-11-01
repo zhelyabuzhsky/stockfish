@@ -35,8 +35,8 @@ class Stockfish:
         self.stockfish = subprocess.Popen(
             path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
         )
-
-        self._stockfish_major_version: float = float(self._read_line().split(" ")[1])
+        
+        self._stockfish_major_version: int = int(self._read_line().split(" ")[1].split(".")[0])
 
         self._put("uci")
 

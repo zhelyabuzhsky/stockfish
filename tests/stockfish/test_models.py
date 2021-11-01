@@ -251,6 +251,7 @@ class TestStockfish:
             11,
             12,
             13,
+            14
         )
 
     def test_get_evaluation_cp(self, stockfish):
