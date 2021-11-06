@@ -36,7 +36,9 @@ class Stockfish:
             path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
         )
 
-        self._stockfish_major_version: int = int(self._read_line().split(" ")[1].split(".")[0])
+        self._stockfish_major_version: int = int(
+            self._read_line().split(" ")[1].split(".")[0]
+        )
 
         self._put("uci")
 

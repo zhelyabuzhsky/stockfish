@@ -244,15 +244,7 @@ class TestStockfish:
         )
 
     def test_get_stockfish_major_version(self, stockfish):
-        assert stockfish.get_stockfish_major_version() in (
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14
-        )
+        assert stockfish.get_stockfish_major_version() in (8, 9, 10, 11, 12, 13, 14)
 
     def test_get_evaluation_cp(self, stockfish):
         stockfish.set_fen_position(
