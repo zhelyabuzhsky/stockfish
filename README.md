@@ -183,6 +183,20 @@ Positive is advantage white, negative is advantage black
 {"type":"mate", "value":-3}
 ```
 
+### Run benchmark 
+```python 
+stockfish.benchmark()
+```
+This will run the bench command with default settings. kwargs can be supplied as options.
+```text
+ttSize: int -> Transposition Table size in MB (max 2048)
+threads: int -> Number of search threads that should be used (max 512)
+limit: int -> Limit value of limitType spent for each position (max 10000)
+fenFile: str -> Path to a FEN format file containing positions to bench (.fen format)
+limitType: str -> Type of the limit used with limit value (depth, perft, nodes, movetime (milliseconds))
+evalType: str -> Evaluation type used (mixed, classical, NNUE)
+```
+
 ### Get current major version of stockfish engine
 ```python 
 stockfish.get_stockfish_major_version()

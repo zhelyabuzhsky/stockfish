@@ -7,7 +7,7 @@ from stockfish import Stockfish
 class TestStockfish:
     @pytest.fixture
     def stockfish(self):
-        return Stockfish()
+        return Stockfish("C:/Users/Adam/Desktop/stockfish_14.1_win_x64_avx2/stockfish_14.1_win_x64_avx2.exe")
 
     def test_get_best_move_first_move(self, stockfish):
         best_move = stockfish.get_best_move()
@@ -408,3 +408,11 @@ class TestStockfish:
             total_time_calculating_second += default_timer() - start
 
         assert total_time_calculating_first < total_time_calculating_second
+
+    def test_benchmark(self, stockfish):
+        defaults = stockfish.benchmark()
+        assert defaults != None
+        valid_options = stockfish.benchmark(ttSize=64, threads=2, limit=10000, limitType="movetime", evalType="classical")
+        assert valid_options != None
+        invalid_options = stockfish.benchmark(ttSize=2049, threads=0, limit=0, fenFile="./fakefile.fen", limitType="fghthtr", evalType="")
+        assert invalid_options != None

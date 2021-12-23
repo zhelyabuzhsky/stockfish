@@ -8,6 +8,7 @@
 import subprocess
 from typing import Any, List, Optional
 import copy
+import os
 
 
 class Stockfish:
@@ -33,7 +34,11 @@ class Stockfish:
             "UCI_Elo": 1350,
         }
         self.stockfish = subprocess.Popen(
-            path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
+            path,
+            universal_newlines=True,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
 
         self._stockfish_major_version: int = int(
@@ -88,6 +93,11 @@ class Stockfish:
         if not self.stockfish.stdout:
             raise BrokenPipeError()
         return self.stockfish.stdout.readline().strip()
+
+    def _read_err_line(self) -> str:
+        if not self.stockfish.stderr:
+            raise BrokenPipeError()
+        return self.stockfish.stderr.readline().strip()
 
     def _set_option(self, name: str, value: Any) -> None:
         self._put(f"setoption name {name} value {value}")
@@ -379,6 +389,64 @@ class Stockfish:
             self._set_option("MultiPV", old_MultiPV_value)
             self._parameters.update({"MultiPV": old_MultiPV_value})
         return top_moves
+
+    def benchmark(self, **kwargs: dict[str:Any]) -> Optional[str]:
+        """Benchmark will run the bench command with kwargs as options or with the Defaults provided.
+        It is an Additional custom non-UCI command, mainly for debugging.
+        Do not use this command during a search!
+
+        Kwargs:
+            ttSize: int -> Transposition Table size in MB (max 2048)
+            threads: int -> Number of search threads that should be used (max 512)
+            limit: int -> Limit value of limitType spent for each position (max 10000)
+            fenFile: str -> Path to a FEN format file containing positions to bench (.fen format)
+            limitType: str -> Type of the limit used with limit value (depth, perft, nodes, movetime (milliseconds))
+            evalType: str -> Evaluation type used (mixed, classical, NNUE)
+        """
+        defaults = {
+            "ttSize": {"option": range(1, 2048), "default": 16},
+            "threads": {"option": range(1, 512), "default": 1},
+            "limit": {"option": range(1, 10000), "default": 13},
+            "fenFile": {"default": "default"},
+            "limitType": {
+                "option": ["depth", "perft", "nodes", "movetime"],
+                "default": "depth",
+            },
+            "evalType": {"option": ["mixed", "classical", "NNUE"], "default": "mixed"},
+        }
+        options: str = ""
+
+        for key in defaults:
+            # Handle case for path to a FEN format file provided
+            if key == "fenFile":
+                try:
+                    if kwargs[key].endswith(".fen") and os.path.isfile(
+                        kwargs["fenFile"]
+                    ):
+                        options += str(kwargs[key]) + " "
+                        continue
+                except KeyError:
+                    options += str(defaults[key]["default"]) + " "
+                    continue
+            try:
+                value = kwargs[key]
+                option = (
+                    value
+                    if value in defaults[key]["option"]
+                    else defaults[key]["default"]
+                )
+                options += str(option) + " "
+            except KeyError:
+                options += str(defaults[key]["default"]) + " "
+
+        self._put(f"bench {options}")
+        last_text: str = ""
+        while True:
+            text = self._read_err_line()
+            splitted_text = text.split(" ")
+            if splitted_text[0] == "Nodes/second":
+                return last_text
+            last_text += text
 
     def set_depth(self, depth_value: int = 2) -> None:
         """Sets current depth of stockfish engine.
