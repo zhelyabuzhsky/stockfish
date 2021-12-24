@@ -412,7 +412,20 @@ class TestStockfish:
     def test_benchmark(self, stockfish):
         defaults = stockfish.benchmark()
         assert defaults != None
-        valid_options = stockfish.benchmark(ttSize=64, threads=2, limit=10000, limitType="movetime", evalType="classical")
+        valid_options = stockfish.benchmark(
+            ttSize=64,
+            threads=2,
+            limit=10000,
+            limitType="movetime",
+            evalType="classical",
+        )
         assert valid_options != None
-        invalid_options = stockfish.benchmark(ttSize=2049, threads=0, limit=0, fenFile="./fakefile.fen", limitType="fghthtr", evalType="")
+        invalid_options = stockfish.benchmark(
+            ttSize=2049,
+            threads=0,
+            limit=0,
+            fenFile="./fakefile.fen",
+            limitType="fghthtr",
+            evalType="",
+        )
         assert invalid_options != None

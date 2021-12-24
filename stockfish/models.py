@@ -420,9 +420,7 @@ class Stockfish:
             # Handle case for path to a FEN format file provided
             if key == "fenFile":
                 try:
-                    if kwargs[key].endswith(".fen") and path.isfile(
-                        kwargs["fenFile"]
-                    ):
+                    if kwargs[key].endswith(".fen") and path.isfile(kwargs["fenFile"]):
                         options += str(kwargs[key]) + " "
                         continue
                 except KeyError:
