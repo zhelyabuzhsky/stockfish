@@ -21,7 +21,7 @@ class TestStockfish:
 
     def test_get_best_move_time_first_move(self, stockfish):
         best_move = stockfish.get_best_move_time(1000)
-        assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3")
+        assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3", "d2d4")
 
     def test_set_position_resets_info(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6"])
@@ -87,8 +87,8 @@ class TestStockfish:
         stockfish.set_fen_position("3kn3/p5rp/1p3p2/3B4/3P1P2/2P5/1P3K2/8 w - - 0 53")
         assert stockfish.info == ""
 
-    def test_set_fen_position_second_argument(self):
-        stockfish = Stockfish(depth=16)
+    def test_set_fen_position_second_argument(self, stockfish):
+        stockfish.set_depth(16)
         stockfish.set_fen_position(
             "rnbqk2r/pppp1ppp/3bpn2/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 1", True
         )
@@ -182,6 +182,7 @@ class TestStockfish:
             "d1e2",
             "g2g3",
             "c2c4",
+            "f1e2",
         )
         assert stockfish.get_parameters()["UCI_Elo"] == 2000
 
@@ -191,11 +192,13 @@ class TestStockfish:
             "b1c3",
             "d2d3",
             "d2d4",
+            "c2c4",
+            "f1e2",
         )
         assert stockfish.get_parameters()["UCI_Elo"] == 1350
 
-    def test_stockfish_constructor_with_custom_params(self):
-        stockfish = Stockfish(parameters={"Skill Level": 1})
+    def test_stockfish_constructor_with_custom_params(self, stockfish):
+        stockfish.set_skill_level(1)
         assert stockfish.get_parameters() == {
             "Write Debug Log": "false",
             "Contempt": 0,
@@ -296,28 +299,25 @@ class TestStockfish:
         stockfish.get_best_move()
         assert "depth 12" in stockfish.info
 
-    def test_get_best_move_wrong_position(self):
+    def test_get_best_move_wrong_position(self, stockfish):
         wrong_fen = "3kk3/8/8/8/8/8/8/3KK3 w - - 0 0"
-        s = Stockfish()
-        s.set_fen_position(wrong_fen)
-        assert s.get_best_move() in (
+        stockfish.set_fen_position(wrong_fen)
+        assert stockfish.get_best_move() in (
             "d1e2",
             "d1c1",
         )
 
-    def test_get_parameters(self):
-        s1 = Stockfish()
-        s2 = Stockfish()
-        arg1 = s1.get_parameters()
-        arg2 = s2.get_parameters()
+    def test_get_parameters(self, stockfish):
+        arg1 = str(stockfish.get_parameters())
+        arg2 = str(stockfish.get_parameters())
         assert arg1 == arg2
-        s1.set_skill_level(1)
-        arg1 = s1.get_parameters()
-        arg2 = s2.get_parameters()
+        stockfish._set_option("Minimum Thinking Time", 10)
+        arg2 = str(stockfish.get_parameters())
         assert arg1 != arg2
 
-    def test_get_top_moves(self):
-        stockfish = Stockfish(depth=15, parameters={"MultiPV": 4})
+    def test_get_top_moves(self, stockfish):
+        stockfish.set_depth(15)
+        stockfish._set_option("MultiPV", 4)
         stockfish.set_fen_position("1rQ1r1k1/5ppp/8/8/1R6/8/2r2PPP/4R1K1 w - - 0 1")
         assert stockfish.get_top_moves(2) == [
             {"Move": "e1e8", "Centipawn": None, "Mate": 1},
@@ -329,14 +329,14 @@ class TestStockfish:
             {"Move": "g1h1", "Centipawn": None, "Mate": -1},
         ]
 
-    def test_get_top_moves_mate(self):
-        stockfish = Stockfish(depth=10, parameters={"MultiPV": 3})
+    def test_get_top_moves_mate(self, stockfish):
+        stockfish.set_depth(10)
+        stockfish._set_option("MultiPV", 3)
         stockfish.set_fen_position("8/8/8/8/8/6k1/8/3r2K1 w - - 0 1")
         assert stockfish.get_top_moves() == []
         assert stockfish.get_parameters()["MultiPV"] == 3
 
-    def test_get_top_moves_raising_error(self):
-        stockfish = Stockfish()
+    def test_get_top_moves_raising_error(self, stockfish):
         stockfish.set_fen_position(
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         )
@@ -374,7 +374,7 @@ class TestStockfish:
             == "r1b1kb1r/ppp1n1pp/2p5/4Pp2/8/2N2N1P/PPP2PP1/R1BR2K1 w - f6 0 9"
         )
 
-    def test_make_moves_transposition_table_speed(self):
+    def test_make_moves_transposition_table_speed(self, stockfish):
         """
         make_moves_from_current_position won't send the "ucinewgame" token to Stockfish, since it
         will reach a new position similar to the current one. Meanwhile, set_fen_position will send this
@@ -386,7 +386,7 @@ class TestStockfish:
         evaluating a consecutive set of positions when the make_moves_from_current_position function is used.
         """
 
-        stockfish = Stockfish(depth=16)
+        stockfish.set_depth(16)
         positions_considered = []
         stockfish.set_fen_position(
             "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2"
@@ -411,15 +411,17 @@ class TestStockfish:
 
     def test_benchmark(self, stockfish):
         defaults = stockfish.benchmark()
-        assert defaults != None
+        assert defaults.split(" ")[0] == "Nodes/second"
+
         valid_options = stockfish.benchmark(
             ttSize=64,
             threads=2,
-            limit=10000,
+            limit=1000,
             limitType="movetime",
             evalType="classical",
         )
-        assert valid_options != None
+        assert valid_options.split(" ")[0] == "Nodes/second"
+
         invalid_options = stockfish.benchmark(
             ttSize=2049,
             threads=0,
@@ -428,4 +430,4 @@ class TestStockfish:
             limitType="fghthtr",
             evalType="",
         )
-        assert invalid_options != None
+        assert invalid_options.split(" ")[0] == "Nodes/second"

@@ -38,7 +38,7 @@ class Stockfish:
             universal_newlines=True,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
         )
 
         self._stockfish_major_version: int = int(
@@ -94,13 +94,9 @@ class Stockfish:
             raise BrokenPipeError()
         return self.stockfish.stdout.readline().strip()
 
-    def _read_err_line(self) -> str:
-        if not self.stockfish.stderr:
-            raise BrokenPipeError()
-        return self.stockfish.stderr.readline().strip()
-
     def _set_option(self, name: str, value: Any) -> None:
         self._put(f"setoption name {name} value {value}")
+        self._parameters.update({name: value})
         self._is_ready()
 
     def _is_ready(self) -> None:
@@ -197,6 +193,7 @@ class Stockfish:
             None
         """
         self._set_option("UCI_LimitStrength", "false")
+        self._parameters.update({"UCI_LimitStrength": "false"})
         self._set_option("Skill Level", skill_level)
         self._parameters.update({"Skill Level": skill_level})
 
@@ -210,6 +207,7 @@ class Stockfish:
             None
         """
         self._set_option("UCI_LimitStrength", "true")
+        self._parameters.update({"UCI_LimitStrength": "true"})
         self._set_option("UCI_Elo", elo_rating)
         self._parameters.update({"UCI_Elo": elo_rating})
 
@@ -399,14 +397,14 @@ class Stockfish:
             ttSize: int -> Transposition Table size in MB (max 2048)
             threads: int -> Number of search threads that should be used (max 512)
             limit: int -> Limit value of limitType spent for each position (max 10000)
-            fenFile: str -> Path to a FEN format file containing positions to bench (.fen format)
-            limitType: str -> Type of the limit used with limit value (depth, perft, nodes, movetime (milliseconds))
+            fenFile: str -> Path to a FEN format file containing positions to bench (path/to/file.fen)
+            limitType: str -> Type of the limit used with limit value (depth, perft, nodes, movetime)
             evalType: str -> Evaluation type used (mixed, classical, NNUE)
         """
         defaults: Dict[str, Any] = {
-            "ttSize": {"option": range(1, 2048), "default": 16},
-            "threads": {"option": range(1, 512), "default": 1},
-            "limit": {"option": range(1, 10000), "default": 13},
+            "ttSize": {"option": range(1, 2049), "default": 16},
+            "threads": {"option": range(1, 513), "default": 1},
+            "limit": {"option": range(1, 10001), "default": 13},
             "fenFile": {"default": "default"},
             "limitType": {
                 "option": ["depth", "perft", "nodes", "movetime"],
@@ -419,9 +417,10 @@ class Stockfish:
         for key in defaults:
             try:
                 # Handle case for path to a FEN format file provided
-                if kwargs[key].endswith(".fen") and path.isfile(kwargs["fenFile"]):
-                    options += str(kwargs[key]) + " "
-                    continue
+                if key == "fenFile":
+                    if kwargs[key].endswith(".fen") and path.isfile(kwargs["fenFile"]):
+                        options += str(kwargs[key]) + " "
+                        continue
                 value = kwargs[key]
                 option = (
                     value
@@ -435,12 +434,12 @@ class Stockfish:
         self._put(f"bench {options}")
         last_text: str = ""
         while True:
-            text = self._read_err_line()
+            text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "Nodes/second":
-                last_text += text
+                last_text = text
                 return last_text
-            last_text += text
+            last_text = text
 
     def set_depth(self, depth_value: int = 2) -> None:
         """Sets current depth of stockfish engine.
