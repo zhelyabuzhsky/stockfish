@@ -390,7 +390,7 @@ class Stockfish:
             self._parameters.update({"MultiPV": old_MultiPV_value})
         return top_moves
 
-    def benchmark(self, **kwargs: dict[str:Any]) -> str:
+    def benchmark(self, **kwargs: Any) -> str:
         """Benchmark will run the bench command with kwargs as options or with the Defaults provided.
         It is an Additional custom non-UCI command, mainly for debugging.
         Do not use this command during a search!
@@ -403,7 +403,7 @@ class Stockfish:
             limitType: str -> Type of the limit used with limit value (depth, perft, nodes, movetime (milliseconds))
             evalType: str -> Evaluation type used (mixed, classical, NNUE)
         """
-        defaults = {
+        defaults: dict[str, Any] = {
             "ttSize": {"option": range(1, 2048), "default": 16},
             "threads": {"option": range(1, 512), "default": 1},
             "limit": {"option": range(1, 10000), "default": 13},
