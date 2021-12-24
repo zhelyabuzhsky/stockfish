@@ -8,7 +8,7 @@
 import subprocess
 from typing import Any, List, Optional
 import copy
-import os
+from os import path
 
 
 class Stockfish:
@@ -390,7 +390,7 @@ class Stockfish:
             self._parameters.update({"MultiPV": old_MultiPV_value})
         return top_moves
 
-    def benchmark(self, **kwargs: dict[str:Any]) -> Optional[str]:
+    def benchmark(self, **kwargs: dict[str:Any]) -> str:
         """Benchmark will run the bench command with kwargs as options or with the Defaults provided.
         It is an Additional custom non-UCI command, mainly for debugging.
         Do not use this command during a search!
@@ -420,7 +420,7 @@ class Stockfish:
             # Handle case for path to a FEN format file provided
             if key == "fenFile":
                 try:
-                    if kwargs[key].endswith(".fen") and os.path.isfile(
+                    if kwargs[key].endswith(".fen") and path.isfile(
                         kwargs["fenFile"]
                     ):
                         options += str(kwargs[key]) + " "
@@ -445,6 +445,7 @@ class Stockfish:
             text = self._read_err_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "Nodes/second":
+                last_text += text
                 return last_text
             last_text += text
 

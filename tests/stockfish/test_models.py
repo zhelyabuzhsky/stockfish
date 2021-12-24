@@ -7,7 +7,7 @@ from stockfish import Stockfish
 class TestStockfish:
     @pytest.fixture
     def stockfish(self):
-        return Stockfish("C:/Users/Adam/Desktop/stockfish_14.1_win_x64_avx2/stockfish_14.1_win_x64_avx2.exe")
+        return Stockfish()
 
     def test_get_best_move_first_move(self, stockfish):
         best_move = stockfish.get_best_move()
