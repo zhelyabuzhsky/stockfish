@@ -6,7 +6,7 @@
 """
 
 import subprocess
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Dict
 import copy
 from os import path
 
@@ -403,7 +403,7 @@ class Stockfish:
             limitType: str -> Type of the limit used with limit value (depth, perft, nodes, movetime (milliseconds))
             evalType: str -> Evaluation type used (mixed, classical, NNUE)
         """
-        defaults: dict[str, Any] = {
+        defaults: Dict[str, Any] = {
             "ttSize": {"option": range(1, 2048), "default": 16},
             "threads": {"option": range(1, 512), "default": 1},
             "limit": {"option": range(1, 10000), "default": 13},
@@ -417,16 +417,11 @@ class Stockfish:
         options: str = ""
 
         for key in defaults:
-            # Handle case for path to a FEN format file provided
-            if key == "fenFile":
-                try:
-                    if kwargs[key].endswith(".fen") and path.isfile(kwargs["fenFile"]):
-                        options += str(kwargs[key]) + " "
-                        continue
-                except KeyError:
-                    options += str(defaults[key]["default"]) + " "
-                    continue
             try:
+                # Handle case for path to a FEN format file provided
+                if kwargs[key].endswith(".fen") and path.isfile(kwargs["fenFile"]):
+                    options += str(kwargs[key]) + " "
+                    continue
                 value = kwargs[key]
                 option = (
                     value
