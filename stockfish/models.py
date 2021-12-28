@@ -31,6 +31,7 @@ class Stockfish:
             "UCI_Chess960": "false",
             "UCI_LimitStrength": "false",
             "UCI_Elo": 1350,
+            "UCI_ShowWDL": "true",
         }
         self.stockfish = subprocess.Popen(
             path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
@@ -39,6 +40,9 @@ class Stockfish:
         self._stockfish_major_version: int = int(
             self._read_line().split(" ")[1].split(".")[0]
         )
+        
+        if self._stockfish_major_version < 12:
+            del self.default_stockfish_params["UCI_ShowWDL"]
 
         self._put("uci")
 
@@ -282,6 +286,34 @@ class Stockfish:
                     return False
                 else:
                     return True
+                
+    def get_WDL_stats(self) -> List:
+        """Returns Stockfish's win/draw/loss stats for the side to move.
+        
+        Returns:
+            A list of three integers (unless the game is over, in which case
+            None is returned).
+        """
+        
+        assert "UCI_ShowWDL" in self._parameters
+        self._go()
+        lines = []
+        while True:
+            text = self._read_line()
+            splitted_text = text.split(" ")
+            lines.append(splitted_text)
+            if splitted_text[0] == "bestmove":
+                break
+        for current_line in reversed(lines):
+            if current_line[0] == "bestmove" and current_line[1] == "(none)":
+                return None
+            elif current_line[0] == "info" and current_line[1] == "depth":
+                assert "wdl" in current_line
+                index_of_wdl = current_line.index("wdl")
+                wdl_stats = []
+                for i in range(1, 4):
+                    wdl_stats.append(int(current_line[index_of_wdl + i]))
+                return wdl_stats
 
     def get_evaluation(self) -> dict:
         """Evaluates current position
