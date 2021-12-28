@@ -104,6 +104,14 @@ stockfish.get_top_moves(3)
 ]
 ```
 
+### Get Stockfish's win/draw/loss stats for the side to move in the current position.
+```python
+stockfish.get_WDL_stats()
+```
+```text
+[87, 894, 19]
+```
+
 ### Set current engine's skill level (ignoring ELO rating):
 ```python
 stockfish.set_skill_level(15)

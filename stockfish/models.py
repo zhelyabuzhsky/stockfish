@@ -40,7 +40,7 @@ class Stockfish:
         self._stockfish_major_version: int = int(
             self._read_line().split(" ")[1].split(".")[0]
         )
-        
+
         if self._stockfish_major_version < 12:
             del self.default_stockfish_params["UCI_ShowWDL"]
 
@@ -286,17 +286,18 @@ class Stockfish:
                     return False
                 else:
                     return True
-                
+
     def get_WDL_stats(self) -> List:
         """Returns Stockfish's win/draw/loss stats for the side to move.
-        
+
         Returns:
             Ideally, a list of three integers. However, if the game is over,
-            or if too old a version of SF is being used, then None is returned.
+            or if too old a version of SF is being used, then an empty list
+            is returned.
         """
-        
+
         if "UCI_ShowWDL" not in self._parameters:
-            return None
+            return []
         self._go()
         lines = []
         while True:
@@ -307,7 +308,7 @@ class Stockfish:
                 break
         for current_line in reversed(lines):
             if current_line[0] == "bestmove" and current_line[1] == "(none)":
-                return None
+                return []
             elif "multipv" in current_line:
                 index_of_multipv = current_line.index("multipv")
                 if current_line[index_of_multipv + 1] == "1":
@@ -316,6 +317,7 @@ class Stockfish:
                     for i in range(1, 4):
                         wdl_stats.append(int(current_line[index_of_wdl + i]))
                     return wdl_stats
+        raise RuntimeError("Reached the end of the get_WDL_stats function.")
 
     def get_evaluation(self) -> dict:
         """Evaluates current position
