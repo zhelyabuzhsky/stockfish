@@ -14,7 +14,7 @@ class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
     def __init__(
-        self, path: str = "stockfish", depth: int = 2, parameters: dict = None
+        self, path: str = "stockfish", depth: int = 15, parameters: dict = None
     ) -> None:
         self.default_stockfish_params = {
             "Write Debug Log": "false",

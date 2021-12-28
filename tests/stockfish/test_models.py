@@ -408,3 +408,22 @@ class TestStockfish:
             total_time_calculating_second += default_timer() - start
 
         assert total_time_calculating_first < total_time_calculating_second
+        
+    def test_get_WDL_stats(self):
+        stockfish = Stockfish(parameters={"MultiPV": 2})
+        stockfish.set_fen_position(
+            "7k/4R3/4P1pp/7N/8/8/1q5q/3K4 w - - 0 1"
+        )
+        wdl_stats = stockfish.get_WDL_stats()
+        assert wdl_stats[1] > wdl_stats[0] * 15
+        assert abs(wdl_stats[0] - wdl_stats[2]) / wdl_stats[0] < 0.1
+        stockfish.set_fen_position(
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        )
+        wdl_stats = stockfish.get_WDL_stats()
+        assert wdl_stats[1] > wdl_stats[0] * 5
+        assert wdl_stats[0] > wdl_stats[2] * 3
+        stockfish.set_fen_position(
+            "8/8/8/8/8/6k1/6p1/6K1 w - - 0 1"
+        )
+        assert stockfish.get_WDL_stats() is None
