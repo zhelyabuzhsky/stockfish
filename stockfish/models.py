@@ -41,10 +41,10 @@ class Stockfish:
             self._read_line().split(" ")[1].split(".")[0]
         )
 
-        if self._stockfish_major_version < 12:
-            del self.default_stockfish_params["UCI_ShowWDL"]
-
         self._put("uci")
+
+        if not self._has_UCI_ShowWDL_option():
+            del self.default_stockfish_params["UCI_ShowWDL"]
 
         self.depth = str(depth)
         self.info: str = ""
@@ -108,6 +108,16 @@ class Stockfish:
 
     def _go_time(self, time: int) -> None:
         self._put(f"go movetime {time}")
+
+    def _has_UCI_ShowWDL_option(self) -> bool:
+        self._put("uci")
+        while True:
+            text = self._read_line()
+            splitted_text = text.split(" ")
+            if splitted_text[0] == "uciok":
+                return False
+            elif "UCI_ShowWDL" in splitted_text:
+                return True
 
     @staticmethod
     def _convert_move_list_to_str(moves: List[str]) -> str:
