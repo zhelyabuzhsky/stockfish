@@ -291,11 +291,12 @@ class Stockfish:
         """Returns Stockfish's win/draw/loss stats for the side to move.
         
         Returns:
-            A list of three integers (unless the game is over, in which case
-            None is returned).
+            Ideally, a list of three integers. However, if the game is over,
+            or if too old a version of SF is being used, then None is returned.
         """
         
-        assert "UCI_ShowWDL" in self._parameters
+        if "UCI_ShowWDL" not in self._parameters:
+            return None
         self._go()
         lines = []
         while True:
@@ -307,13 +308,14 @@ class Stockfish:
         for current_line in reversed(lines):
             if current_line[0] == "bestmove" and current_line[1] == "(none)":
                 return None
-            elif current_line[0] == "info" and current_line[1] == "depth":
-                assert "wdl" in current_line
-                index_of_wdl = current_line.index("wdl")
-                wdl_stats = []
-                for i in range(1, 4):
-                    wdl_stats.append(int(current_line[index_of_wdl + i]))
-                return wdl_stats
+            elif "multipv" in current_line:
+                index_of_multipv = current_line.index("multipv")
+                if current_line[index_of_multipv + 1] == "1":
+                    index_of_wdl = current_line.index("wdl")
+                    wdl_stats = []
+                    for i in range(1, 4):
+                        wdl_stats.append(int(current_line[index_of_wdl + i]))
+                    return wdl_stats
 
     def get_evaluation(self) -> dict:
         """Evaluates current position
