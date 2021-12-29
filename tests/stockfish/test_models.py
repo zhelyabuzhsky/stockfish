@@ -407,21 +407,21 @@ class TestStockfish:
         assert total_time_calculating_first < total_time_calculating_second
 
     def test_benchmark_result_with_defaults(self, stockfish):
-        result = stockfish.benchmark()
-        assert defaults.split(" ")[0] == "Nodes/second"
+        params = stockfish.BenchmarkParameters()
+        result = stockfish.benchmark(params)
+        # result should contain the last line of a successful method call
+        assert result.split(" ")[0] == "Nodes/second"
 
     def test_benchmark_result_with_valid_options(self, stockfish):
-        result = stockfish.benchmark(
-            ttSize=64,
-            threads=2,
-            limit=1000,
-            limitType="movetime",
-            evalType="classical",
+        params = stockfish.BenchmarkParameters(
+            ttSize=64, threads=2, limit=1000, limitType="movetime", evalType="classical"
         )
-        assert valid_options.split(" ")[0] == "Nodes/second"
+        result = stockfish.benchmark(params)
+        # result should contain the last line of a successful method call
+        assert result.split(" ")[0] == "Nodes/second"
 
     def test_benchmark_result_with_invalid_options(self, stockfish):
-        result = stockfish.benchmark(
+        params = stockfish.BenchmarkParameters(
             ttSize=2049,
             threads=0,
             limit=0,
@@ -429,4 +429,6 @@ class TestStockfish:
             limitType="fghthtr",
             evalType="",
         )
-        assert invalid_options.split(" ")[0] == "Nodes/second"
+        result = stockfish.benchmark(params)
+        # result should contain the last line of a successful method call
+        assert result.split(" ")[0] == "Nodes/second"

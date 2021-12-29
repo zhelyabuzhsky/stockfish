@@ -6,9 +6,10 @@
 """
 
 import subprocess
-from typing import Any, List, Optional, Dict
+from typing import Any, List, Optional
 import copy
 from os import path
+from dataclasses import dataclass
 
 
 class Stockfish:
@@ -388,50 +389,44 @@ class Stockfish:
             self._parameters.update({"MultiPV": old_MultiPV_value})
         return top_moves
 
-    def benchmark(self, **kwargs: Any) -> str:
-        """Benchmark will run the bench command with kwargs as options or with the Defaults provided.
+    @dataclass
+    class BenchmarkParameters:
+        ttSize: int = 16
+        threads: int = 1
+        limit: int = 13
+        fenFile: str = "default"
+        limitType: str = "depth"
+        evalType: str = "mixed"
+
+        def __post_init__(self):
+            self.ttSize = self.ttSize if self.ttSize in range(1, 128001) else 16
+            self.threads = self.threads if self.threads in range(1, 513) else 1
+            self.limit = self.limit if self.limit in range(1, 10001) else 13
+            self.fenFile = (
+                self.fenFile
+                if self.fenFile.endswith(".fen") and path.isfile(self.fenFile)
+                else "default"
+            )
+            self.limitType = (
+                self.limitType
+                if self.limitType in ["depth", "perft", "nodes", "movetime"]
+                else "depth"
+            )
+            self.evalType = (
+                self.evalType
+                if self.evalType in ["mixed", "classical", "NNUE"]
+                else "mixed"
+            )
+
+    def benchmark(self, params: BenchmarkParameters) -> str:
+        """Benchmark will run the bench command with BenchmarkParameters.
         It is an Additional custom non-UCI command, mainly for debugging.
         Do not use this command during a search!
-
-        Kwargs:
-            ttSize: int -> Transposition Table size in MB (max 2048)
-            threads: int -> Number of search threads that should be used (max 512)
-            limit: int -> Limit value of limitType spent for each position (max 10000)
-            fenFile: str -> Path to a FEN format file containing positions to bench (path/to/file.fen)
-            limitType: str -> Type of the limit used with limit value (depth, perft, nodes, movetime)
-            evalType: str -> Evaluation type used (mixed, classical, NNUE)
         """
-        defaults: Dict[str, Any] = {
-            "ttSize": {"option": range(1, 2049), "default": 16},
-            "threads": {"option": range(1, 513), "default": 1},
-            "limit": {"option": range(1, 10001), "default": 13},
-            "fenFile": {"default": "default"},
-            "limitType": {
-                "option": ["depth", "perft", "nodes", "movetime"],
-                "default": "depth",
-            },
-            "evalType": {"option": ["mixed", "classical", "NNUE"], "default": "mixed"},
-        }
-        options: str = ""
-
-        for key in defaults:
-            try:
-                # Handle case for path to a FEN format file provided
-                if key == "fenFile":
-                    if kwargs[key].endswith(".fen") and path.isfile(kwargs["fenFile"]):
-                        options += str(kwargs[key]) + " "
-                        continue
-                value = kwargs[key]
-                option = (
-                    value
-                    if value in defaults[key]["option"]
-                    else defaults[key]["default"]
-                )
-                options += str(option) + " "
-            except KeyError:
-                options += str(defaults[key]["default"]) + " "
-
-        self._put(f"bench {options}")
+        options = params
+        self._put(
+            f"bench {options.ttSize} {options.threads} {options.limit} {options.fenFile} {options.limitType} {options.evalType}"
+        )
         last_text: str = ""
         while True:
             text = self._read_line()
