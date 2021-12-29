@@ -413,15 +413,19 @@ class TestStockfish:
         stockfish = Stockfish(depth=15, parameters={"MultiPV": 2})
         if stockfish.does_sf_version_have_wdl_option():
             stockfish.set_fen_position("7k/4R3/4P1pp/7N/8/8/1q5q/3K4 w - - 0 1")
+            stockfish.set_show_wdl_option(True)
             wdl_stats = stockfish.get_wdl_stats()
             assert wdl_stats[1] > wdl_stats[0] * 7
             assert abs(wdl_stats[0] - wdl_stats[2]) / wdl_stats[0] < 0.1
+            assert stockfish._parameters["UCI_ShowWDL"] == "true"
             stockfish.set_fen_position(
                 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
             )
+            stockfish.set_show_wdl_option(False)
             wdl_stats = stockfish.get_wdl_stats()
             assert wdl_stats[1] > wdl_stats[0] * 4
             assert wdl_stats[0] > wdl_stats[2] * 1.8
+            assert stockfish._parameters["UCI_ShowWDL"] == "false"
             stockfish.set_fen_position("8/8/8/8/8/6k1/6p1/6K1 w - - 0 1")
             assert stockfish.get_wdl_stats() is None
         else:
@@ -432,21 +436,24 @@ class TestStockfish:
         stockfish = Stockfish()
         if stockfish.get_stockfish_major_version() <= 11:
             assert not stockfish.does_sf_version_have_wdl_option()
+            assert "UCI_ShowWDL" not in self._parameters
             with pytest.raises(RuntimeError):
                 stockfish.get_wdl_stats()
 
     def test_set_show_wdl_option(self):
         stockfish = Stockfish()
         stockfish.set_fen_position(
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+            "rnbqkb1r/pp3ppp/3p1n2/1B2p3/3NP3/2N5/PPP2PPP/R1BQK2R b KQkq - 0 6"
         )
         if stockfish.does_sf_version_have_wdl_option():
             stockfish.set_show_wdl_option(True)
             assert stockfish._parameters["UCI_ShowWDL"] == "true"
             assert len(Stockfish.get_wdl_stats()) == 3
+            assert stockfish._parameters["UCI_ShowWDL"] == "true"
             stockfish.set_show_wdl_option(False)
             assert stockfish._parameters["UCI_ShowWDL"] == "false"
             assert Stockfish.get_wdl_stats() is None
+            assert stockfish._parameters["UCI_ShowWDL"] == "false"
         else:
             with pytest.raises(RuntimeError):
                 stockfish.set_show_wdl_option(True)

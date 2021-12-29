@@ -302,6 +302,7 @@ class Stockfish:
             raise RuntimeError(
                 "Your version of Stockfish isn't recent enough to have the UCI_ShowWDL option."
             )
+        was_wdl_option_false_before = self._parameters["UCI_ShowWDL"] == "false"
         self.set_show_wdl_option(True)
         self._go()
         lines = []
@@ -313,6 +314,8 @@ class Stockfish:
                 break
         for current_line in reversed(lines):
             if current_line[0] == "bestmove" and current_line[1] == "(none)":
+                if was_wdl_option_false_before:
+                    self.set_show_wdl_option(False)
                 return None
             elif "multipv" in current_line:
                 index_of_multipv = current_line.index("multipv")
@@ -321,6 +324,8 @@ class Stockfish:
                     wdl_stats = []
                     for i in range(1, 4):
                         wdl_stats.append(int(current_line[index_of_wdl + i]))
+                    if was_wdl_option_false_before:
+                        self.set_show_wdl_option(False)
                     return wdl_stats
         raise RuntimeError("Reached the end of the get_wdl_stats function.")
 
