@@ -185,17 +185,11 @@ Positive is advantage white, negative is advantage black
 
 ### Run benchmark 
 ```python 
-stockfish.benchmark()
+stockfish.benchmark(params: BenchmarkParameters)
 ```
-This will run the bench command with default settings. kwargs can be supplied as options.
-```text
-ttSize: int -> Transposition Table size in MB (max 2048)
-threads: int -> Number of search threads that should be used (max 512)
-limit: int -> Limit value of limitType spent for each position (max 10000)
-fenFile: str -> Path to a FEN format file containing positions to bench (path/to/file.fen)
-limitType: str -> Type of the limit used with limit value (depth, perft, nodes, movetime)
-evalType: str -> Evaluation type used (mixed, classical, NNUE)
-```
+This will run the bench command with BenchmarkParameters.
+It is an Additional custom non-UCI command, mainly for debugging.
+Do not use this command during a search!
 
 ### Get current major version of stockfish engine
 ```python 
