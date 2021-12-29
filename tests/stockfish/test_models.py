@@ -436,7 +436,7 @@ class TestStockfish:
         stockfish = Stockfish()
         if stockfish.get_stockfish_major_version() <= 11:
             assert not stockfish.does_sf_version_have_wdl_option()
-            assert "UCI_ShowWDL" not in self._parameters
+            assert "UCI_ShowWDL" not in stockfish._parameters
             with pytest.raises(RuntimeError):
                 stockfish.get_wdl_stats()
 
