@@ -185,7 +185,7 @@ Positive is advantage white, negative is advantage black
 
 ### Run benchmark 
 ```python 
-stockfish.benchmark(params: BenchmarkParameters)
+stockfish.benchmark(BenchmarkParameters)
 ```
 This will run the bench command with BenchmarkParameters.
 It is an Additional custom non-UCI command, mainly for debugging.
