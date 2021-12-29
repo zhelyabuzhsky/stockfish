@@ -112,6 +112,19 @@ stockfish.get_WDL_stats()
 [87, 894, 19]
 ```
 
+### Find if your version of Stockfish is recent enough to display WDL stats.
+```python
+stockfish.does_sf_version_have_wdl_option()
+```
+```text
+True
+```
+
+### Tell Stockfish whether or not to display WDL stats after analyzing a position.
+```python
+stockfish.set_show_wdl_option(True)
+```
+
 ### Set current engine's skill level (ignoring ELO rating):
 ```python
 stockfish.set_skill_level(15)

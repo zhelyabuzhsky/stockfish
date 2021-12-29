@@ -31,7 +31,7 @@ class Stockfish:
             "UCI_Chess960": "false",
             "UCI_LimitStrength": "false",
             "UCI_Elo": 1350,
-            "UCI_ShowWDL": "true",
+            "UCI_ShowWDL": "false",
         }
         self.stockfish = subprocess.Popen(
             path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
@@ -43,7 +43,10 @@ class Stockfish:
 
         self._put("uci")
 
-        if not self._has_UCI_ShowWDL_option():
+        self.has_wdl_option = None  # Necessary to have before call below.
+        self.has_wdl_option = self.does_sf_version_have_wdl_option()
+
+        if not self.has_wdl_option:
             del self.default_stockfish_params["UCI_ShowWDL"]
 
         self.depth = str(depth)
@@ -108,16 +111,6 @@ class Stockfish:
 
     def _go_time(self, time: int) -> None:
         self._put(f"go movetime {time}")
-
-    def _has_UCI_ShowWDL_option(self) -> bool:
-        self._put("uci")
-        while True:
-            text = self._read_line()
-            splitted_text = text.split(" ")
-            if splitted_text[0] == "uciok":
-                return False
-            elif "UCI_ShowWDL" in splitted_text:
-                return True
 
     @staticmethod
     def _convert_move_list_to_str(moves: List[str]) -> str:
@@ -297,17 +290,19 @@ class Stockfish:
                 else:
                     return True
 
-    def get_WDL_stats(self) -> List:
+    def get_wdl_stats(self) -> Optional[List]:
         """Returns Stockfish's win/draw/loss stats for the side to move.
 
         Returns:
-            Ideally, a list of three integers. However, if the game is over,
-            or if too old a version of SF is being used, then an empty list
-            is returned.
+            A list of three integers, unless the game is over (in which case,
+            None is returned).
         """
 
-        if "UCI_ShowWDL" not in self._parameters:
-            return []
+        if not self.does_sf_version_have_wdl_option():
+            raise RuntimeError(
+                "Your version of Stockfish isn't recent enough to have the UCI_ShowWDL option."
+            )
+        self.set_show_wdl_option(True)
         self._go()
         lines = []
         while True:
@@ -318,16 +313,49 @@ class Stockfish:
                 break
         for current_line in reversed(lines):
             if current_line[0] == "bestmove" and current_line[1] == "(none)":
-                return []
+                return None
             elif "multipv" in current_line:
                 index_of_multipv = current_line.index("multipv")
-                if current_line[index_of_multipv + 1] == "1":
+                if current_line[index_of_multipv + 1] == "1" and "wdl" in current_line:
                     index_of_wdl = current_line.index("wdl")
                     wdl_stats = []
                     for i in range(1, 4):
                         wdl_stats.append(int(current_line[index_of_wdl + i]))
                     return wdl_stats
-        raise RuntimeError("Reached the end of the get_WDL_stats function.")
+        raise RuntimeError("Reached the end of the get_wdl_stats function.")
+
+    def does_sf_version_have_wdl_option(self) -> bool:
+        if self.has_wdl_option is not None:
+            return self.has_wdl_option
+        self._put("uci")
+        while True:
+            text = self._read_line()
+            splitted_text = text.split(" ")
+            if splitted_text[0] == "uciok":
+                return False
+            elif "UCI_ShowWDL" in splitted_text:
+                return True
+
+    def set_show_wdl_option(self, value: bool) -> None:
+        """Sets Stockfish's "UCI_ShowWDL" option to either "true" or "false".
+
+        Args:
+            value:
+              Tells Stockfish whether to set its UCI option "UCI_ShowWDL"
+              to the value "true" or "false".
+
+        Returns:
+            None
+        """
+
+        if not self.does_sf_version_have_wdl_option():
+            raise RuntimeError(
+                "Your version of Stockfish isn't recent enough to have the UCI_ShowWDL option."
+            )
+        assert "UCI_ShowWDL" in self._parameters
+        value_as_string = "true" if value else "false"
+        self._parameters["UCI_ShowWDL"] = value_as_string
+        self._set_option("UCI_ShowWDL", value_as_string)
 
     def get_evaluation(self) -> dict:
         """Evaluates current position
