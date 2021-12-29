@@ -452,6 +452,7 @@ class TestStockfish:
             assert stockfish._parameters["UCI_ShowWDL"] == "true"
             stockfish.set_show_wdl_option(False)
             assert stockfish._parameters["UCI_ShowWDL"] == "false"
+            stockfish.set_fen_position("8/8/8/8/8/3k4/3p4/3K4 w - - 0 1")
             assert Stockfish.get_wdl_stats() is None
             assert stockfish._parameters["UCI_ShowWDL"] == "false"
         else:
