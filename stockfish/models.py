@@ -423,9 +423,11 @@ class Stockfish:
         It is an Additional custom non-UCI command, mainly for debugging.
         Do not use this command during a search!
         """
-        options = params
+        if type(params) != self.BenchmarkParameters:
+            params = self.BenchmarkParameters()
+
         self._put(
-            f"bench {options.ttSize} {options.threads} {options.limit} {options.fenFile} {options.limitType} {options.evalType}"
+            f"bench {params.ttSize} {params.threads} {params.limit} {params.fenFile} {params.limitType} {params.evalType}"
         )
         last_text: str = ""
         while True:
