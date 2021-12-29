@@ -440,7 +440,7 @@ class TestStockfish:
             "limit": 13,
             "fenFile": "./fakefile.fen",
             "limitType": "depth",
-            "evalType": "mixed"
+            "evalType": "mixed",
         }
         result = stockfish.benchmark(params)
         # result should contain the last line of a successful method call
