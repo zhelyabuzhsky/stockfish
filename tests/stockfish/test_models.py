@@ -308,12 +308,9 @@ class TestStockfish:
         )
 
     def test_get_parameters(self, stockfish):
-        arg1 = str(stockfish.get_parameters())
-        arg2 = str(stockfish.get_parameters())
-        assert arg1 == arg2
         stockfish._set_option("Minimum Thinking Time", 10)
-        arg2 = str(stockfish.get_parameters())
-        assert arg1 != arg2
+        parameters = stockfish.get_parameters()
+        assert parameters["Minimum Thinking Time"] == 10
 
     def test_get_top_moves(self, stockfish):
         stockfish.set_depth(15)
@@ -409,10 +406,11 @@ class TestStockfish:
 
         assert total_time_calculating_first < total_time_calculating_second
 
-    def test_benchmark(self, stockfish):
+    def test_benchmark_result_with_defaults(self, stockfish):
         defaults = stockfish.benchmark()
         assert defaults.split(" ")[0] == "Nodes/second"
 
+    def test_benchmark_result_with_valid_options(self, stockfish):
         valid_options = stockfish.benchmark(
             ttSize=64,
             threads=2,
@@ -422,6 +420,7 @@ class TestStockfish:
         )
         assert valid_options.split(" ")[0] == "Nodes/second"
 
+    def test_benchmark_result_with_invalid_options(self, stockfish):
         invalid_options = stockfish.benchmark(
             ttSize=2049,
             threads=0,
