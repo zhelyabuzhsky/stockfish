@@ -407,11 +407,11 @@ class TestStockfish:
         assert total_time_calculating_first < total_time_calculating_second
 
     def test_benchmark_result_with_defaults(self, stockfish):
-        defaults = stockfish.benchmark()
+        result = stockfish.benchmark()
         assert defaults.split(" ")[0] == "Nodes/second"
 
     def test_benchmark_result_with_valid_options(self, stockfish):
-        valid_options = stockfish.benchmark(
+        result = stockfish.benchmark(
             ttSize=64,
             threads=2,
             limit=1000,
@@ -421,7 +421,7 @@ class TestStockfish:
         assert valid_options.split(" ")[0] == "Nodes/second"
 
     def test_benchmark_result_with_invalid_options(self, stockfish):
-        invalid_options = stockfish.benchmark(
+        result = stockfish.benchmark(
             ttSize=2049,
             threads=0,
             limit=0,
