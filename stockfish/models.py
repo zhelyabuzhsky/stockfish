@@ -33,6 +33,7 @@ class Stockfish:
             "UCI_Chess960": "false",
             "UCI_LimitStrength": "false",
             "UCI_Elo": 1350,
+            "UCI_ShowWDL": "false",
         }
         self.stockfish = subprocess.Popen(
             path,
@@ -47,6 +48,13 @@ class Stockfish:
         )
 
         self._put("uci")
+
+        self._already_set_the_has_wdl_option_variable = False
+        self._has_wdl_option = self.does_current_engine_version_have_wdl_option()
+        self._already_set_the_has_wdl_option_variable = True
+
+        if not self._has_wdl_option:
+            del self.default_stockfish_params["UCI_ShowWDL"]
 
         self.depth = str(depth)
         self.info: str = ""
@@ -291,6 +299,85 @@ class Stockfish:
                     return False
                 else:
                     return True
+
+    def get_wdl_stats(self) -> Optional[List]:
+        """Returns Stockfish's win/draw/loss stats for the side to move.
+
+        Returns:
+            A list of three integers, unless the game is over (in which case,
+            None is returned).
+        """
+
+        if not self.does_current_engine_version_have_wdl_option():
+            raise RuntimeError(
+                "Your version of Stockfish isn't recent enough to have the UCI_ShowWDL option."
+            )
+        was_wdl_option_false_before = self._parameters["UCI_ShowWDL"] == "false"
+        self.set_show_wdl_option(True)
+        self._go()
+        lines = []
+        while True:
+            text = self._read_line()
+            splitted_text = text.split(" ")
+            lines.append(splitted_text)
+            if splitted_text[0] == "bestmove":
+                break
+        for current_line in reversed(lines):
+            if current_line[0] == "bestmove" and current_line[1] == "(none)":
+                if was_wdl_option_false_before:
+                    self.set_show_wdl_option(False)
+                return None
+            elif "multipv" in current_line:
+                index_of_multipv = current_line.index("multipv")
+                if current_line[index_of_multipv + 1] == "1" and "wdl" in current_line:
+                    index_of_wdl = current_line.index("wdl")
+                    wdl_stats = []
+                    for i in range(1, 4):
+                        wdl_stats.append(int(current_line[index_of_wdl + i]))
+                    if was_wdl_option_false_before:
+                        self.set_show_wdl_option(False)
+                    return wdl_stats
+        raise RuntimeError("Reached the end of the get_wdl_stats function.")
+
+    def does_current_engine_version_have_wdl_option(self) -> bool:
+        """Returns whether the user's version of Stockfish has the option
+           to display WDL stats.
+
+        Returns:
+            True, if SF has the option -- False otherwise.
+        """
+
+        if self._already_set_the_has_wdl_option_variable:
+            return self._has_wdl_option
+        self._put("uci")
+        while True:
+            text = self._read_line()
+            splitted_text = text.split(" ")
+            if splitted_text[0] == "uciok":
+                return False
+            elif "UCI_ShowWDL" in splitted_text:
+                return True
+
+    def set_show_wdl_option(self, value: bool) -> None:
+        """Sets Stockfish's "UCI_ShowWDL" option to either "true" or "false".
+
+        Args:
+            value:
+              Tells Stockfish whether to set its UCI option "UCI_ShowWDL"
+              to the value "true" or "false".
+
+        Returns:
+            None
+        """
+
+        if not self.does_current_engine_version_have_wdl_option():
+            raise RuntimeError(
+                "Your version of Stockfish isn't recent enough to have the UCI_ShowWDL option."
+            )
+        assert "UCI_ShowWDL" in self._parameters
+        value_as_string = "true" if value else "false"
+        self._parameters["UCI_ShowWDL"] = value_as_string
+        self._set_option("UCI_ShowWDL", value_as_string)
 
     def get_evaluation(self) -> dict:
         """Evaluates current position

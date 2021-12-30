@@ -406,6 +406,57 @@ class TestStockfish:
 
         assert total_time_calculating_first < total_time_calculating_second
 
+    def test_get_wdl_stats(self, stockfish):
+        stockfish.set_depth(15)
+        stockfish._set_option("MultiPV", 2)
+        if stockfish.does_current_engine_version_have_wdl_option():
+            stockfish.set_fen_position("7k/4R3/4P1pp/7N/8/8/1q5q/3K4 w - - 0 1")
+            stockfish.set_show_wdl_option(True)
+            wdl_stats = stockfish.get_wdl_stats()
+            assert wdl_stats[1] > wdl_stats[0] * 7
+            assert abs(wdl_stats[0] - wdl_stats[2]) / wdl_stats[0] < 0.1
+            assert stockfish._parameters["UCI_ShowWDL"] == "true"
+            stockfish.set_fen_position(
+                "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+            )
+            stockfish.set_show_wdl_option(False)
+            wdl_stats = stockfish.get_wdl_stats()
+            assert wdl_stats[1] > wdl_stats[0] * 4
+            assert wdl_stats[0] > wdl_stats[2] * 1.8
+            assert stockfish._parameters["UCI_ShowWDL"] == "false"
+            stockfish.set_fen_position("8/8/8/8/8/6k1/6p1/6K1 w - - 0 1")
+            assert stockfish.get_wdl_stats() is None
+        else:
+            with pytest.raises(RuntimeError):
+                stockfish.get_wdl_stats()
+
+    def test_does_current_engine_version_have_wdl_option(self, stockfish):
+        if stockfish.get_stockfish_major_version() <= 11:
+            assert not stockfish.does_current_engine_version_have_wdl_option()
+            assert "UCI_ShowWDL" not in stockfish._parameters
+            with pytest.raises(RuntimeError):
+                stockfish.get_wdl_stats()
+
+    def test_set_show_wdl_option(self, stockfish):
+        stockfish.set_fen_position(
+            "rnbqkb1r/pp3ppp/3p1n2/1B2p3/3NP3/2N5/PPP2PPP/R1BQK2R b KQkq - 0 6"
+        )
+        if stockfish.does_current_engine_version_have_wdl_option():
+            stockfish.set_show_wdl_option(True)
+            assert stockfish._parameters["UCI_ShowWDL"] == "true"
+            assert len(Stockfish.get_wdl_stats()) == 3
+            assert stockfish._parameters["UCI_ShowWDL"] == "true"
+            stockfish.set_show_wdl_option(False)
+            assert stockfish._parameters["UCI_ShowWDL"] == "false"
+            stockfish.set_fen_position("8/8/8/8/8/3k4/3p4/3K4 w - - 0 1")
+            assert Stockfish.get_wdl_stats() is None
+            assert stockfish._parameters["UCI_ShowWDL"] == "false"
+        else:
+            with pytest.raises(RuntimeError):
+                stockfish.set_show_wdl_option(True)
+            with pytest.raises(RuntimeError):
+                stockfish.set_show_wdl_option(False)
+
     def test_benchmark_result_with_defaults(self, stockfish):
         params = stockfish.BenchmarkParameters()
         result = stockfish.benchmark(params)
