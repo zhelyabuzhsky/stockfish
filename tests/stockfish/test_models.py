@@ -408,7 +408,7 @@ class TestStockfish:
 
     def test_get_wdl_stats(self, stockfish):
         stockfish.set_depth(15)
-        stockfish.set_option("MultiPV", 2)
+        stockfish._set_option("MultiPV", 2)
         if stockfish.does_current_engine_version_have_wdl_option():
             stockfish.set_fen_position("7k/4R3/4P1pp/7N/8/8/1q5q/3K4 w - - 0 1")
             stockfish.set_show_wdl_option(True)
