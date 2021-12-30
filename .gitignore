@@ -9,3 +9,5 @@ __pycache/
 /build/
 /dist/
 /venv/
+*/__pycache__
+*/*/__pycache__
