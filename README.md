@@ -202,7 +202,7 @@ evalType: "mixed", "classical", "NNUE"
 stockfish.benchmark(params)
 ```
 This will run the bench command with BenchmarkParameters.
-It is an Additional custom non-UCI command, mainly for debugging.
+It is an additional custom non-UCI command, mainly for debugging.
 Do not use this command during a search!
 
 ### Get current major version of stockfish engine
