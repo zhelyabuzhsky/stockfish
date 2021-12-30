@@ -204,6 +204,28 @@ Positive is advantage white, negative is advantage black
 {"type":"mate", "value":-3}
 ```
 
+### BenchmarkParameters
+```python
+params = BenchmarkParameters(**kwargs)
+```
+parameters required to run the benchmark function. kwargs can be used to set custom values.
+```text
+ttSize: range(1,128001)
+threads: range(1,513)
+limit: range(1,10001)
+fenFile: "path/to/file.fen"
+limitType: "depth", "perft", "nodes", "movetime"
+evalType: "mixed", "classical", "NNUE"
+```
+
+### Run benchmark 
+```python 
+stockfish.benchmark(params)
+```
+This will run the bench command with BenchmarkParameters.
+It is an additional custom non-UCI command, mainly for debugging.
+Do not use this command during a search!
+
 ### Get current major version of stockfish engine
 ```python 
 stockfish.get_stockfish_major_version()

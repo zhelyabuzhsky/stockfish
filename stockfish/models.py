@@ -8,6 +8,8 @@
 import subprocess
 from typing import Any, List, Optional
 import copy
+from os import path
+from dataclasses import dataclass
 
 
 class Stockfish:
@@ -34,7 +36,11 @@ class Stockfish:
             "UCI_ShowWDL": "false",
         }
         self.stockfish = subprocess.Popen(
-            path, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
+            path,
+            universal_newlines=True,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
         )
 
         self._stockfish_major_version: int = int(
@@ -98,6 +104,7 @@ class Stockfish:
 
     def _set_option(self, name: str, value: Any) -> None:
         self._put(f"setoption name {name} value {value}")
+        self._parameters.update({name: value})
         self._is_ready()
 
     def _is_ready(self) -> None:
@@ -194,6 +201,7 @@ class Stockfish:
             None
         """
         self._set_option("UCI_LimitStrength", "false")
+        self._parameters.update({"UCI_LimitStrength": "false"})
         self._set_option("Skill Level", skill_level)
         self._parameters.update({"Skill Level": skill_level})
 
@@ -207,6 +215,7 @@ class Stockfish:
             None
         """
         self._set_option("UCI_LimitStrength", "true")
+        self._parameters.update({"UCI_LimitStrength": "true"})
         self._set_option("UCI_Elo", elo_rating)
         self._parameters.update({"UCI_Elo": elo_rating})
 
@@ -458,6 +467,55 @@ class Stockfish:
             self._set_option("MultiPV", old_MultiPV_value)
             self._parameters.update({"MultiPV": old_MultiPV_value})
         return top_moves
+
+    @dataclass
+    class BenchmarkParameters:
+        ttSize: int = 16
+        threads: int = 1
+        limit: int = 13
+        fenFile: str = "default"
+        limitType: str = "depth"
+        evalType: str = "mixed"
+
+        def __post_init__(self):
+            self.ttSize = self.ttSize if self.ttSize in range(1, 128001) else 16
+            self.threads = self.threads if self.threads in range(1, 513) else 1
+            self.limit = self.limit if self.limit in range(1, 10001) else 13
+            self.fenFile = (
+                self.fenFile
+                if self.fenFile.endswith(".fen") and path.isfile(self.fenFile)
+                else "default"
+            )
+            self.limitType = (
+                self.limitType
+                if self.limitType in ["depth", "perft", "nodes", "movetime"]
+                else "depth"
+            )
+            self.evalType = (
+                self.evalType
+                if self.evalType in ["mixed", "classical", "NNUE"]
+                else "mixed"
+            )
+
+    def benchmark(self, params: BenchmarkParameters) -> str:
+        """Benchmark will run the bench command with BenchmarkParameters.
+        It is an Additional custom non-UCI command, mainly for debugging.
+        Do not use this command during a search!
+        """
+        if type(params) != self.BenchmarkParameters:
+            params = self.BenchmarkParameters()
+
+        self._put(
+            f"bench {params.ttSize} {params.threads} {params.limit} {params.fenFile} {params.limitType} {params.evalType}"
+        )
+        last_text: str = ""
+        while True:
+            text = self._read_line()
+            splitted_text = text.split(" ")
+            if splitted_text[0] == "Nodes/second":
+                last_text = text
+                return last_text
+            last_text = text
 
     def set_depth(self, depth_value: int = 2) -> None:
         """Sets current depth of stockfish engine.
