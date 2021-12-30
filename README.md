@@ -51,17 +51,17 @@ You can change them during your Stockfish class initialization:
 stockfish = Stockfish(parameters={"Threads": 2, "Minimum Thinking Time": 30})
 ```
 
-### Set position by sequence of moves:
+### Set position by sequence of moves
 ```python
 stockfish.set_position(["e2e4", "e7e6"])
 ```
 
-### Update position by making a sequence of moves from the current position:
+### Update position by making a sequence of moves from the current position
 ```python
 stockfish.make_moves_from_current_position(["g4d7", "a8b8", "f1d1"])
 ```
 
-### Set position by Forsyth–Edwards Notation (FEN):
+### Set position by Forsyth–Edwards Notation (FEN)
 ```python
 stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
 ```
@@ -104,7 +104,7 @@ stockfish.get_top_moves(3)
 ]
 ```
 
-### Get Stockfish's win/draw/loss stats for the side to move in the current position.
+### Get Stockfish's win/draw/loss stats for the side to move in the current position
 ```python
 stockfish.get_wdl_stats()
 ```
@@ -112,7 +112,7 @@ stockfish.get_wdl_stats()
 [87, 894, 19]
 ```
 
-### Find if your version of Stockfish is recent enough to display WDL stats.
+### Find if your version of Stockfish is recent enough to display WDL stats
 ```python
 stockfish.does_current_engine_version_have_wdl_option()
 ```
@@ -120,27 +120,27 @@ stockfish.does_current_engine_version_have_wdl_option()
 True
 ```
 
-### Tell Stockfish whether or not to display WDL stats after analyzing a position.
+### Tell Stockfish whether or not to display WDL stats after analyzing a position
 ```python
 stockfish.set_show_wdl_option(True)
 ```
 
-### Set current engine's skill level (ignoring ELO rating):
+### Set current engine's skill level (ignoring ELO rating)
 ```python
 stockfish.set_skill_level(15)
 ```
 
-### Set current engine's ELO rating (ignoring skill level):
+### Set current engine's ELO rating (ignoring skill level)
 ```python
 stockfish.set_elo_rating(1350)
 ```
 
-### Set current engine's depth:
+### Set current engine's depth
 ```python
 stockfish.set_depth(15)
 ```
 
-### Get current engine's parameters:
+### Get current engine's parameters
 ```python
 stockfish.get_parameters()
 ```
@@ -161,7 +161,7 @@ stockfish.get_parameters()
 }
 ```
 
-### Get current board position in Forsyth–Edwards notation (FEN):
+### Get current board position in Forsyth–Edwards notation (FEN)
 ```python
 stockfish.get_fen_position()
 ```
@@ -204,7 +204,9 @@ Positive is advantage white, negative is advantage black
 {"type":"mate", "value":-3}
 ```
 
-### BenchmarkParameters
+### Run benchmark
+
+#### BenchmarkParameters
 ```python
 params = BenchmarkParameters(**kwargs)
 ```
@@ -218,7 +220,6 @@ limitType: "depth", "perft", "nodes", "movetime"
 evalType: "mixed", "classical", "NNUE"
 ```
 
-### Run benchmark 
 ```python 
 stockfish.benchmark(params)
 ```
