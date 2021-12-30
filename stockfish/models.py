@@ -49,10 +49,11 @@ class Stockfish:
 
         self._put("uci")
 
-        self.has_wdl_option = None  # Necessary to have before call below.
-        self.has_wdl_option = self.does_sf_version_have_wdl_option()
+        self._already_set_the_has_wdl_option_variable = False
+        self._has_wdl_option = self.does_current_engine_version_have_wdl_option()
+        self._already_set_the_has_wdl_option_variable = True
 
-        if not self.has_wdl_option:
+        if not self._has_wdl_option:
             del self.default_stockfish_params["UCI_ShowWDL"]
 
         self.depth = str(depth)
@@ -307,7 +308,7 @@ class Stockfish:
             None is returned).
         """
 
-        if not self.does_sf_version_have_wdl_option():
+        if not self.does_current_engine_version_have_wdl_option():
             raise RuntimeError(
                 "Your version of Stockfish isn't recent enough to have the UCI_ShowWDL option."
             )
@@ -338,9 +339,16 @@ class Stockfish:
                     return wdl_stats
         raise RuntimeError("Reached the end of the get_wdl_stats function.")
 
-    def does_sf_version_have_wdl_option(self) -> bool:
-        if self.has_wdl_option is not None:
-            return self.has_wdl_option
+    def does_current_engine_version_have_wdl_option(self) -> bool:
+        """Returns whether the user's version of Stockfish has the option
+           to display WDL stats.
+
+        Returns:
+            True, if SF has the option -- False otherwise.
+        """
+
+        if self._already_set_the_has_wdl_option_variable:
+            return self._has_wdl_option
         self._put("uci")
         while True:
             text = self._read_line()
@@ -362,7 +370,7 @@ class Stockfish:
             None
         """
 
-        if not self.does_sf_version_have_wdl_option():
+        if not self.does_current_engine_version_have_wdl_option():
             raise RuntimeError(
                 "Your version of Stockfish isn't recent enough to have the UCI_ShowWDL option."
             )

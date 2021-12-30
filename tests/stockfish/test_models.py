@@ -406,9 +406,10 @@ class TestStockfish:
 
         assert total_time_calculating_first < total_time_calculating_second
 
-    def test_get_wdl_stats(self):
-        stockfish = Stockfish(depth=15, parameters={"MultiPV": 2})
-        if stockfish.does_sf_version_have_wdl_option():
+    def test_get_wdl_stats(self, stockfish):
+        stockfish.set_depth(15)
+        stockfish.set_option("MultiPV", 2)
+        if stockfish.does_current_engine_version_have_wdl_option():
             stockfish.set_fen_position("7k/4R3/4P1pp/7N/8/8/1q5q/3K4 w - - 0 1")
             stockfish.set_show_wdl_option(True)
             wdl_stats = stockfish.get_wdl_stats()
@@ -429,20 +430,18 @@ class TestStockfish:
             with pytest.raises(RuntimeError):
                 stockfish.get_wdl_stats()
 
-    def test_does_sf_version_have_wdl_option(self):
-        stockfish = Stockfish()
+    def test_does_current_engine_version_have_wdl_option(self, stockfish):
         if stockfish.get_stockfish_major_version() <= 11:
-            assert not stockfish.does_sf_version_have_wdl_option()
+            assert not stockfish.does_current_engine_version_have_wdl_option()
             assert "UCI_ShowWDL" not in stockfish._parameters
             with pytest.raises(RuntimeError):
                 stockfish.get_wdl_stats()
 
-    def test_set_show_wdl_option(self):
-        stockfish = Stockfish()
+    def test_set_show_wdl_option(self, stockfish):
         stockfish.set_fen_position(
             "rnbqkb1r/pp3ppp/3p1n2/1B2p3/3NP3/2N5/PPP2PPP/R1BQK2R b KQkq - 0 6"
         )
-        if stockfish.does_sf_version_have_wdl_option():
+        if stockfish.does_current_engine_version_have_wdl_option():
             stockfish.set_show_wdl_option(True)
             assert stockfish._parameters["UCI_ShowWDL"] == "true"
             assert len(Stockfish.get_wdl_stats()) == 3
