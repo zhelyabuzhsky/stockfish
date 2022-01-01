@@ -102,7 +102,6 @@ class Stockfish:
             self._stockfish.stdin.flush()
             if command == "quit":
                 self._has_quit_command_been_sent = True
-                # sleep(0.1)
 
     def _read_line(self) -> str:
         if not self._stockfish.stdout:
@@ -554,4 +553,3 @@ class Stockfish:
             self._stockfish.kill()
             while self._stockfish.poll() == None:
                 pass
-            # sleep(0.1)
