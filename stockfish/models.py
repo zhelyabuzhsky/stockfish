@@ -10,7 +10,6 @@ from typing import Any, List, Optional
 import copy
 from os import path
 from dataclasses import dataclass
-from time import sleep
 
 
 class Stockfish:
@@ -103,7 +102,7 @@ class Stockfish:
             self._stockfish.stdin.flush()
             if command == "quit":
                 self._has_quit_command_been_sent = True
-                sleep(0.1)
+                # sleep(0.1)
 
     def _read_line(self) -> str:
         if not self._stockfish.stdout:
@@ -553,4 +552,6 @@ class Stockfish:
         if self._stockfish.poll() is None:
             self._put("quit")
             self._stockfish.kill()
-            sleep(0.1)
+            while self._stockfish.poll() == None:
+                pass
+            # sleep(0.1)

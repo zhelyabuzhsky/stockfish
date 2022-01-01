@@ -166,6 +166,7 @@ class TestStockfish:
         assert stockfish.get_parameters()["Skill Level"] == 20
 
     def test_set_elo_rating(self, stockfish):
+        print(stockfish.depth)
         stockfish.set_fen_position(
             "rnbqkbnr/ppp2ppp/3pp3/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1"
         )
@@ -187,6 +188,7 @@ class TestStockfish:
         assert stockfish.get_parameters()["UCI_Elo"] == 2000
 
         stockfish.set_elo_rating(1350)
+        print(stockfish.depth)
         assert stockfish.get_best_move() in (
             "d1e2",
             "b1c3",
@@ -517,10 +519,8 @@ class TestStockfish:
         assert sf._stockfish.poll() is None
         assert not sf._has_quit_command_been_sent
         sf._put("quit")
-        assert sf._stockfish.poll() is not None
         assert sf._has_quit_command_been_sent
         sf._put("quit")
-        assert sf._stockfish.poll() is not None
         assert sf._has_quit_command_been_sent
         sf.__del__()
         assert sf._stockfish.poll() is not None
