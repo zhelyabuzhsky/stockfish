@@ -25,7 +25,7 @@ You should install the stockfish engine in your operating system globally or spe
 ```python
 from stockfish import Stockfish
 
-stockfish = Stockfish("/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64")
+stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64")
 ```
 
 There are some default engine's settings:
@@ -48,7 +48,7 @@ There are some default engine's settings:
 
 You can change them during your Stockfish class initialization:
 ```python
-stockfish = Stockfish(parameters={"Threads": 2, "Minimum Thinking Time": 30})
+stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64", parameters={"Threads": 2, "Minimum Thinking Time": 30})
 ```
 
 ### Set position by sequence of moves
