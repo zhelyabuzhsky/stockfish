@@ -507,7 +507,7 @@ class TestStockfish:
         stockfish.__del__()
         assert stockfish._stockfish.poll() is not None
         assert stockfish._has_quit_command_been_sent
-        
+
     def test_multiple_quit_commands(self, stockfish):
         # Test multiple quit commands, and include a call to del too. All of
         # them should run without causing some Exception.

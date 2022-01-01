@@ -46,9 +46,9 @@ There are some default engine's settings:
 }
 ```
 
-You can change them, as well as set the default depth, during your Stockfish class initialization:
+You can change them, as well as the default search depth, during your Stockfish class initialization:
 ```python
-stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64", depth=15, parameters={"Threads": 2, "Minimum Thinking Time": 30})
+stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64", depth=18, parameters={"Threads": 2, "Minimum Thinking Time": 30})
 ```
 
 ### Set position by sequence of moves
