@@ -512,3 +512,24 @@ class TestStockfish:
         sf.__del__()
         assert sf._stockfish.poll() is not None
         assert sf._has_quit_command_been_sent
+
+    def test_multiple_quit_calls(self):
+        sf = Stockfish()
+        assert sf._stockfish.poll() is None
+        assert not sf._has_quit_command_been_sent
+        sf._put("quit")
+        assert sf._stockfish.poll() is None
+        assert sf._has_quit_command_been_sent
+        time.sleep(2)
+        sf._put("quit")
+        assert sf._stockfish.poll() is None
+        assert sf._has_quit_command_been_sent
+        time.sleep(2)
+        sf.__del__()
+        time.sleep(2)
+        assert sf._stockfish.poll() is not None
+        assert sf._has_quit_command_been_sent
+        sf._put("quit")
+        time.sleep(2)
+        assert sf._stockfish.poll() is not None
+        assert sf._has_quit_command_been_sent
