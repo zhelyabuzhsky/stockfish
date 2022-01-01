@@ -518,6 +518,7 @@ class TestStockfish:
         assert sf._stockfish.poll() is None
         assert not sf._has_quit_command_been_sent
         sf._put("quit")
+        time.sleep(2)
         assert sf._stockfish.poll() is None
         assert sf._has_quit_command_been_sent
         time.sleep(2)
