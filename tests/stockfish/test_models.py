@@ -1,6 +1,5 @@
 import pytest
 from timeit import default_timer
-import time
 
 from stockfish import Stockfish
 
@@ -505,32 +504,28 @@ class TestStockfish:
         assert sf._stockfish.poll() is None
         assert not sf._has_quit_command_been_sent
         sf.__del__()
-        time.sleep(2)
         assert sf._stockfish.poll() is not None
         assert sf._has_quit_command_been_sent
-        time.sleep(2)
         sf.__del__()
         assert sf._stockfish.poll() is not None
         assert sf._has_quit_command_been_sent
 
-    def test_multiple_quit_calls(self):
+    def test_multiple_quit_commands(self):
+        # Test multiple quit commands, and include a call to del too. All of
+        # them should run without causing some Exception.
         sf = Stockfish()
         assert sf._stockfish.poll() is None
         assert not sf._has_quit_command_been_sent
         sf._put("quit")
-        time.sleep(2)
-        assert sf._stockfish.poll() is None
-        assert sf._has_quit_command_been_sent
-        time.sleep(2)
-        sf._put("quit")
-        assert sf._stockfish.poll() is None
-        assert sf._has_quit_command_been_sent
-        time.sleep(2)
-        sf.__del__()
-        time.sleep(2)
         assert sf._stockfish.poll() is not None
         assert sf._has_quit_command_been_sent
         sf._put("quit")
-        time.sleep(2)
+        assert sf._stockfish.poll() is not None
+        assert sf._has_quit_command_been_sent
+        sf.__del__()
+        assert sf._stockfish.poll() is not None
+        assert sf._has_quit_command_been_sent
+        sf._put(f"go depth {10}")
+        # Should do nothing, and change neither of the values below.
         assert sf._stockfish.poll() is not None
         assert sf._has_quit_command_been_sent
