@@ -1,5 +1,6 @@
 import pytest
 from timeit import default_timer
+import time
 
 from stockfish import Stockfish
 
@@ -496,3 +497,18 @@ class TestStockfish:
         result = stockfish.benchmark(params)
         # result should contain the last line of a successful method call
         assert result.split(" ")[0] == "Nodes/second"
+
+    def test_multiple_calls_to_del(self):
+        # Don't use the same stockfish reference as in the other tests, since
+        # the del method will be called on it in this test.
+        sf = Stockfish()
+        assert sf._stockfish.poll() is None
+        assert not sf._has_quit_command_been_sent
+        sf.__del__()
+        time.sleep(2)
+        assert sf._stockfish.poll() is not None
+        assert sf._has_quit_command_been_sent
+        time.sleep(2)
+        sf.__del__()
+        assert sf._stockfish.poll() is not None
+        assert sf._has_quit_command_been_sent
