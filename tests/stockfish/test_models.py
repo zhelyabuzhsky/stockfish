@@ -166,6 +166,7 @@ class TestStockfish:
         assert stockfish.get_parameters()["Skill Level"] == 20
 
     def test_set_elo_rating(self, stockfish):
+        stockfish.set_depth(2)
         stockfish.set_fen_position(
             "rnbqkbnr/ppp2ppp/3pp3/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1"
         )
@@ -496,3 +497,30 @@ class TestStockfish:
         result = stockfish.benchmark(params)
         # result should contain the last line of a successful method call
         assert result.split(" ")[0] == "Nodes/second"
+
+    def test_multiple_calls_to_del(self, stockfish):
+        assert stockfish._stockfish.poll() is None
+        assert not stockfish._has_quit_command_been_sent
+        stockfish.__del__()
+        assert stockfish._stockfish.poll() is not None
+        assert stockfish._has_quit_command_been_sent
+        stockfish.__del__()
+        assert stockfish._stockfish.poll() is not None
+        assert stockfish._has_quit_command_been_sent
+
+    def test_multiple_quit_commands(self, stockfish):
+        # Test multiple quit commands, and include a call to del too. All of
+        # them should run without causing some Exception.
+        assert stockfish._stockfish.poll() is None
+        assert not stockfish._has_quit_command_been_sent
+        stockfish._put("quit")
+        assert stockfish._has_quit_command_been_sent
+        stockfish._put("quit")
+        assert stockfish._has_quit_command_been_sent
+        stockfish.__del__()
+        assert stockfish._stockfish.poll() is not None
+        assert stockfish._has_quit_command_been_sent
+        stockfish._put(f"go depth {10}")
+        # Should do nothing, and change neither of the values below.
+        assert stockfish._stockfish.poll() is not None
+        assert stockfish._has_quit_command_been_sent

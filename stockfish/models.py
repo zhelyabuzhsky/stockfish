@@ -16,7 +16,7 @@ class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
     def __init__(
-        self, path: str = "stockfish", depth: int = 2, parameters: dict = None
+        self, path: str = "stockfish", depth: int = 15, parameters: dict = None
     ) -> None:
         self.default_stockfish_params = {
             "Write Debug Log": "false",
@@ -35,13 +35,15 @@ class Stockfish:
             "UCI_Elo": 1350,
             "UCI_ShowWDL": "false",
         }
-        self.stockfish = subprocess.Popen(
+        self._stockfish = subprocess.Popen(
             path,
             universal_newlines=True,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
+
+        self._has_quit_command_been_sent = False
 
         self._stockfish_major_version: int = int(
             self._read_line().split(" ")[1].split(".")[0]
@@ -93,15 +95,18 @@ class Stockfish:
         self.info = ""
 
     def _put(self, command: str) -> None:
-        if not self.stockfish.stdin:
+        if not self._stockfish.stdin:
             raise BrokenPipeError()
-        self.stockfish.stdin.write(f"{command}\n")
-        self.stockfish.stdin.flush()
+        if self._stockfish.poll() is None and not self._has_quit_command_been_sent:
+            self._stockfish.stdin.write(f"{command}\n")
+            self._stockfish.stdin.flush()
+            if command == "quit":
+                self._has_quit_command_been_sent = True
 
     def _read_line(self) -> str:
-        if not self.stockfish.stdout:
+        if not self._stockfish.stdout:
             raise BrokenPipeError()
-        return self.stockfish.stdout.readline().strip()
+        return self._stockfish.stdout.readline().strip()
 
     def _set_option(self, name: str, value: Any) -> None:
         self._put(f"setoption name {name} value {value}")
@@ -543,5 +548,8 @@ class Stockfish:
         return self._stockfish_major_version
 
     def __del__(self) -> None:
-        self._put("quit")
-        self.stockfish.kill()
+        if self._stockfish.poll() is None:
+            self._put("quit")
+            self._stockfish.kill()
+            while self._stockfish.poll() == None:
+                pass
