@@ -200,7 +200,7 @@ class TestStockfish:
 
     def test_stockfish_constructor_with_custom_params(self, stockfish):
         stockfish.set_skill_level(1)
-        assert stockfish.get_parameters() == {
+        expected_params = {
             "Write Debug Log": "false",
             "Contempt": 0,
             "Min Split Depth": 0,
@@ -216,6 +216,9 @@ class TestStockfish:
             "UCI_LimitStrength": "false",
             "UCI_Elo": 1350,
         }
+        if stockfish.does_current_engine_version_have_wdl_option():
+            expected_params["UCI_ShowWDL"] = "false"
+        assert stockfish.get_parameters() == expected_params
 
     def test_get_board_visual(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6", "d2d4", "d7d5"])
@@ -445,12 +448,12 @@ class TestStockfish:
         if stockfish.does_current_engine_version_have_wdl_option():
             stockfish.set_show_wdl_option(True)
             assert stockfish._parameters["UCI_ShowWDL"] == "true"
-            assert len(Stockfish.get_wdl_stats()) == 3
+            assert len(stockfish.get_wdl_stats()) == 3
             assert stockfish._parameters["UCI_ShowWDL"] == "true"
             stockfish.set_show_wdl_option(False)
             assert stockfish._parameters["UCI_ShowWDL"] == "false"
             stockfish.set_fen_position("8/8/8/8/8/3k4/3p4/3K4 w - - 0 1")
-            assert Stockfish.get_wdl_stats() is None
+            assert stockfish.get_wdl_stats() is None
             assert stockfish._parameters["UCI_ShowWDL"] == "false"
         else:
             with pytest.raises(RuntimeError):
