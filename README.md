@@ -245,7 +245,7 @@ If you discover any security related issues, please email zhelyabuzhsky@icloud.c
 
 ## Credits
 - [Ilya Zhelyabuzhsky](https://github.com/zhelyabuzhsky)
-- [All Contributors](../../contributors)
+- [All Contributors](https://github.com/zhelyabuzhsky/stockfish/graphs/contributors)
 
 ## License
-MIT License. Please see [License File](LICENSE) for more information.
+MIT License. Please see [License File](https://github.com/zhelyabuzhsky/stockfish/blob/master/LICENSE) for more information.
