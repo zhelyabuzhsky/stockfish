@@ -551,5 +551,5 @@ class Stockfish:
         if self._stockfish.poll() is None:
             self._put("quit")
             self._stockfish.kill()
-            while self._stockfish.poll() == None:
+            while self._stockfish.poll() is None:
                 pass
