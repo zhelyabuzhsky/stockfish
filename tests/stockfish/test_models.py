@@ -304,6 +304,7 @@ class TestStockfish:
         assert "depth 12" in stockfish.info
 
     def test_get_best_move_wrong_position(self, stockfish):
+        stockfish.set_depth(2)
         wrong_fen = "3kk3/8/8/8/8/8/8/3KK3 w - - 0 0"
         stockfish.set_fen_position(wrong_fen)
         assert stockfish.get_best_move() in (
