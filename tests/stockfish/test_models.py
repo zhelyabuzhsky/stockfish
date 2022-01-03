@@ -197,13 +197,12 @@ class TestStockfish:
         assert stockfish.get_parameters()["UCI_Elo"] == 1350
 
         stockfish.set_elo_rating(2850)
+        major_version = stockfish.get_stockfish_major_version()
 
         expected_best_moves = ["d2d4", "b1c3", "c2c3", "c2c4", "f1e2"]
-        if (
-            stockfish.get_stockfish_major_version() >= 12
-            and stockfish.get_stockfish_major_version() < 100
-        ):
-            # SF is an officially released version at least as recent as 12.
+        if (major_version >= 12 and 
+           not (major_version >= 10109 and major_version <= 123129)):
+            # SF major version is at least 12, and not a dd/mm/yy date.
             expected_best_moves.remove("f1e2")
 
         assert stockfish.get_best_move() in expected_best_moves
@@ -292,7 +291,10 @@ class TestStockfish:
         )
 
     def test_get_stockfish_major_version(self, stockfish):
-        assert stockfish.get_stockfish_major_version() in (8, 9, 10, 11, 12, 13, 14)
+        major_version = stockfish.get_stockfish_major_version()
+        if not (major_version >= 10109 and major_version <= 123129):
+            # Not a dd/mm/yy date.
+            assert stockfish.get_stockfish_major_version() in (8, 9, 10, 11, 12, 13, 14)
 
     def test_get_evaluation_cp(self, stockfish):
         stockfish.set_fen_position(
@@ -438,7 +440,7 @@ class TestStockfish:
             )
             stockfish.set_show_wdl_option(False)
             wdl_stats = stockfish.get_wdl_stats()
-            assert wdl_stats[1] > wdl_stats[0] * 4
+            assert wdl_stats[1] > wdl_stats[0] * 3.5
             assert wdl_stats[0] > wdl_stats[2] * 1.8
             assert stockfish._parameters["UCI_ShowWDL"] == "false"
             stockfish.set_fen_position("8/8/8/8/8/6k1/6p1/6K1 w - - 0 1")
