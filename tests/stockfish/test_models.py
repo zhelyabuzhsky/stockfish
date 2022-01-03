@@ -193,15 +193,17 @@ class TestStockfish:
             "c2c3",
             "f1b5",
             "g2g3",
+            "h2h3",
         )
         assert stockfish.get_parameters()["UCI_Elo"] == 1350
 
         stockfish.set_elo_rating(2850)
         major_version = stockfish.get_stockfish_major_version()
 
-        expected_best_moves = ["d2d4", "b1c3", "c2c3", "c2c4", "f1e2"]
-        if (major_version >= 12 and 
-           not (major_version >= 10109 and major_version <= 123129)):
+        expected_best_moves = ["d2d4", "b1c3", "c2c3", "c2c4", "f1b5", "f1e2"]
+        if major_version >= 12 and not (
+            major_version >= 10109 and major_version <= 123129
+        ):
             # SF major version is at least 12, and not a dd/mm/yy date.
             expected_best_moves.remove("f1e2")
 
