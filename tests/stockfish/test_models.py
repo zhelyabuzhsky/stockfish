@@ -146,8 +146,6 @@ class TestStockfish:
 
         stockfish.set_skill_level(1)
         assert stockfish.get_best_move() in (
-            "b2b3",
-            "b2b3",
             "d2d3",
             "d2d4",
             "b1c3",
@@ -161,11 +159,7 @@ class TestStockfish:
         assert stockfish.get_parameters()["Skill Level"] == 1
 
         stockfish.set_skill_level(20)
-        assert stockfish.get_best_move() in (
-            "d2d4",
-            "b1c3",
-            "c2c4",
-        )
+        assert stockfish.get_best_move() == "d2d4"
         assert stockfish.get_parameters()["Skill Level"] == 20
 
     def test_set_elo_rating(self, stockfish):
@@ -196,17 +190,14 @@ class TestStockfish:
             "d2d4",
             "c2c4",
             "f1e2",
-            "h2h3",
             "c2c3",
+            "f1b5",
+            "g2g3",
         )
         assert stockfish.get_parameters()["UCI_Elo"] == 1350
         
         stockfish.set_elo_rating(2850)
-        assert stockfish.get_best_move() in (
-            "d2d4",
-            "b1c3",
-            "c2c4",
-        )
+        assert stockfish.get_best_move() == "d2d4"
         assert stockfish.get_parameters()["UCI_Elo"] == 2850
 
     def test_stockfish_constructor_with_custom_params(self, stockfish):
