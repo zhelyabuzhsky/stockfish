@@ -195,9 +195,19 @@ class TestStockfish:
             "g2g3",
         )
         assert stockfish.get_parameters()["UCI_Elo"] == 1350
-        
+
         stockfish.set_elo_rating(2850)
-        assert stockfish.get_best_move() == "d2d4"
+
+        expected_best_moves = ["d2d4", "b1c3", "c2c3", "c2c4", "f1e2"]
+        if (
+            stockfish.get_stockfish_major_version() >= 12
+            and stockfish.get_stockfish_major_version() < 100
+        ):
+            # SF is an officially released version at least as recent as 12.
+            expected_best_moves.remove("f1e2")
+
+        assert stockfish.get_best_move() in expected_best_moves
+
         assert stockfish.get_parameters()["UCI_Elo"] == 2850
 
     def test_stockfish_constructor_with_custom_params(self, stockfish):
