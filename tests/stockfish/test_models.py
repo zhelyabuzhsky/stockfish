@@ -155,6 +155,7 @@ class TestStockfish:
             "f1e2",
             "c2c3",
             "h2h3",
+            "b2b3",
         )
         assert stockfish.get_parameters()["Skill Level"] == 1
 
@@ -179,6 +180,7 @@ class TestStockfish:
             "h2h3",
             "c2c3",
             "f1d3",
+            "a2a3",
         )
         assert stockfish.get_parameters()["UCI_Elo"] == 2000
 
