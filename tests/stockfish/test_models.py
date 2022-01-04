@@ -146,6 +146,7 @@ class TestStockfish:
 
         stockfish.set_skill_level(1)
         assert stockfish.get_best_move() in (
+            "b2b3",
             "d2d3",
             "d2d4",
             "b1c3",
@@ -155,7 +156,6 @@ class TestStockfish:
             "f1e2",
             "c2c3",
             "h2h3",
-            "b2b3",
         )
         assert stockfish.get_parameters()["Skill Level"] == 1
 
@@ -203,10 +203,7 @@ class TestStockfish:
         major_version = stockfish.get_stockfish_major_version()
 
         expected_best_moves = ["d2d4", "b1c3", "c2c3", "c2c4", "f1b5", "f1e2"]
-        if major_version >= 12 and not (
-            major_version >= 10109 and major_version <= 123129
-        ):
-            # SF major version is at least 12, and not a dd/mm/yy date.
+        if major_version >= 12 and not (stockfish.is_stockfish_major_version_a_date()):
             expected_best_moves.remove("f1e2")
 
         assert stockfish.get_best_move() in expected_best_moves
@@ -295,10 +292,9 @@ class TestStockfish:
         )
 
     def test_get_stockfish_major_version(self, stockfish):
-        major_version = stockfish.get_stockfish_major_version()
-        if not (major_version >= 10109 and major_version <= 123129):
-            # Not a dd/mm/yy date.
-            assert stockfish.get_stockfish_major_version() in (8, 9, 10, 11, 12, 13, 14)
+        assert (
+            stockfish.get_stockfish_major_version() in (8, 9, 10, 11, 12, 13, 14)
+        ) != stockfish.is_stockfish_major_version_a_date()
 
     def test_get_evaluation_cp(self, stockfish):
         stockfish.set_fen_position(

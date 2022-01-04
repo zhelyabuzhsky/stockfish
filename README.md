@@ -235,6 +235,14 @@ stockfish.get_stockfish_major_version()
 11
 ```
 
+### Get whether the major version represents a dd/mm/yy date
+```python
+stockfish.is_stockfish_major_version_a_date()
+```
+```text
+False
+```
+
 ## Testing
 ```bash
 $ python setup.py test

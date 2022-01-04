@@ -547,6 +547,19 @@ class Stockfish:
 
         return self._stockfish_major_version
 
+    def is_stockfish_major_version_a_date(self) -> bool:
+        """Returns whether the major version is a date.
+
+        Returns:
+            True if the major version is a date, indicating SF was downloaded
+            as a development build. E.g., 020122 is the major version
+            of the SF development build released on Jan 2, 2022.
+        """
+        return (
+            self._stockfish_major_version >= 10109
+            and self._stockfish_major_version <= 311229
+        )
+
     def __del__(self) -> None:
         if self._stockfish.poll() is None:
             self._put("quit")
