@@ -557,7 +557,7 @@ class Stockfish:
         """
         return (
             self._stockfish_major_version >= 10109
-            and self._stockfish_major_version <= 311229
+            and self._stockfish_major_version <= 311299
         )
 
     def __del__(self) -> None:
