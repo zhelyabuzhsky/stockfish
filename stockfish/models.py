@@ -547,13 +547,15 @@ class Stockfish:
 
         return self._stockfish_major_version
 
-    def is_stockfish_major_version_a_date(self) -> bool:
-        """Returns whether the major version is a date.
+    def is_development_build_of_engine(self) -> bool:
+        """Returns whether the version of Stockfish being used is a
+           development build.
 
         Returns:
-            True if the major version is a date, indicating SF was downloaded
-            as a development build. E.g., 020122 is the major version
-            of the SF development build released on Jan 2, 2022.
+            True if the major version is a date, indicating SF is a
+            development build. E.g., 020122 is the major version of the SF
+            development build released on Jan 2, 2022. Otherwise, False is
+            returned (which means the engine is an official release of SF).
         """
         return (
             self._stockfish_major_version >= 10109

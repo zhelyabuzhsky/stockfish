@@ -235,9 +235,9 @@ stockfish.get_stockfish_major_version()
 11
 ```
 
-### Get whether the major version represents a dd/mm/yy date
+### Find if the version of Stockfish being used is a developemnt build
 ```python
-stockfish.is_stockfish_major_version_a_date()
+stockfish.is_development_build_of_engine()
 ```
 ```text
 False

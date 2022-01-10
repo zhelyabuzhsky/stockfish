@@ -203,7 +203,7 @@ class TestStockfish:
         major_version = stockfish.get_stockfish_major_version()
 
         expected_best_moves = ["d2d4", "b1c3", "c2c3", "c2c4", "f1b5", "f1e2"]
-        if major_version >= 12 and not (stockfish.is_stockfish_major_version_a_date()):
+        if major_version >= 12 and not stockfish.is_development_build_of_engine():
             expected_best_moves.remove("f1e2")
 
         assert stockfish.get_best_move() in expected_best_moves
@@ -294,7 +294,7 @@ class TestStockfish:
     def test_get_stockfish_major_version(self, stockfish):
         assert (
             stockfish.get_stockfish_major_version() in (8, 9, 10, 11, 12, 13, 14)
-        ) != stockfish.is_stockfish_major_version_a_date()
+        ) != stockfish.is_development_build_of_engine()
 
     def test_get_evaluation_cp(self, stockfish):
         stockfish.set_fen_position(
