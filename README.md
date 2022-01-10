@@ -235,7 +235,7 @@ stockfish.get_stockfish_major_version()
 11
 ```
 
-### Find if the version of Stockfish being used is a developemnt build
+### Find if the version of Stockfish being used is a development build
 ```python
 stockfish.is_development_build_of_engine()
 ```
