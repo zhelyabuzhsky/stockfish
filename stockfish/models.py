@@ -547,9 +547,24 @@ class Stockfish:
 
         return self._stockfish_major_version
 
+    def is_development_build_of_engine(self) -> bool:
+        """Returns whether the version of Stockfish being used is a
+           development build.
+
+        Returns:
+            True if the major version is a date, indicating SF is a
+            development build. E.g., 020122 is the major version of the SF
+            development build released on Jan 2, 2022. Otherwise, False is
+            returned (which means the engine is an official release of SF).
+        """
+        return (
+            self._stockfish_major_version >= 10109
+            and self._stockfish_major_version <= 311299
+        )
+
     def __del__(self) -> None:
         if self._stockfish.poll() is None:
             self._put("quit")
             self._stockfish.kill()
-            while self._stockfish.poll() == None:
+            while self._stockfish.poll() is None:
                 pass

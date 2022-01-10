@@ -147,7 +147,6 @@ class TestStockfish:
         stockfish.set_skill_level(1)
         assert stockfish.get_best_move() in (
             "b2b3",
-            "b2b3",
             "d2d3",
             "d2d4",
             "b1c3",
@@ -155,18 +154,16 @@ class TestStockfish:
             "g2g3",
             "c2c4",
             "f1e2",
+            "c2c3",
+            "h2h3",
         )
         assert stockfish.get_parameters()["Skill Level"] == 1
 
         stockfish.set_skill_level(20)
-        assert stockfish.get_best_move() in (
-            "d2d4",
-            "b1c3",
-        )
+        assert stockfish.get_best_move() == "d2d4"
         assert stockfish.get_parameters()["Skill Level"] == 20
 
     def test_set_elo_rating(self, stockfish):
-        stockfish.set_depth(2)
         stockfish.set_fen_position(
             "rnbqkbnr/ppp2ppp/3pp3/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1"
         )
@@ -175,15 +172,15 @@ class TestStockfish:
 
         stockfish.set_elo_rating(2000)
         assert stockfish.get_best_move() in (
-            "b2b3",
-            "b2b3",
-            "d2d3",
             "d2d4",
             "b1c3",
             "d1e2",
-            "g2g3",
             "c2c4",
             "f1e2",
+            "h2h3",
+            "c2c3",
+            "f1d3",
+            "a2a3",
         )
         assert stockfish.get_parameters()["UCI_Elo"] == 2000
 
@@ -195,12 +192,27 @@ class TestStockfish:
             "d2d4",
             "c2c4",
             "f1e2",
+            "c2c3",
+            "f1b5",
+            "g2g3",
+            "h2h3",
         )
         assert stockfish.get_parameters()["UCI_Elo"] == 1350
 
+        stockfish.set_elo_rating(2850)
+        major_version = stockfish.get_stockfish_major_version()
+
+        expected_best_moves = ["d2d4", "b1c3", "c2c3", "c2c4", "f1b5", "f1e2"]
+        if major_version >= 12 and not stockfish.is_development_build_of_engine():
+            expected_best_moves.remove("f1e2")
+
+        assert stockfish.get_best_move() in expected_best_moves
+
+        assert stockfish.get_parameters()["UCI_Elo"] == 2850
+
     def test_stockfish_constructor_with_custom_params(self, stockfish):
         stockfish.set_skill_level(1)
-        assert stockfish.get_parameters() == {
+        expected_params = {
             "Write Debug Log": "false",
             "Contempt": 0,
             "Min Split Depth": 0,
@@ -216,6 +228,9 @@ class TestStockfish:
             "UCI_LimitStrength": "false",
             "UCI_Elo": 1350,
         }
+        if stockfish.does_current_engine_version_have_wdl_option():
+            expected_params["UCI_ShowWDL"] = "false"
+        assert stockfish.get_parameters() == expected_params
 
     def test_get_board_visual(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6", "d2d4", "d7d5"])
@@ -277,7 +292,9 @@ class TestStockfish:
         )
 
     def test_get_stockfish_major_version(self, stockfish):
-        assert stockfish.get_stockfish_major_version() in (8, 9, 10, 11, 12, 13, 14)
+        assert (
+            stockfish.get_stockfish_major_version() in (8, 9, 10, 11, 12, 13, 14)
+        ) != stockfish.is_development_build_of_engine()
 
     def test_get_evaluation_cp(self, stockfish):
         stockfish.set_fen_position(
@@ -301,6 +318,7 @@ class TestStockfish:
         assert "depth 12" in stockfish.info
 
     def test_get_best_move_wrong_position(self, stockfish):
+        stockfish.set_depth(2)
         wrong_fen = "3kk3/8/8/8/8/8/8/3KK3 w - - 0 0"
         stockfish.set_fen_position(wrong_fen)
         assert stockfish.get_best_move() in (
@@ -422,7 +440,7 @@ class TestStockfish:
             )
             stockfish.set_show_wdl_option(False)
             wdl_stats = stockfish.get_wdl_stats()
-            assert wdl_stats[1] > wdl_stats[0] * 4
+            assert wdl_stats[1] > wdl_stats[0] * 3.5
             assert wdl_stats[0] > wdl_stats[2] * 1.8
             assert stockfish._parameters["UCI_ShowWDL"] == "false"
             stockfish.set_fen_position("8/8/8/8/8/6k1/6p1/6K1 w - - 0 1")
@@ -445,12 +463,12 @@ class TestStockfish:
         if stockfish.does_current_engine_version_have_wdl_option():
             stockfish.set_show_wdl_option(True)
             assert stockfish._parameters["UCI_ShowWDL"] == "true"
-            assert len(Stockfish.get_wdl_stats()) == 3
+            assert len(stockfish.get_wdl_stats()) == 3
             assert stockfish._parameters["UCI_ShowWDL"] == "true"
             stockfish.set_show_wdl_option(False)
             assert stockfish._parameters["UCI_ShowWDL"] == "false"
             stockfish.set_fen_position("8/8/8/8/8/3k4/3p4/3K4 w - - 0 1")
-            assert Stockfish.get_wdl_stats() is None
+            assert stockfish.get_wdl_stats() is None
             assert stockfish._parameters["UCI_ShowWDL"] == "false"
         else:
             with pytest.raises(RuntimeError):
