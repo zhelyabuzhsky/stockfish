@@ -30,7 +30,7 @@ class TestStockfish:
         assert best_move in ("d2d4")
         best_move = stockfish.get_best_move(wtime=1000, btime=1000)
         assert best_move in ("e2e4", "d2d4")
-        best_move = stockfish.get_best_move(wtime=5*60*1000, btime=1000)
+        best_move = stockfish.get_best_move(wtime=5 * 60 * 1000, btime=1000)
         assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3", "d2d4")
 
     def test_set_position_resets_info(self, stockfish):
@@ -58,7 +58,7 @@ class TestStockfish:
         assert best_move in ("d2d4")
         best_move = stockfish.get_best_move(wtime=1000, btime=1000)
         assert best_move in ("d2d4", "b1c3")
-        best_move = stockfish.get_best_move(wtime=5*60*1000, btime=1000)
+        best_move = stockfish.get_best_move(wtime=5 * 60 * 1000, btime=1000)
         assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3", "d2d4")
 
     def test_get_best_move_checkmate(self, stockfish):
@@ -74,7 +74,7 @@ class TestStockfish:
         assert stockfish.get_best_move(wtime=1000) is None
         assert stockfish.get_best_move(btime=1000) is None
         assert stockfish.get_best_move(wtime=1000, btime=1000) is None
-        assert stockfish.get_best_move(wtime=5*60*1000, btime=1000) is None
+        assert stockfish.get_best_move(wtime=5 * 60 * 1000, btime=1000) is None
 
     def test_set_fen_position(self, stockfish):
         stockfish.set_fen_position(
