@@ -23,6 +23,16 @@ class TestStockfish:
         best_move = stockfish.get_best_move_time(1000)
         assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3", "d2d4")
 
+    def test_get_best_move_remaining_time_first_move(self, stockfish):
+        best_move = stockfish.get_best_move(wtime=1000)
+        assert best_move in ("a2a3")
+        best_move = stockfish.get_best_move(btime=1000)
+        assert best_move in ("d2d4")
+        best_move = stockfish.get_best_move(wtime=1000, btime=1000)
+        assert best_move in ("e2e4", "d2d4")
+        best_move = stockfish.get_best_move(wtime=5*60*1000, btime=1000)
+        assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3", "d2d4")
+
     def test_set_position_resets_info(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6"])
         stockfish.get_best_move()
@@ -40,6 +50,17 @@ class TestStockfish:
         best_move = stockfish.get_best_move_time(1000)
         assert best_move in ("d2d4", "g1f3")
 
+    def test_get_best_move_remaining_time_not_first_move(self, stockfish):
+        stockfish.set_position(["e2e4", "e7e6"])
+        best_move = stockfish.get_best_move(wtime=1000)
+        assert best_move in ("a2a3")
+        best_move = stockfish.get_best_move(btime=1000)
+        assert best_move in ("d2d4")
+        best_move = stockfish.get_best_move(wtime=1000, btime=1000)
+        assert best_move in ("d2d4", "b1c3")
+        best_move = stockfish.get_best_move(wtime=5*60*1000, btime=1000)
+        assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3", "d2d4")
+
     def test_get_best_move_checkmate(self, stockfish):
         stockfish.set_position(["f2f3", "e7e5", "g2g4", "d8h4"])
         assert stockfish.get_best_move() is None
@@ -47,6 +68,13 @@ class TestStockfish:
     def test_get_best_move_time_checkmate(self, stockfish):
         stockfish.set_position(["f2f3", "e7e5", "g2g4", "d8h4"])
         assert stockfish.get_best_move_time(1000) is None
+
+    def test_get_best_move_remaining_time_checkmate(self, stockfish):
+        stockfish.set_position(["f2f3", "e7e5", "g2g4", "d8h4"])
+        assert stockfish.get_best_move(wtime=1000) is None
+        assert stockfish.get_best_move(btime=1000) is None
+        assert stockfish.get_best_move(wtime=1000, btime=1000) is None
+        assert stockfish.get_best_move(wtime=5*60*1000, btime=1000) is None
 
     def test_set_fen_position(self, stockfish):
         stockfish.set_fen_position(
