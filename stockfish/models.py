@@ -125,7 +125,7 @@ class Stockfish:
     def _go_time(self, time: int) -> None:
         self._put(f"go movetime {time}")
 
-    def _go_remaining_time(self, wtime: int, btime: int) -> None:
+    def _go_remaining_time(self, wtime: Optional[int], btime: Optional[int]) -> None:
         cmd = "go"
         if wtime is not None:
             cmd += f" wtime {wtime}"
