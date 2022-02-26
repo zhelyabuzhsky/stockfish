@@ -73,6 +73,10 @@ stockfish.get_best_move()
 ```text
 d2d4
 ```
+It's possible to specify remaining time on black and/or white clock. Time is in milliseconds.
+```python
+stockfish.get_best_move(wtime=1000, btime=1000)
+```
 
 ### Get best move based on a time constraint
 ```python
