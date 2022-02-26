@@ -255,7 +255,7 @@ class Stockfish:
 
     def get_best_move(self, wtime: int = None, btime: int = None) -> Optional[str]:
         """Returns best move with current position on the board.
-        Uses depth limit if both white and black remaining times are not specified.
+        wtime and btime arguments influence the search only if provided.
 
         Returns:
             A string of move in algebraic notation or None, if it's a mate now.
