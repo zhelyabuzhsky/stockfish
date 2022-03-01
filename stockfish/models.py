@@ -125,6 +125,14 @@ class Stockfish:
     def _go_time(self, time: int) -> None:
         self._put(f"go movetime {time}")
 
+    def _go_remaining_time(self, wtime: Optional[int], btime: Optional[int]) -> None:
+        cmd = "go"
+        if wtime is not None:
+            cmd += f" wtime {wtime}"
+        if btime is not None:
+            cmd += f" btime {btime}"
+        self._put(cmd)
+
     @staticmethod
     def _convert_move_list_to_str(moves: List[str]) -> str:
         result = ""
@@ -245,13 +253,17 @@ class Stockfish:
         self._prepare_for_new_position(send_ucinewgame_token)
         self._put(f"position fen {fen_position}")
 
-    def get_best_move(self) -> Optional[str]:
+    def get_best_move(self, wtime: int = None, btime: int = None) -> Optional[str]:
         """Returns best move with current position on the board.
+        wtime and btime arguments influence the search only if provided.
 
         Returns:
             A string of move in algebraic notation or None, if it's a mate now.
         """
-        self._go()
+        if wtime is not None or btime is not None:
+            self._go_remaining_time(wtime, btime)
+        else:
+            self._go()
         last_text: str = ""
         while True:
             text = self._read_line()
