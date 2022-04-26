@@ -550,11 +550,11 @@ class Stockfish:
         """
         self.depth = str(depth_value)
         
-    def will_move_be_a_capture(self, move: str) -> bool:
+    def will_move_be_a_capture(self, move_value: str) -> bool:
         """Returns whether the proposed move will be a capture.
         
         Args:
-            move:
+            move_value:
                 The proposed move, in the notation that Stockfish uses.
                 I.e., the coordinate of the starting square followed by
                 the coordinate of the destination square. 
@@ -565,20 +565,10 @@ class Stockfish:
             pieces or pawns.
             False if the destination square is empty.
         """
-
-        if len(move) != 4:
-            raise ValueError("The length of the string argument must be 4.")
-        is_white_to_move = "w" in self.get_fen_position()
-        side_to_move = "white" if is_white_to_move else "black"
-        pieces_of_side_to_move = (["P", "N", "B", "R", "Q", "K"] if is_white_to_move 
-                                  else ["p", "n", "b", "r", "q", "k"])
-        starting_square_piece = self.get_what_is_on_square(move[:2])
-        ending_square_piece = self.get_what_is_on_square(move[-2:])
-        if starting_square_piece not in pieces_of_side_to_move:
-            raise ValueError(f"There is no {side_to_move} piece on your move's starting square {move[:2]}")
-        if ending_square_piece in pieces_of_side_to_move:
-            raise ValueError(f"There is already a {side_to_move} piece on your move's ending square {move[-2:]}")
-        return ending_square_piece != " "
+        
+        if not self.is_move_correct(move_value):
+            raise ValueError("The proposed move is not valid in the current position.")
+        return self.get_what_is_on_square(move_value[-2:]) != " "
     
     def get_what_is_on_square(self, square: str) -> str:
         """Returns what is on the specified square.
