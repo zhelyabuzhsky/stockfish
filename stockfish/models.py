@@ -549,6 +549,48 @@ class Stockfish:
             depth_value: Depth option higher than 1
         """
         self.depth = str(depth_value)
+        
+    def will_move_be_a_capture(self, move: str) -> bool:
+        """Returns whether the proposed move will be a capture.
+        
+        Args:
+            move:
+                The proposed move, in the notation that Stockfish uses.
+                I.e., the coordinate of the starting square followed by
+                the coordinate of the destination square. 
+                E.g., e2e4 or g1f3.
+        
+        Returns:
+            True if the destination square contains one of the opponent's 
+            pieces or pawns.
+            False if the destination square is empty.
+        """
+        
+        # TODO - Call the other function you've written below.
+    
+    def get_what_is_on_square(self, square: str) -> str:
+        """Returns what is on the specified square.
+        
+        Args:
+            square:
+                The coordinate of the square in question. E.g., e4.
+        
+        Returns:
+            One of: "P", "p", "R", "r", "N", "n", "B", "b", "Q", "q",
+            "K", "k", or " ".
+            Uppercase represents a white piece, lowercase represents a black
+            piece, and a single space represents an empty square.
+        """
+        
+        file_letter = square[0].lower()
+        rank_num_as_string = square[1]
+        if (len(square) != 2 or file_letter < 'a' or file_letter > 'h' or
+            rank_num_as_string < '1' or rank_num_as_string > '8'):
+            raise ValueError("square argument to the get_what_is_on_square function isn't valid.")
+        for current_rank in self.get_board_visual().splitlines():
+            if rank_num_as_string in current_rank:
+                return current_rank[2 + (ord(file_letter) - ord("a")) * 4]
+        raise RuntimeError("Control reached the end of the get_what_is_on_square function.")
 
     def get_stockfish_major_version(self):
         """Returns Stockfish engine major version.
