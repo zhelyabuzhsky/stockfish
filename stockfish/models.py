@@ -565,8 +565,20 @@ class Stockfish:
             pieces or pawns.
             False if the destination square is empty.
         """
-        
-        # TODO - Call the other function you've written below.
+
+        if len(move) != 4:
+            raise ValueError("The length of the string argument must be 4.")
+        is_white_to_move = "w" in self.get_fen_position()
+        side_to_move = "white" if is_white_to_move else "black"
+        pieces_of_side_to_move = (["P", "N", "B", "R", "Q", "K"] if is_white_to_move 
+                                  else ["p", "n", "b", "r", "q", "k"])
+        starting_square_piece = self.get_what_is_on_square(move[:2])
+        ending_square_piece = self.get_what_is_on_square(move[-2:])
+        if starting_square_piece not in pieces_of_side_to_move:
+            raise ValueError(f"There is no {side_to_move} piece on your move's starting square {move[:2]}")
+        if ending_square_piece in pieces_of_side_to_move:
+            raise ValueError(f"There is already a {side_to_move} piece on your move's ending square {move[-2:]}")
+        return ending_square_piece != " "
     
     def get_what_is_on_square(self, square: str) -> str:
         """Returns what is on the specified square.
@@ -576,7 +588,7 @@ class Stockfish:
                 The coordinate of the square in question. E.g., e4.
         
         Returns:
-            One of: "P", "p", "R", "r", "N", "n", "B", "b", "Q", "q",
+            One of: "P", "p", "N", "n", "B", "b", "R", "r", "Q", "q",
             "K", "k", or " ".
             Uppercase represents a white piece, lowercase represents a black
             piece, and a single space represents an empty square.
