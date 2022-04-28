@@ -574,39 +574,29 @@ class Stockfish:
                 return current_rank[2 + (ord(file_letter) - ord("a")) * 4]
         raise RuntimeError("Control reached the end of the get_what_is_on_the_square function.")
 
-    def will_move_be_a_capture(self, move_value: str) -> bool:
-        """Returns whether the proposed move will be a capture.
+    def will_move_be_a_capture(self, move_value: str) -> str:
+        """Returns whether the proposed move will be a direct capture, 
+           en passant, or not a capture at all.
         
         Args:
             move_value:
                 The proposed move, in the notation that Stockfish uses.
-                I.e., the coordinate of the starting square followed by
-                the coordinate of the destination square. 
-                E.g., e2e4 or g1f3.
+                E.g., "e2e4", "g1f3", etc.
         
         Returns:
-            True if the destination square contains one of the opponent's 
-            pieces or pawns.
-            False if the destination square is empty.
+            "direct capture" if the move will be a direct capture.
+            "en passant" if the move is a capture done with en passant.
+            "no capture" if the move does not capture anything.
         """
         if not self.is_move_correct(move_value):
             raise ValueError("The proposed move is not valid in the current position.")
-        return (self.get_what_is_on_the_square(move_value[-2:]) != " " or
-                self.will_move_be_en_passant(move_value))
-    
-    def will_move_be_en_passant(self, move_value: str) -> bool:
-        """Returns whether the proposed move will be en passant.
-        
-        Args:
-            move_value:
-                The proposed move, in the notation that Stockfish uses (e.g., e5d6).
-        
-        Returns:
-            True if the move will be en passant, False otherwise.
-        """
-        if not self.is_move_correct(move_value):
-            raise ValueError("The proposed move is not valid in the current position.")
-        return move_value == self.get_fen_position().split()[3]
+        if self.get_what_is_on_the_square(move_value[-2:]) != " ":
+            return "direct capture"
+        elif (move_value[-2:] == self.get_fen_position().split()[3] and
+              self.get_what_is_on_the_square(move_value[:2]) in ['P','p']):
+            return "en passant"
+        else:
+            return "no capture"
 
     def get_stockfish_major_version(self):
         """Returns Stockfish engine major version.
