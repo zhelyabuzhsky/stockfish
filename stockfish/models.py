@@ -550,7 +550,7 @@ class Stockfish:
         """
         self.depth = str(depth_value)
     
-    def get_what_is_on_the_square(self, square: str) -> str:
+    def get_what_is_on_square(self, square: str) -> str:
         """Returns what is on the specified square.
         
         Args:
@@ -568,11 +568,11 @@ class Stockfish:
         rank_num_as_string = square[1]
         if (len(square) != 2 or file_letter < 'a' or file_letter > 'h' or
             rank_num_as_string < '1' or rank_num_as_string > '8'):
-            raise ValueError("square argument to the get_what_is_on_the_square function isn't valid.")
+            raise ValueError("square argument to the get_what_is_on_square function isn't valid.")
         for current_rank in self.get_board_visual().splitlines():
             if rank_num_as_string in current_rank:
                 return current_rank[2 + (ord(file_letter) - ord("a")) * 4]
-        raise RuntimeError("Control reached the end of the get_what_is_on_the_square function.")
+        raise RuntimeError("Control reached the end of the get_what_is_on_square function.")
 
     def will_move_be_a_capture(self, move_value: str) -> str:
         """Returns whether the proposed move will be a direct capture, 
@@ -590,10 +590,10 @@ class Stockfish:
         """
         if not self.is_move_correct(move_value):
             raise ValueError("The proposed move is not valid in the current position.")
-        if self.get_what_is_on_the_square(move_value[-2:]) != " ":
+        if self.get_what_is_on_square(move_value[-2:]) != " ":
             return "direct capture"
         elif (move_value[-2:] == self.get_fen_position().split()[3] and
-              self.get_what_is_on_the_square(move_value[:2]) in ['P','p']):
+              self.get_what_is_on_square(move_value[:2]) in ['P','p']):
             return "en passant"
         else:
             return "no capture"

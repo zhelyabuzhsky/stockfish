@@ -570,3 +570,35 @@ class TestStockfish:
         # Should do nothing, and change neither of the values below.
         assert stockfish._stockfish.poll() is not None
         assert stockfish._has_quit_command_been_sent
+    
+    def test_what_is_on_square_and_capture_functions(self, stockfish):
+        stockfish.set_fen_position(
+            "rnbq1rk1/ppp1ppbp/5np1/3pP3/8/BPN5/P1PP1PPP/R2QKBNR w KQ d6 0 6"
+        )
+        assert stockfish.get_what_is_on_square("a1") == "R"
+        assert stockfish.get_what_is_on_square("a8") == "r"
+        assert stockfish.get_what_is_on_square("g8") == "k"
+        assert stockfish.get_what_is_on_square("e1") == "K"
+        assert stockfish.get_what_is_on_square("h2") == "P"
+        assert stockfish.get_what_is_on_square("f8") == "r"
+        assert stockfish.get_what_is_on_square("h7") == "p"
+        assert stockfish.will_move_be_a_capture("c3d5") == "direct capture"
+        assert stockfish.will_move_be_a_capture("e5d6") == "en passant"
+        assert stockfish.will_move_be_a_capture("f1e2") == "no capture"
+        assert stockfish.will_move_be_a_capture("e5f6") == "direct capture"
+        assert stockfish.will_move_be_a_capture("a3d6") == "no capture"
+        with pytest.raises(ValueError):
+            stockfish.get_what_is_on_square("i1")
+        with pytest.raises(ValueError):
+            stockfish.get_what_is_on_square("b9")
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
