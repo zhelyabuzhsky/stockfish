@@ -549,38 +549,45 @@ class Stockfish:
             depth_value: Depth option higher than 1
         """
         self.depth = str(depth_value)
-    
+
     def get_what_is_on_square(self, square: str) -> str:
         """Returns what is on the specified square.
-        
+
         Args:
             square:
                 The coordinate of the square in question. E.g., e4.
-        
+
         Returns:
             One of: "P", "p", "N", "n", "B", "b", "R", "r", "Q", "q",
             "K", "k", or " ".
             Uppercase represents a white piece, lowercase represents a black
             piece, and a single space represents an empty square.
         """
-        
+
         file_letter = square[0].lower()
         rank_num = int(square[1])
-        if (len(square) != 2 or file_letter < 'a' or file_letter > 'h' or
-            square[1] < '1' or square[1] > '8'):
-            raise ValueError("square argument to the get_what_is_on_square function isn't valid.")
+        if (
+            len(square) != 2
+            or file_letter < "a"
+            or file_letter > "h"
+            or square[1] < "1"
+            or square[1] > "8"
+        ):
+            raise ValueError(
+                "square argument to the get_what_is_on_square function isn't valid."
+            )
         rank_visual = self.get_board_visual().splitlines()[17 - 2 * rank_num]
         return rank_visual[2 + (ord(file_letter) - ord("a")) * 4]
 
     def will_move_be_a_capture(self, move_value: str) -> str:
-        """Returns whether the proposed move will be a direct capture, 
+        """Returns whether the proposed move will be a direct capture,
            en passant, or not a capture at all.
-        
+
         Args:
             move_value:
                 The proposed move, in the notation that Stockfish uses.
                 E.g., "e2e4", "g1f3", etc.
-        
+
         Returns:
             "direct capture" if the move will be a direct capture.
             "en passant" if the move is a capture done with en passant.
@@ -590,8 +597,9 @@ class Stockfish:
             raise ValueError("The proposed move is not valid in the current position.")
         if self.get_what_is_on_square(move_value[-2:]) != " ":
             return "direct capture"
-        elif (move_value[-2:] == self.get_fen_position().split()[3] and
-              self.get_what_is_on_square(move_value[:2]) in ['P','p']):
+        elif move_value[-2:] == self.get_fen_position().split()[
+            3
+        ] and self.get_what_is_on_square(move_value[:2]) in ["P", "p"]:
             return "en passant"
         else:
             return "no capture"

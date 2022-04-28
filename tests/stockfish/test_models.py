@@ -570,7 +570,7 @@ class TestStockfish:
         # Should do nothing, and change neither of the values below.
         assert stockfish._stockfish.poll() is not None
         assert stockfish._has_quit_command_been_sent
-    
+
     def test_what_is_on_square_and_capture_functions(self, stockfish):
         stockfish.set_fen_position(
             "rnbq1rk1/ppp1ppbp/5np1/3pP3/8/BPN5/P1PP1PPP/R2QKBNR w KQ d6 0 6"
@@ -591,14 +591,3 @@ class TestStockfish:
             stockfish.get_what_is_on_square("i1")
         with pytest.raises(ValueError):
             stockfish.get_what_is_on_square("b9")
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
