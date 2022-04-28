@@ -565,14 +565,12 @@ class Stockfish:
         """
         
         file_letter = square[0].lower()
-        rank_num_as_string = square[1]
+        rank_num = int(square[1])
         if (len(square) != 2 or file_letter < 'a' or file_letter > 'h' or
-            rank_num_as_string < '1' or rank_num_as_string > '8'):
+            square[1] < '1' or square[1] > '8'):
             raise ValueError("square argument to the get_what_is_on_square function isn't valid.")
-        for current_rank in self.get_board_visual().splitlines():
-            if rank_num_as_string in current_rank:
-                return current_rank[2 + (ord(file_letter) - ord("a")) * 4]
-        raise RuntimeError("Control reached the end of the get_what_is_on_square function.")
+        rank_visual = self.get_board_visual().splitlines()[17 - 2 * rank_num]
+        return rank_visual[2 + (ord(file_letter) - ord("a")) * 4]
 
     def will_move_be_a_capture(self, move_value: str) -> str:
         """Returns whether the proposed move will be a direct capture, 
