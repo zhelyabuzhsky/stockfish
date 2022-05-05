@@ -321,7 +321,7 @@ class TestStockfish:
 
     def test_get_stockfish_major_version(self, stockfish):
         assert (
-            stockfish.get_stockfish_major_version() in (8, 9, 10, 11, 12, 13, 14)
+            stockfish.get_stockfish_major_version() in (8, 9, 10, 11, 12, 13, 14, 15)
         ) != stockfish.is_development_build_of_engine()
 
     def test_get_evaluation_cp(self, stockfish):
@@ -352,6 +352,7 @@ class TestStockfish:
         assert stockfish.get_best_move() in (
             "d1e2",
             "d1c1",
+            "d1c2",
         )
 
     def test_get_parameters(self, stockfish):
