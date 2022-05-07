@@ -313,10 +313,7 @@ class Stockfish:
             text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "bestmove":
-                if splitted_text[1] == "(none)":
-                    return False
-                else:
-                    return True
+                return splitted_text[1] != "(none)"
 
     def get_wdl_stats(self) -> Optional[List]:
         """Returns Stockfish's win/draw/loss stats for the side to move.
