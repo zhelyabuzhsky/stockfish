@@ -258,13 +258,14 @@ stockfish.get_what_is_on_square("e1")
 ```
 
 ### Find if a move will be a capture (and if so, what type of capture)
-The argument must be a string that represents the move, using the notation that Stockfish uses (i.e., the coordinate of the starting square followed by the coordinate of the ending square). The function will return one of the following strings: "direct capture", "en passant", or "no capture".  
+The argument must be a string that represents the move, using the notation that Stockfish uses (i.e., the coordinate of the starting square followed by the coordinate of the ending square).   
+The function will return one of the following enum members from a custom Stockfish.Capture enum: DIRECT_CAPTURE, EN_PASSANT, or NO_CAPTURE.  
 For example, say the current position is the one after 1.e4 Nf6 2.Nc3 e6 3.e5 d5.
 ```python
-stockfish.will_move_be_a_capture("c3d5")  # returns "direct capture"  
-stockfish.will_move_be_a_capture("e5f6")  # returns "direct capture"  
-stockfish.will_move_be_a_capture("e5d6")  # returns "en passant"  
-stockfish.will_move_be_a_capture("f1e2")  # returns "no capture"  
+stockfish.will_move_be_a_capture("c3d5")  # returns Stockfish.Capture.DIRECT_CAPTURE  
+stockfish.will_move_be_a_capture("e5f6")  # returns Stockfish.Capture.DIRECT_CAPTURE  
+stockfish.will_move_be_a_capture("e5d6")  # returns Stockfish.Capture.EN_PASSANT  
+stockfish.will_move_be_a_capture("f1e2")  # returns Stockfish.Capture.NO_CAPTURE  
 ```
 
 ## Testing

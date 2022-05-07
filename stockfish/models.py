@@ -10,6 +10,7 @@ from typing import Any, List, Optional
 import copy
 from os import path
 from dataclasses import dataclass
+from enum import Enum
 
 
 class Stockfish:
@@ -579,7 +580,12 @@ class Stockfish:
         rank_visual = self.get_board_visual().splitlines()[17 - 2 * rank_num]
         return rank_visual[2 + (ord(file_letter) - ord("a")) * 4]
 
-    def will_move_be_a_capture(self, move_value: str) -> str:
+    class Capture(Enum):
+        DIRECT_CAPTURE = "direct capture"
+        EN_PASSANT = "en passant"
+        NO_CAPTURE = "no capture"
+
+    def will_move_be_a_capture(self, move_value: str) -> Capture:
         """Returns whether the proposed move will be a direct capture,
            en passant, or not a capture at all.
 
@@ -588,21 +594,21 @@ class Stockfish:
                 The proposed move, in the notation that Stockfish uses.
                 E.g., "e2e4", "g1f3", etc.
 
-        Returns:
-            "direct capture" if the move will be a direct capture.
-            "en passant" if the move is a capture done with en passant.
-            "no capture" if the move does not capture anything.
+        Returns one of the following members of the Capture enum:
+            DIRECT_CAPTURE if the move will be a direct capture.
+            EN_PASSANT if the move is a capture done with en passant.
+            NO_CAPTURE if the move does not capture anything.
         """
         if not self.is_move_correct(move_value):
             raise ValueError("The proposed move is not valid in the current position.")
         if self.get_what_is_on_square(move_value[-2:]) != " ":
-            return "direct capture"
+            return Stockfish.Capture.DIRECT_CAPTURE
         elif move_value[-2:] == self.get_fen_position().split()[
             3
         ] and self.get_what_is_on_square(move_value[:2]) in ["P", "p"]:
-            return "en passant"
+            return Stockfish.Capture.EN_PASSANT
         else:
-            return "no capture"
+            return Stockfish.Capture.NO_CAPTURE
 
     def get_stockfish_major_version(self):
         """Returns Stockfish engine major version.

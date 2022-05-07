@@ -572,7 +572,7 @@ class TestStockfish:
         assert stockfish._stockfish.poll() is not None
         assert stockfish._has_quit_command_been_sent
 
-    def test_what_is_on_square_and_capture_functions(self, stockfish):
+    def test_what_is_on_square(self, stockfish):
         stockfish.set_fen_position(
             "rnbq1rk1/ppp1ppbp/5np1/3pP3/8/BPN5/P1PP1PPP/R2QKBNR w KQ d6 0 6"
         )
@@ -583,12 +583,42 @@ class TestStockfish:
         assert stockfish.get_what_is_on_square("h2") == "P"
         assert stockfish.get_what_is_on_square("f8") == "r"
         assert stockfish.get_what_is_on_square("h7") == "p"
-        assert stockfish.will_move_be_a_capture("c3d5") == "direct capture"
-        assert stockfish.will_move_be_a_capture("e5d6") == "en passant"
-        assert stockfish.will_move_be_a_capture("f1e2") == "no capture"
-        assert stockfish.will_move_be_a_capture("e5f6") == "direct capture"
-        assert stockfish.will_move_be_a_capture("a3d6") == "no capture"
         with pytest.raises(ValueError):
             stockfish.get_what_is_on_square("i1")
         with pytest.raises(ValueError):
             stockfish.get_what_is_on_square("b9")
+
+    def test_will_move_be_a_capture(self, stockfish):
+        stockfish.set_fen_position(
+            "rnbq1rk1/ppp1ppbp/5np1/3pP3/8/BPN5/P1PP1PPP/R2QKBNR w KQ d6 0 6"
+        )
+        c3d5_result = stockfish.will_move_be_a_capture("c3d5")
+        assert (
+            c3d5_result is Stockfish.Capture.DIRECT_CAPTURE
+            and c3d5_result.name == "DIRECT_CAPTURE"
+            and c3d5_result.value == "direct capture"
+        )
+        e5d6_result = stockfish.will_move_be_a_capture("e5d6")
+        assert (
+            e5d6_result is Stockfish.Capture.EN_PASSANT
+            and e5d6_result.name == "EN_PASSANT"
+            and e5d6_result.value == "en passant"
+        )
+        f1e2_result = stockfish.will_move_be_a_capture("f1e2")
+        assert (
+            f1e2_result is Stockfish.Capture.NO_CAPTURE
+            and f1e2_result.name == "NO_CAPTURE"
+            and f1e2_result.value == "no capture"
+        )
+        e5f6_result = stockfish.will_move_be_a_capture("e5f6")
+        assert (
+            e5f6_result is Stockfish.Capture.DIRECT_CAPTURE
+            and e5f6_result.name == "DIRECT_CAPTURE"
+            and e5f6_result.value == "direct capture"
+        )
+        a3d6_result = stockfish.will_move_be_a_capture("a3d6")
+        assert (
+            a3d6_result is Stockfish.Capture.NO_CAPTURE
+            and a3d6_result.name == "NO_CAPTURE"
+            and a3d6_result.value == "no capture"
+        )
