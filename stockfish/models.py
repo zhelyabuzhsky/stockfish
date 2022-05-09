@@ -562,7 +562,7 @@ class Stockfish:
         WHITE_KING = "K"
         BLACK_KING = "k"
 
-    def get_what_is_on_square(self, square: str) -> Piece:
+    def get_what_is_on_square(self, square: str) -> Optional[Piece]:
         """Returns what is on the specified square.
 
         Args:
