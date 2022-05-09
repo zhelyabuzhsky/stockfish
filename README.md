@@ -248,13 +248,15 @@ False
 ```
 
 ### Find what is on a certain square
-Will return one of: "P", "p", "N", "n", "B", "b", "R", "r", "Q", "q", "K", "k", or " ".  
-Uppercase is a white piece, lowercase is a black piece, and a single space means the square is empty.
+If the square is empty, the None object is returned. Otherwise, one of 12 enum members of a custom  
+Stockfish.Piece enum will be returned. Each of the 12 members of this enum is named in the following pattern:  
+*colour* followed by *underscore* followed by *piece name*, where the colour and piece name are in all caps.  
+For example, say the current position is the starting position:  
 ```python
-stockfish.get_what_is_on_square("e1")
-```
-```text
-"K"
+stockfish.get_what_is_on_square("e1") # returns Stockfish.Piece.WHITE_KING
+stockfish.get_what_is_on_square("d8") # returns Stockfish.Piece.BLACK_QUEEN
+stockfish.get_what_is_on_square("h2") # returns Stockfish.Piece.WHITE_PAWN
+stockfish.get_what_is_on_square("b5") # returns None
 ```
 
 ### Find if a move will be a capture (and if so, what type of capture)
