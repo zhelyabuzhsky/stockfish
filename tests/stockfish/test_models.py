@@ -325,11 +325,16 @@ class TestStockfish:
         ) != stockfish.is_development_build_of_engine()
 
     def test_get_evaluation_cp(self, stockfish):
+        stockfish.set_depth(20)
         stockfish.set_fen_position(
             "r4rk1/pppb1p1p/2nbpqp1/8/3P4/3QBN2/PPP1BPPP/R4RK1 w - - 0 11"
         )
         evaluation = stockfish.get_evaluation()
-        assert evaluation["type"] == "cp" and evaluation["value"] > 0
+        assert (
+            evaluation["type"] == "cp"
+            and evaluation["value"] >= 60
+            and evaluation["value"] <= 150
+        )
 
     def test_get_evaluation_checkmate(self, stockfish):
         stockfish.set_fen_position("1nb1k1n1/pppppppp/8/6r1/5bqK/6r1/8/8 w - - 2 2")
