@@ -548,7 +548,21 @@ class Stockfish:
         """
         self.depth = str(depth_value)
 
-    def get_what_is_on_square(self, square: str) -> str:
+    class Piece(Enum):
+        WHITE_PAWN = "P"
+        BLACK_PAWN = "p"
+        WHITE_KNIGHT = "N"
+        BLACK_KNIGHT = "n"
+        WHITE_BISHOP = "B"
+        BLACK_BISHOP = "b"
+        WHITE_ROOK = "R"
+        BLACK_ROOK = "r"
+        WHITE_QUEEN = "Q"
+        BLACK_QUEEN = "q"
+        WHITE_KING = "K"
+        BLACK_KING = "k"
+
+    def get_what_is_on_square(self, square: str) -> Piece:
         """Returns what is on the specified square.
 
         Args:
@@ -556,10 +570,8 @@ class Stockfish:
                 The coordinate of the square in question. E.g., e4.
 
         Returns:
-            One of: "P", "p", "N", "n", "B", "b", "R", "r", "Q", "q",
-            "K", "k", or " ".
-            Uppercase represents a white piece, lowercase represents a black
-            piece, and a single space represents an empty square.
+            Either one of the 12 enum members in the Piece enum, or the None
+            object if the square is empty.
         """
 
         file_letter = square[0].lower()
@@ -575,7 +587,11 @@ class Stockfish:
                 "square argument to the get_what_is_on_square function isn't valid."
             )
         rank_visual = self.get_board_visual().splitlines()[17 - 2 * rank_num]
-        return rank_visual[2 + (ord(file_letter) - ord("a")) * 4]
+        piece_as_char = rank_visual[2 + (ord(file_letter) - ord("a")) * 4]
+        if piece_as_char == " ":
+            return None
+        else:
+            return Stockfish.Piece(piece_as_char)
 
     class Capture(Enum):
         DIRECT_CAPTURE = "direct capture"
@@ -598,11 +614,14 @@ class Stockfish:
         """
         if not self.is_move_correct(move_value):
             raise ValueError("The proposed move is not valid in the current position.")
-        if self.get_what_is_on_square(move_value[-2:]) != " ":
+        if self.get_what_is_on_square(move_value[-2:]) != None:
             return Stockfish.Capture.DIRECT_CAPTURE
         elif move_value[-2:] == self.get_fen_position().split()[
             3
-        ] and self.get_what_is_on_square(move_value[:2]) in ["P", "p"]:
+        ] and self.get_what_is_on_square(move_value[:2]) in [
+            Stockfish.Piece.WHITE_PAWN,
+            Stockfish.Piece.BLACK_PAWN,
+        ]:
             return Stockfish.Capture.EN_PASSANT
         else:
             return Stockfish.Capture.NO_CAPTURE

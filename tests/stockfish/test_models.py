@@ -581,17 +581,51 @@ class TestStockfish:
         stockfish.set_fen_position(
             "rnbq1rk1/ppp1ppbp/5np1/3pP3/8/BPN5/P1PP1PPP/R2QKBNR w KQ d6 0 6"
         )
-        assert stockfish.get_what_is_on_square("a1") == "R"
-        assert stockfish.get_what_is_on_square("a8") == "r"
-        assert stockfish.get_what_is_on_square("g8") == "k"
-        assert stockfish.get_what_is_on_square("e1") == "K"
-        assert stockfish.get_what_is_on_square("h2") == "P"
-        assert stockfish.get_what_is_on_square("f8") == "r"
-        assert stockfish.get_what_is_on_square("h7") == "p"
+        assert stockfish.get_what_is_on_square("a1") == Stockfish.Piece.WHITE_ROOK
+        assert stockfish.get_what_is_on_square("a8") == Stockfish.Piece.BLACK_ROOK
+        assert stockfish.get_what_is_on_square("g8") == Stockfish.Piece.BLACK_KING
+        assert stockfish.get_what_is_on_square("e1") == Stockfish.Piece.WHITE_KING
+        assert stockfish.get_what_is_on_square("h2") == Stockfish.Piece.WHITE_PAWN
+        assert stockfish.get_what_is_on_square("f8") == Stockfish.Piece.BLACK_ROOK
+        assert stockfish.get_what_is_on_square("d6") == None
+        assert stockfish.get_what_is_on_square("h7") == Stockfish.Piece.BLACK_PAWN
+        assert stockfish.get_what_is_on_square("c3") == Stockfish.Piece.WHITE_KNIGHT
+        assert stockfish.get_what_is_on_square("a3") == Stockfish.Piece.WHITE_BISHOP
+        assert stockfish.get_what_is_on_square("h8") == None
+        assert stockfish.get_what_is_on_square("d1") == Stockfish.Piece.WHITE_QUEEN
+        assert stockfish.get_what_is_on_square("d4") == None
+        assert stockfish.get_what_is_on_square("f6") == Stockfish.Piece.BLACK_KNIGHT
+        assert stockfish.get_what_is_on_square("g7") == Stockfish.Piece.BLACK_BISHOP
+        assert stockfish.get_what_is_on_square("d8") == Stockfish.Piece.BLACK_QUEEN
         with pytest.raises(ValueError):
             stockfish.get_what_is_on_square("i1")
         with pytest.raises(ValueError):
             stockfish.get_what_is_on_square("b9")
+
+    def test_13_return_values_from_what_is_on_square(self, stockfish):
+        stockfish.set_fen_position(
+            "rnbq1rk1/ppp1ppbp/5np1/3pP3/8/BPN5/P1PP1PPP/R2QKBNR w KQ d6 0 6"
+        )
+        expected_enum_members = [
+            "WHITE_PAWN",
+            "BLACK_PAWN",
+            "WHITE_KNIGHT",
+            "BLACK_KNIGHT",
+            "WHITE_BISHOP",
+            "BLACK_BISHOP",
+            "WHITE_ROOK",
+            "BLACK_ROOK",
+            "WHITE_QUEEN",
+            "BLACK_QUEEN",
+            "WHITE_KING",
+            "BLACK_KING",
+        ]
+        rows = ["a", "b", "c", "d", "e", "f", "g", "h"]
+        cols = ["1", "2", "3", "4", "5", "6", "7", "8"]
+        for row in rows:
+            for col in cols:
+                val = stockfish.get_what_is_on_square(row + col)
+                assert val == None or val.name in expected_enum_members
 
     def test_will_move_be_a_capture(self, stockfish):
         stockfish.set_fen_position(
