@@ -238,7 +238,7 @@ class TestStockfish:
 
         assert stockfish.get_parameters()["UCI_Elo"] == 2850
 
-    def test_stockfish_constructor_with_custom_params(self, stockfish):
+    def test_that_set_skill_level_updates_params(self, stockfish):
         old_parameters = stockfish._parameters
         old_skill_level = stockfish._parameters["Skill Level"]
         stockfish.set_skill_level(1)
@@ -262,20 +262,22 @@ class TestStockfish:
         stockfish.set_skill_level(old_skill_level)
         assert stockfish.get_parameters() == old_parameters
 
-    def test_chess_960_position(self, stockfish):
+    def test_chess960_position(self, stockfish):
         old_parameters = stockfish.get_parameters()
         expected_parameters = stockfish.get_parameters()
         expected_parameters["UCI_Chess960"] = "true"
-        stockfish._set_option("UCI_Chess960", "true")
+        stockfish.update_parameters({"UCI_Chess960": "true"})
         assert stockfish.get_parameters() == expected_parameters
         stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
         assert stockfish.get_best_move() == "f1h1"
         assert stockfish.get_evaluation() == {"type": "mate", "value": 1}
-        stockfish._set_option("UCI_Chess960", "false")
+        assert stockfish.will_move_be_a_capture("f1h1") is Stockfish.Capture.NO_CAPTURE
+        stockfish.update_parameters({"UCI_Chess960": "false"})
         assert stockfish.get_parameters() == old_parameters
         stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
         assert stockfish.get_best_move() == "f1g1"
         assert stockfish.get_evaluation() == {"type": "mate", "value": 1}
+        assert stockfish.will_move_be_a_capture("f1g1") is Stockfish.Capture.NO_CAPTURE
 
     def test_get_board_visual(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6", "d2d4", "d7d5"])
@@ -377,10 +379,38 @@ class TestStockfish:
             "d1c2",
         )
 
-    def test_get_parameters(self, stockfish):
-        stockfish._set_option("Minimum Thinking Time", 10)
-        parameters = stockfish.get_parameters()
-        assert parameters["Minimum Thinking Time"] == 10
+    def test_get_and_update_parameters(self, stockfish):
+        stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
+        assert stockfish.get_best_move() == "f1g1"  # ensures Chess960 param is false.
+        assert "multipv 1" in stockfish.info
+        old_parameters = stockfish.get_parameters()
+        stockfish.update_parameters(
+            {
+                "Minimum Thinking Time": 10,
+                "Hash": 32,
+                "MultiPV": 2,
+                "UCI_Chess960": "true",
+            }
+        )
+        updated_parameters = stockfish.get_parameters()
+        for key, value in updated_parameters.items():
+            if key == "Minimum Thinking Time":
+                assert value == 10
+            elif key == "Hash":
+                assert value == 32
+            elif key == "MultiPV":
+                assert value == 2
+            elif key == "UCI_Chess960":
+                assert value == "true"
+            else:
+                assert updated_parameters[key] == old_parameters[key]
+        stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
+        assert (
+            stockfish.get_best_move() == "f1h1"
+        )  # ensures stockfish updated to play Chess960.
+        assert "multipv 2" in stockfish.info
+        with pytest.raises(ValueError):
+            stockfish.update_parameters({"Not an existing key", "value"})
 
     def test_get_top_moves(self, stockfish):
         stockfish.set_depth(15)
@@ -583,22 +613,22 @@ class TestStockfish:
         stockfish.set_fen_position(
             "rnbq1rk1/ppp1ppbp/5np1/3pP3/8/BPN5/P1PP1PPP/R2QKBNR w KQ d6 0 6"
         )
-        assert stockfish.get_what_is_on_square("a1") == Stockfish.Piece.WHITE_ROOK
-        assert stockfish.get_what_is_on_square("a8") == Stockfish.Piece.BLACK_ROOK
-        assert stockfish.get_what_is_on_square("g8") == Stockfish.Piece.BLACK_KING
-        assert stockfish.get_what_is_on_square("e1") == Stockfish.Piece.WHITE_KING
-        assert stockfish.get_what_is_on_square("h2") == Stockfish.Piece.WHITE_PAWN
-        assert stockfish.get_what_is_on_square("f8") == Stockfish.Piece.BLACK_ROOK
-        assert stockfish.get_what_is_on_square("d6") == None
-        assert stockfish.get_what_is_on_square("h7") == Stockfish.Piece.BLACK_PAWN
-        assert stockfish.get_what_is_on_square("c3") == Stockfish.Piece.WHITE_KNIGHT
-        assert stockfish.get_what_is_on_square("a3") == Stockfish.Piece.WHITE_BISHOP
-        assert stockfish.get_what_is_on_square("h8") == None
-        assert stockfish.get_what_is_on_square("d1") == Stockfish.Piece.WHITE_QUEEN
-        assert stockfish.get_what_is_on_square("d4") == None
-        assert stockfish.get_what_is_on_square("f6") == Stockfish.Piece.BLACK_KNIGHT
-        assert stockfish.get_what_is_on_square("g7") == Stockfish.Piece.BLACK_BISHOP
-        assert stockfish.get_what_is_on_square("d8") == Stockfish.Piece.BLACK_QUEEN
+        assert stockfish.get_what_is_on_square("a1") is Stockfish.Piece.WHITE_ROOK
+        assert stockfish.get_what_is_on_square("a8") is Stockfish.Piece.BLACK_ROOK
+        assert stockfish.get_what_is_on_square("g8") is Stockfish.Piece.BLACK_KING
+        assert stockfish.get_what_is_on_square("e1") is Stockfish.Piece.WHITE_KING
+        assert stockfish.get_what_is_on_square("h2") is Stockfish.Piece.WHITE_PAWN
+        assert stockfish.get_what_is_on_square("f8") is Stockfish.Piece.BLACK_ROOK
+        assert stockfish.get_what_is_on_square("d6") is None
+        assert stockfish.get_what_is_on_square("h7") is Stockfish.Piece.BLACK_PAWN
+        assert stockfish.get_what_is_on_square("c3") is Stockfish.Piece.WHITE_KNIGHT
+        assert stockfish.get_what_is_on_square("a3") is Stockfish.Piece.WHITE_BISHOP
+        assert stockfish.get_what_is_on_square("h8") is None
+        assert stockfish.get_what_is_on_square("d1") is Stockfish.Piece.WHITE_QUEEN
+        assert stockfish.get_what_is_on_square("d4") is None
+        assert stockfish.get_what_is_on_square("f6") is Stockfish.Piece.BLACK_KNIGHT
+        assert stockfish.get_what_is_on_square("g7") is Stockfish.Piece.BLACK_BISHOP
+        assert stockfish.get_what_is_on_square("d8") is Stockfish.Piece.BLACK_QUEEN
         with pytest.raises(ValueError):
             stockfish.get_what_is_on_square("i1")
         with pytest.raises(ValueError):

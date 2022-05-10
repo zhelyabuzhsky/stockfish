@@ -57,9 +57,7 @@ class Stockfish:
         if parameters is None:
             parameters = {}
         self._parameters = copy.deepcopy(self.default_stockfish_params)
-        self._parameters.update(parameters)
-        for name, value in list(self._parameters.items()):
-            self._set_option(name, value)
+        self.update_parameters(parameters)
 
         if self.does_current_engine_version_have_wdl_option():
             self._set_option("UCI_ShowWDL", "true", False)
@@ -82,6 +80,24 @@ class Stockfish:
         """
         self._parameters = copy.deepcopy(self.default_stockfish_params)
         for name, value in list(self._parameters.items()):
+            self._set_option(name, value)
+
+    def update_parameters(self, new_param_values: dict) -> None:
+        """Updates the stockfish parameters.
+
+        Args:
+            new_param_values:
+                Contains (key, value) pairs which will be used to update
+                the _parameters dictionary.
+
+        Returns:
+            None
+        """
+        for key in new_param_values:
+            if key not in self._parameters:
+                raise ValueError(f"'{key}' is not a key that exists.")
+        self._parameters.update(new_param_values)
+        for name, value in self._parameters.items():
             self._set_option(name, value)
 
     def _prepare_for_new_position(self, send_ucinewgame_token: bool = True) -> None:
