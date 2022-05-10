@@ -108,7 +108,9 @@ stockfish.get_top_moves(3)
 ]
 ```
 
-### Get Stockfish's win/draw/loss stats for the side to move in the current position
+### Get Stockfish's win/draw/loss stats for the side to move in the current position  
+Before calling this function, it is recommended that you first check if your version of Stockfish is recent enough to display WDL stats. To do this,  
+use the "does_current_engine_version_have_wdl_option()" function below.
 ```python
 stockfish.get_wdl_stats()
 ```
@@ -122,11 +124,6 @@ stockfish.does_current_engine_version_have_wdl_option()
 ```
 ```text
 True
-```
-
-### Tell Stockfish whether or not to display WDL stats after analyzing a position
-```python
-stockfish.set_show_wdl_option(True)
 ```
 
 ### Set current engine's skill level (ignoring ELO rating)
