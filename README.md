@@ -87,7 +87,6 @@ Time constraint is in milliseconds
 e2e4
 ```
 
-
 ### Check is move correct with current position
 ```python
 stockfish.is_move_correct('a2a3')
@@ -160,6 +159,18 @@ stockfish.get_parameters()
     'Slow Mover': 80,
     'UCI_Chess960': 'false'
 }
+```
+
+### Reset the engine's parameters to the default
+```python
+stockfish.reset_parameters()
+```
+
+### Update the engine's parameters
+This function takes a dictionary of one or more (key, value) pairs as its argument. Then, for the engine's parameters, it updates each  
+specified key with the corresponding value. For example:
+```python
+stockfish.update_parameters({"MultiPV": 2, "UCI_Chess960": "true"}) # Gets SF to use 2 principal variations, and also to play Chess960.
 ```
 
 ### Get current board position in Forsyth–Edwards notation (FEN)
