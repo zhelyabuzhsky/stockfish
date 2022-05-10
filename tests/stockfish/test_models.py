@@ -239,6 +239,8 @@ class TestStockfish:
         assert stockfish.get_parameters()["UCI_Elo"] == 2850
 
     def test_stockfish_constructor_with_custom_params(self, stockfish):
+        old_parameters = stockfish._parameters
+        old_skill_level = stockfish._parameters["Skill Level"]
         stockfish.set_skill_level(1)
         expected_params = {
             "Write Debug Log": "false",
@@ -257,6 +259,23 @@ class TestStockfish:
             "UCI_Elo": 1350,
         }
         assert stockfish.get_parameters() == expected_params
+        stockfish.set_skill_level(old_skill_level)
+        assert stockfish.get_parameters() == old_parameters
+
+    def test_chess_960_position(self, stockfish):
+        old_parameters = stockfish.get_parameters()
+        expected_parameters = stockfish.get_parameters()
+        expected_parameters["UCI_Chess960"] = "true"
+        stockfish._set_option("UCI_Chess960", "true")
+        assert stockfish.get_parameters() == expected_parameters
+        stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
+        assert stockfish.get_best_move() == "f1h1"
+        assert stockfish.get_evaluation() == {"type": "mate", "value": 1}
+        stockfish._set_option("UCI_Chess960", "false")
+        assert stockfish.get_parameters() == old_parameters
+        stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
+        assert stockfish.get_best_move() == "f1g1"
+        assert stockfish.get_evaluation() == {"type": "mate", "value": 1}
 
     def test_get_board_visual(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6", "d2d4", "d7d5"])
