@@ -379,6 +379,33 @@ class TestStockfish:
             "d1c2",
         )
 
+    def test_constructor(self, stockfish):
+        # Will also use a new stockfish instance in order to test sending
+        # params to the constructor.
+
+        stockfish_2 = Stockfish(depth=16, parameters={"MultiPV": 2, "Skill Level": 19})
+        stockfish_2.get_best_move()
+        stockfish.get_best_move()
+
+        assert "multipv 2" in stockfish_2.info
+        assert "depth 16" in stockfish_2.info
+        assert stockfish_2.depth == "16"
+        assert "multipv 1" in stockfish.info
+        assert "depth 15" in stockfish.info
+        assert stockfish.depth == "15"
+
+        stockfish_1_params = stockfish.get_parameters()
+        stockfish_2_params = stockfish_2.get_parameters()
+        for key in stockfish_2_params.keys():
+            if key == "MultiPV":
+                assert stockfish_2_params[key] == 2
+                assert stockfish_1_params[key] == 1
+            elif key == "Skill Level":
+                assert stockfish_2_params[key] == 19
+                assert stockfish_1_params[key] == 20
+            else:
+                assert stockfish_2_params[key] == stockfish_1_params[key]
+
     def test_get_and_update_parameters(self, stockfish):
         stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
         assert stockfish.get_best_move() == "f1g1"  # ensures Chess960 param is false.
