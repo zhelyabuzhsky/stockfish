@@ -186,10 +186,12 @@ class TestStockfish:
             "h2h3",
         )
         assert stockfish.get_parameters()["Skill Level"] == 1
+        assert stockfish.get_parameters()["UCI_LimitStrength"] == "false"
 
         stockfish.set_skill_level(20)
         assert stockfish.get_best_move() == "d2d4"
         assert stockfish.get_parameters()["Skill Level"] == 20
+        assert stockfish.get_parameters()["UCI_LimitStrength"] == "false"
 
     def test_set_elo_rating(self, stockfish):
         stockfish.set_fen_position(
@@ -211,6 +213,7 @@ class TestStockfish:
             "a2a3",
         )
         assert stockfish.get_parameters()["UCI_Elo"] == 2000
+        assert stockfish.get_parameters()["UCI_LimitStrength"] == "true"
 
         stockfish.set_elo_rating(1350)
         assert stockfish.get_best_move() in (
@@ -226,6 +229,7 @@ class TestStockfish:
             "h2h3",
         )
         assert stockfish.get_parameters()["UCI_Elo"] == 1350
+        assert stockfish.get_parameters()["UCI_LimitStrength"] == "true"
 
         stockfish.set_elo_rating(2850)
         major_version = stockfish.get_stockfish_major_version()
@@ -263,18 +267,19 @@ class TestStockfish:
         assert stockfish.get_parameters() == old_parameters
 
     def test_chess960_position(self, stockfish):
+        assert "KQkq" in stockfish.get_fen_position()
         old_parameters = stockfish.get_parameters()
         expected_parameters = stockfish.get_parameters()
         expected_parameters["UCI_Chess960"] = "true"
-        stockfish.update_parameters({"UCI_Chess960": "true"})
+        stockfish.update_engine_parameters({"UCI_Chess960": "true"})
+        assert "HAha" in stockfish.get_fen_position()
         assert stockfish.get_parameters() == expected_parameters
         stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
         assert stockfish.get_best_move() == "f1h1"
         assert stockfish.get_evaluation() == {"type": "mate", "value": 1}
         assert stockfish.will_move_be_a_capture("f1h1") is Stockfish.Capture.NO_CAPTURE
-        stockfish.update_parameters({"UCI_Chess960": "false"})
+        stockfish.update_engine_parameters({"UCI_Chess960": "false"})
         assert stockfish.get_parameters() == old_parameters
-        stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
         assert stockfish.get_best_move() == "f1g1"
         assert stockfish.get_evaluation() == {"type": "mate", "value": 1}
         assert stockfish.will_move_be_a_capture("f1g1") is Stockfish.Capture.NO_CAPTURE
@@ -383,10 +388,20 @@ class TestStockfish:
         # Will also use a new stockfish instance in order to test sending
         # params to the constructor.
 
-        stockfish_2 = Stockfish(depth=16, parameters={"MultiPV": 2, "Skill Level": 19})
+        stockfish_2 = Stockfish(
+            depth=16, parameters={"MultiPV": 2, "UCI_Elo": 2850, "UCI_Chess960": "true"}
+        )
+        assert (
+            stockfish_2.get_fen_position()
+            == "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w HAha - 0 1"
+        )
+        assert (
+            stockfish.get_fen_position()
+            == "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        )
+
         stockfish_2.get_best_move()
         stockfish.get_best_move()
-
         assert "multipv 2" in stockfish_2.info
         assert "depth 16" in stockfish_2.info
         assert stockfish_2.depth == "16"
@@ -400,18 +415,25 @@ class TestStockfish:
             if key == "MultiPV":
                 assert stockfish_2_params[key] == 2
                 assert stockfish_1_params[key] == 1
-            elif key == "Skill Level":
-                assert stockfish_2_params[key] == 19
-                assert stockfish_1_params[key] == 20
+            elif key == "UCI_Elo":
+                assert stockfish_2_params[key] == 2850
+                assert stockfish_1_params[key] == 1350
+            elif key == "UCI_LimitStrength":
+                assert stockfish_2_params[key] == "true"
+                assert stockfish_1_params[key] == "false"
+            elif key == "UCI_Chess960":
+                assert stockfish_2_params[key] == "true"
+                assert stockfish_1_params[key] == "false"
             else:
                 assert stockfish_2_params[key] == stockfish_1_params[key]
 
     def test_get_and_update_parameters(self, stockfish):
         stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
         assert stockfish.get_best_move() == "f1g1"  # ensures Chess960 param is false.
+        assert stockfish.get_fen_position() == "4rkr1/4p1p1/8/8/8/8/8/5K1R w K - 0 100"
         assert "multipv 1" in stockfish.info
         old_parameters = stockfish.get_parameters()
-        stockfish.update_parameters(
+        stockfish.update_engine_parameters(
             {
                 "Minimum Thinking Time": 10,
                 "Hash": 32,
@@ -419,6 +441,9 @@ class TestStockfish:
                 "UCI_Chess960": "true",
             }
         )
+        assert stockfish.get_fen_position() == "4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100"
+        assert stockfish.get_best_move() == "f1h1"
+        assert "multipv 2" in stockfish.info
         updated_parameters = stockfish.get_parameters()
         for key, value in updated_parameters.items():
             if key == "Minimum Thinking Time":
@@ -431,13 +456,18 @@ class TestStockfish:
                 assert value == "true"
             else:
                 assert updated_parameters[key] == old_parameters[key]
-        stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
-        assert (
-            stockfish.get_best_move() == "f1h1"
-        )  # ensures stockfish updated to play Chess960.
-        assert "multipv 2" in stockfish.info
+        assert stockfish.get_parameters()["UCI_LimitStrength"] == "false"
+        stockfish.update_engine_parameters({"UCI_Elo": 2000, "Skill Level": 19})
+        assert stockfish.get_parameters()["UCI_Elo"] == 2000
+        assert stockfish.get_parameters()["Skill Level"] == 19
+        assert stockfish.get_parameters()["UCI_LimitStrength"] == "false"
+        stockfish.update_engine_parameters({"UCI_Elo": 2000})
+        assert stockfish.get_parameters()["UCI_LimitStrength"] == "true"
+        stockfish.update_engine_parameters({"Skill Level": 20})
+        assert stockfish.get_parameters()["UCI_LimitStrength"] == "false"
+        assert stockfish.get_fen_position() == "4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100"
         with pytest.raises(ValueError):
-            stockfish.update_parameters({"Not an existing key", "value"})
+            stockfish.update_engine_parameters({"Not an existing key", "value"})
 
     def test_get_top_moves(self, stockfish):
         stockfish.set_depth(15)

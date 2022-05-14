@@ -170,7 +170,7 @@ stockfish.reset_parameters()
 This function takes a dictionary of one or more (key, value) pairs as its argument. Then, for the engine's parameters, it updates each  
 specified key with the corresponding value. For example:
 ```python
-stockfish.update_parameters({"MultiPV": 2, "UCI_Chess960": "true"}) # Gets SF to use 2 principal variations, and also to play Chess960.
+stockfish.update_engine_parameters({"MultiPV": 2, "UCI_Chess960": "true"}) # Gets SF to use 2 principal variations, and also to play Chess960.
 ```
 
 ### Get current board position in Forsyth–Edwards notation (FEN)

@@ -57,7 +57,7 @@ class Stockfish:
         if parameters is None:
             parameters = {}
         self._parameters = copy.deepcopy(self.default_stockfish_params)
-        self.update_parameters(parameters)
+        self.update_engine_parameters(parameters)
 
         if self.does_current_engine_version_have_wdl_option():
             self._set_option("UCI_ShowWDL", "true", False)
@@ -82,7 +82,7 @@ class Stockfish:
         for name, value in list(self._parameters.items()):
             self._set_option(name, value)
 
-    def update_parameters(self, new_param_values: dict) -> None:
+    def update_engine_parameters(self, new_param_values: dict) -> None:
         """Updates the stockfish parameters.
 
         Args:
@@ -97,8 +97,20 @@ class Stockfish:
             if key not in self._parameters:
                 raise ValueError(f"'{key}' is not a key that exists.")
         self._parameters.update(new_param_values)
+        if ("Skill Level" in new_param_values) != (
+            "UCI_Elo" in new_param_values
+        ) and "UCI_LimitStrength" not in new_param_values:
+            # This means the user wants to update the Skill Level or UCI_Elo (only one,
+            # not both), and that they didn't specify a new value for UCI_LimitStrength.
+            # So, update UCI_LimitStrength, in case it's not the right value currently.
+            if "Skill Level" in new_param_values:
+                self._parameters.update({"UCI_LimitStrength": "false"})
+            elif "UCI_Elo" in new_param_values:
+                self._parameters.update({"UCI_LimitStrength": "true"})
         for name, value in self._parameters.items():
             self._set_option(name, value)
+        self.set_fen_position(self.get_fen_position(), False)
+        # Getting SF to set the position again, since UCI option(s) have been updated.
 
     def _prepare_for_new_position(self, send_ucinewgame_token: bool = True) -> None:
         if send_ucinewgame_token:
@@ -229,10 +241,9 @@ class Stockfish:
         Returns:
             None
         """
-        self._set_option("UCI_LimitStrength", "false")
-        self._parameters.update({"UCI_LimitStrength": "false"})
-        self._set_option("Skill Level", skill_level)
-        self._parameters.update({"Skill Level": skill_level})
+        self.update_engine_parameters(
+            {"UCI_LimitStrength": "false", "Skill Level": skill_level}
+        )
 
     def set_elo_rating(self, elo_rating: int = 1350) -> None:
         """Sets current elo rating of stockfish engine, ignoring skill level.
@@ -243,10 +254,9 @@ class Stockfish:
         Returns:
             None
         """
-        self._set_option("UCI_LimitStrength", "true")
-        self._parameters.update({"UCI_LimitStrength": "true"})
-        self._set_option("UCI_Elo", elo_rating)
-        self._parameters.update({"UCI_Elo": elo_rating})
+        self.update_engine_parameters(
+            {"UCI_LimitStrength": "true", "UCI_Elo": elo_rating}
+        )
 
     def set_fen_position(
         self, fen_position: str, send_ucinewgame_token: bool = True
