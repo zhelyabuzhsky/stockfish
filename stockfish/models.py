@@ -101,7 +101,7 @@ class Stockfish:
             self._set_option(name, value)
         self.set_fen_position(self.get_fen_position(), False)
         # Getting SF to set the position again, since UCI option(s) have been updated.
-    
+
     def reset_engine_parameters(self) -> None:
         """Resets the stockfish parameters.
 
