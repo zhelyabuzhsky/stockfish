@@ -72,16 +72,6 @@ class Stockfish:
         """
         return self._parameters
 
-    def reset_parameters(self) -> None:
-        """Resets the stockfish parameters.
-
-        Returns:
-            None
-        """
-        self._parameters = copy.deepcopy(self.default_stockfish_params)
-        for name, value in list(self._parameters.items()):
-            self._set_option(name, value)
-
     def update_engine_parameters(self, new_param_values: dict) -> None:
         """Updates the stockfish parameters.
 
@@ -111,6 +101,14 @@ class Stockfish:
             self._set_option(name, value)
         self.set_fen_position(self.get_fen_position(), False)
         # Getting SF to set the position again, since UCI option(s) have been updated.
+    
+    def reset_engine_parameters(self) -> None:
+        """Resets the stockfish parameters.
+
+        Returns:
+            None
+        """
+        self.update_engine_parameters(self.default_stockfish_params)
 
     def _prepare_for_new_position(self, send_ucinewgame_token: bool = True) -> None:
         if send_ucinewgame_token:

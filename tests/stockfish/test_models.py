@@ -427,12 +427,12 @@ class TestStockfish:
             else:
                 assert stockfish_2_params[key] == stockfish_1_params[key]
 
-    def test_get_and_update_parameters(self, stockfish):
+    def test_parameters_functions(self, stockfish):
+        old_parameters = stockfish.get_parameters()
         stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
         assert stockfish.get_best_move() == "f1g1"  # ensures Chess960 param is false.
         assert stockfish.get_fen_position() == "4rkr1/4p1p1/8/8/8/8/8/5K1R w K - 0 100"
         assert "multipv 1" in stockfish.info
-        old_parameters = stockfish.get_parameters()
         stockfish.update_engine_parameters(
             {
                 "Minimum Thinking Time": 10,
@@ -466,6 +466,9 @@ class TestStockfish:
         stockfish.update_engine_parameters({"Skill Level": 20})
         assert stockfish.get_parameters()["UCI_LimitStrength"] == "false"
         assert stockfish.get_fen_position() == "4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100"
+        stockfish.reset_engine_parameters()
+        assert stockfish.get_parameters() == old_parameters
+        assert stockfish.get_fen_position() == "4rkr1/4p1p1/8/8/8/8/8/5K1R w K - 0 100"
         with pytest.raises(ValueError):
             stockfish.update_engine_parameters({"Not an existing key", "value"})
 

@@ -43,6 +43,8 @@ There are some default engine's settings:
     "Minimum Thinking Time": 20,
     "Slow Mover": 80,
     "UCI_Chess960": "false",
+    "UCI_LimitStrength": "false",
+    "UCI_Elo": 1350
 }
 ```
 
@@ -51,7 +53,12 @@ You can change them, as well as the default search depth, during your Stockfish 
 stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64", depth=18, parameters={"Threads": 2, "Minimum Thinking Time": 30})
 ```
 
-### Set position by sequence of moves
+These parameters can also be updated at any time by calling the "update_engine_parameters" function:
+```python
+stockfish.update_engine_parameters({"MultiPV": 2, "UCI_Chess960": "true"}) # Gets SF to use 2 principal variations, and also to play Chess960.
+```
+
+### Set position by a sequence of moves from the starting position
 ```python
 stockfish.set_position(["e2e4", "e7e6"])
 ```
@@ -62,6 +69,7 @@ stockfish.make_moves_from_current_position(["g4d7", "a8b8", "f1d1"])
 ```
 
 ### Set position by Forsyth–Edwards Notation (FEN)
+Note that if you want to play Chess960, it's recommended you first update the "UCI_Chess960" engine parameter to be "true", before calling set_fen_position.
 ```python
 stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
 ```
@@ -146,31 +154,26 @@ stockfish.get_parameters()
 ```
 ```text
 {
-    'Write Debug Log': 'false',
-    'Contempt': 0,
-    'Min Split Depth': 0,
-    'Threads': 1,
-    'Ponder': 'false',
-    'Hash': 16,
-    'MultiPV': 1,
-    'Skill Level': 20,
-    'Move Overhead': 30,
-    'Minimum Thinking Time': 20,
-    'Slow Mover': 80,
-    'UCI_Chess960': 'false'
+    "Write Debug Log": "false",
+    "Contempt": 0,
+    "Min Split Depth": 0,
+    "Threads": 1,
+    "Ponder": "false",
+    "Hash": 16,
+    "MultiPV": 1,
+    "Skill Level": 20,
+    "Move Overhead": 30,
+    "Minimum Thinking Time": 20,
+    "Slow Mover": 80,
+    "UCI_Chess960": "false",
+    "UCI_LimitStrength": "false",
+    "UCI_Elo": 1350
 }
 ```
 
 ### Reset the engine's parameters to the default
 ```python
-stockfish.reset_parameters()
-```
-
-### Update the engine's parameters
-This function takes a dictionary of one or more (key, value) pairs as its argument. Then, for the engine's parameters, it updates each  
-specified key with the corresponding value. For example:
-```python
-stockfish.update_engine_parameters({"MultiPV": 2, "UCI_Chess960": "true"}) # Gets SF to use 2 principal variations, and also to play Chess960.
+stockfish.reset_engine_parameters()
 ```
 
 ### Get current board position in Forsyth–Edwards notation (FEN)
