@@ -53,7 +53,7 @@ class TestStockfish:
     def test_get_best_move_remaining_time_not_first_move(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6"])
         best_move = stockfish.get_best_move(wtime=1000)
-        assert best_move in ("a2a3", "d1e2", "b1c3")
+        assert best_move in ("d2d4", "a2a3", "d1e2", "b1c3")
         best_move = stockfish.get_best_move(btime=1000)
         assert best_move in ("d2d4", "b1c3")
         best_move = stockfish.get_best_move(wtime=1000, btime=1000)
@@ -243,28 +243,32 @@ class TestStockfish:
         assert stockfish.get_parameters()["UCI_Elo"] == 2850
 
     def test_that_set_skill_level_updates_params(self, stockfish):
-        old_parameters = stockfish._parameters
-        old_skill_level = stockfish._parameters["Skill Level"]
-        stockfish.set_skill_level(1)
-        expected_params = {
-            "Write Debug Log": "false",
+        old_parameters = {
+            "Debug Log File": "",
             "Contempt": 0,
             "Min Split Depth": 0,
             "Threads": 1,
             "Ponder": "false",
             "Hash": 16,
             "MultiPV": 1,
-            "Skill Level": 1,
-            "Move Overhead": 30,
+            "Skill Level": 20,
+            "Move Overhead": 10,
             "Minimum Thinking Time": 20,
-            "Slow Mover": 80,
+            "Slow Mover": 100,
             "UCI_Chess960": "false",
             "UCI_LimitStrength": "false",
             "UCI_Elo": 1350,
         }
-        assert stockfish.get_parameters() == expected_params
-        stockfish.set_skill_level(old_skill_level)
+        stockfish.set_skill_level(1)
+        for name, value in stockfish.get_parameters().items():
+            if name == "Skill Level":
+                assert value == 1
+            else:
+                assert value == old_parameters[name]
+        assert stockfish._DEFAULT_STOCKFISH_PARAMS == old_parameters
+        stockfish.set_skill_level(20)
         assert stockfish.get_parameters() == old_parameters
+        assert stockfish._DEFAULT_STOCKFISH_PARAMS == old_parameters
 
     def test_chess960_position(self, stockfish):
         assert "KQkq" in stockfish.get_fen_position()

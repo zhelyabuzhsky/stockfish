@@ -31,7 +31,7 @@ stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64")
 There are some default engine's settings:
 ```python
 {
-    "Write Debug Log": "false",
+    "Debug Log File": "",
     "Contempt": 0,
     "Min Split Depth": 0,
     "Threads": 1,
@@ -39,9 +39,9 @@ There are some default engine's settings:
     "Hash": 16,
     "MultiPV": 1,
     "Skill Level": 20,
-    "Move Overhead": 30,
+    "Move Overhead": 10,
     "Minimum Thinking Time": 20,
-    "Slow Mover": 80,
+    "Slow Mover": 100,
     "UCI_Chess960": "false",
     "UCI_LimitStrength": "false",
     "UCI_Elo": 1350
@@ -154,7 +154,7 @@ stockfish.get_parameters()
 ```
 ```text
 {
-    "Write Debug Log": "false",
+    "Debug Log File": "",
     "Contempt": 0,
     "Min Split Depth": 0,
     "Threads": 1,
@@ -162,9 +162,9 @@ stockfish.get_parameters()
     "Hash": 16,
     "MultiPV": 1,
     "Skill Level": 20,
-    "Move Overhead": 30,
+    "Move Overhead": 10,
     "Minimum Thinking Time": 20,
-    "Slow Mover": 80,
+    "Slow Mover": 100,
     "UCI_Chess960": "false",
     "UCI_LimitStrength": "false",
     "UCI_Elo": 1350

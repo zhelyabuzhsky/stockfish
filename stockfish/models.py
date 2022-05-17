@@ -19,8 +19,8 @@ class Stockfish:
     def __init__(
         self, path: str = "stockfish", depth: int = 15, parameters: dict = None
     ) -> None:
-        self.default_stockfish_params = {
-            "Write Debug Log": "false",
+        self._DEFAULT_STOCKFISH_PARAMS = {
+            "Debug Log File": "",
             "Contempt": 0,
             "Min Split Depth": 0,
             "Threads": 1,
@@ -28,9 +28,9 @@ class Stockfish:
             "Hash": 16,
             "MultiPV": 1,
             "Skill Level": 20,
-            "Move Overhead": 30,
+            "Move Overhead": 10,
             "Minimum Thinking Time": 20,
-            "Slow Mover": 80,
+            "Slow Mover": 100,
             "UCI_Chess960": "false",
             "UCI_LimitStrength": "false",
             "UCI_Elo": 1350,
@@ -54,9 +54,8 @@ class Stockfish:
         self.depth = str(depth)
         self.info: str = ""
 
-        if parameters is None:
-            parameters = {}
-        self._parameters = copy.deepcopy(self.default_stockfish_params)
+        self._parameters = {}
+        self.update_engine_parameters(self._DEFAULT_STOCKFISH_PARAMS)
         self.update_engine_parameters(parameters)
 
         if self.does_current_engine_version_have_wdl_option():
@@ -72,7 +71,7 @@ class Stockfish:
         """
         return self._parameters
 
-    def update_engine_parameters(self, new_param_values: dict) -> None:
+    def update_engine_parameters(self, new_param_valuesP: dict) -> None:
         """Updates the stockfish parameters.
 
         Args:
@@ -83,10 +82,15 @@ class Stockfish:
         Returns:
             None
         """
-        for key in new_param_values:
-            if key not in self._parameters:
-                raise ValueError(f"'{key}' is not a key that exists.")
-        self._parameters.update(new_param_values)
+        if not new_param_valuesP:
+            return
+        new_param_values = copy.deepcopy(new_param_valuesP)
+
+        if len(self._parameters) > 0:
+            for key in new_param_values:
+                if key not in self._parameters:
+                    raise ValueError(f"'{key}' is not a key that exists.")
+
         if ("Skill Level" in new_param_values) != (
             "UCI_Elo" in new_param_values
         ) and "UCI_LimitStrength" not in new_param_values:
@@ -94,11 +98,12 @@ class Stockfish:
             # not both), and that they didn't specify a new value for UCI_LimitStrength.
             # So, update UCI_LimitStrength, in case it's not the right value currently.
             if "Skill Level" in new_param_values:
-                self._parameters.update({"UCI_LimitStrength": "false"})
+                new_param_values.update({"UCI_LimitStrength": "false"})
             elif "UCI_Elo" in new_param_values:
-                self._parameters.update({"UCI_LimitStrength": "true"})
-        for name, value in self._parameters.items():
-            self._set_option(name, value)
+                new_param_values.update({"UCI_LimitStrength": "true"})
+
+        for name, value in new_param_values.items():
+            self._set_option(name, value, True)
         self.set_fen_position(self.get_fen_position(), False)
         # Getting SF to set the position again, since UCI option(s) have been updated.
 
@@ -108,7 +113,7 @@ class Stockfish:
         Returns:
             None
         """
-        self.update_engine_parameters(self.default_stockfish_params)
+        self.update_engine_parameters(self._DEFAULT_STOCKFISH_PARAMS)
 
     def _prepare_for_new_position(self, send_ucinewgame_token: bool = True) -> None:
         if send_ucinewgame_token:
