@@ -25,7 +25,7 @@ class Stockfish:
             "Min Split Depth": 0,
             "Threads": 1,
             "Ponder": "false",
-            "Hash": 16,
+            "Hash": 1024,
             "MultiPV": 1,
             "Skill Level": 20,
             "Move Overhead": 10,
@@ -102,6 +102,19 @@ class Stockfish:
                 new_param_values.update({"UCI_LimitStrength": "false"})
             elif "UCI_Elo" in new_param_values:
                 new_param_values.update({"UCI_LimitStrength": "true"})
+
+        if "Threads" in new_param_values:
+            # Recommended to set the hash param after threads.
+            threads_value = new_param_values["Threads"]
+            del new_param_values["Threads"]
+            hash_value = None
+            if "Hash" in new_param_values:
+                hash_value = new_param_values["Hash"]
+                del new_param_values["Hash"]
+            else:
+                hash_value = self._parameters["Hash"]
+            new_param_values["Threads"] = threads_value
+            new_param_values["Hash"] = hash_value
 
         for name, value in new_param_values.items():
             self._set_option(name, value, True)

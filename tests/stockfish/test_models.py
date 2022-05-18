@@ -25,9 +25,9 @@ class TestStockfish:
 
     def test_get_best_move_remaining_time_first_move(self, stockfish):
         best_move = stockfish.get_best_move(wtime=1000)
-        assert best_move in ("a2a3", "d2d4", "e2e4", "g1f3")
+        assert best_move in ("a2a3", "d2d4", "e2e4", "g1f3", "c2c4")
         best_move = stockfish.get_best_move(btime=1000)
-        assert best_move in ("g1f3", "d2d4", "e2e4")
+        assert best_move in ("g1f3", "d2d4", "e2e4", "c2c4")
         best_move = stockfish.get_best_move(wtime=1000, btime=1000)
         assert best_move in ("g1f3", "e2e4", "d2d4", "c2c4", "e2e3")
         best_move = stockfish.get_best_move(wtime=5 * 60 * 1000, btime=1000)
@@ -189,7 +189,7 @@ class TestStockfish:
         assert stockfish.get_parameters()["UCI_LimitStrength"] == "false"
 
         stockfish.set_skill_level(20)
-        assert stockfish.get_best_move() == "d2d4"
+        assert stockfish.get_best_move() in ("d2d4", "c2c4")
         assert stockfish.get_parameters()["Skill Level"] == 20
         assert stockfish.get_parameters()["UCI_LimitStrength"] == "false"
 
@@ -242,14 +242,14 @@ class TestStockfish:
 
         assert stockfish.get_parameters()["UCI_Elo"] == 2850
 
-    def test_that_set_skill_level_updates_params(self, stockfish):
+    def test_specific_params(self, stockfish):
         old_parameters = {
             "Debug Log File": "",
             "Contempt": 0,
             "Min Split Depth": 0,
             "Threads": 1,
             "Ponder": "false",
-            "Hash": 16,
+            "Hash": 1024,
             "MultiPV": 1,
             "Skill Level": 20,
             "Move Overhead": 10,
@@ -259,16 +259,25 @@ class TestStockfish:
             "UCI_LimitStrength": "false",
             "UCI_Elo": 1350,
         }
+        expected_parameters = old_parameters.copy()
         stockfish.set_skill_level(1)
-        for name, value in stockfish.get_parameters().items():
-            if name == "Skill Level":
-                assert value == 1
-            else:
-                assert value == old_parameters[name]
+        expected_parameters["Skill Level"] = 1
+        assert stockfish.get_parameters() == expected_parameters
         assert stockfish._DEFAULT_STOCKFISH_PARAMS == old_parameters
         stockfish.set_skill_level(20)
+        expected_parameters["Skill Level"] = 20
         assert stockfish.get_parameters() == old_parameters
         assert stockfish._DEFAULT_STOCKFISH_PARAMS == old_parameters
+
+        stockfish.update_engine_parameters({"Threads": 4})
+        expected_parameters["Threads"] = 4
+        assert stockfish.get_parameters() == expected_parameters
+        stockfish.update_engine_parameters({"Hash": 128})
+        expected_parameters["Hash"] = 128
+        assert stockfish.get_parameters() == expected_parameters
+        stockfish.update_engine_parameters({"Hash": 256, "Threads": 3})
+        expected_parameters.update({"Hash": 256, "Threads": 3})
+        assert stockfish.get_parameters() == expected_parameters
 
     def test_chess960_position(self, stockfish):
         assert "KQkq" in stockfish.get_fen_position()

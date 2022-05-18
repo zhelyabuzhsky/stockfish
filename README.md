@@ -28,7 +28,7 @@ from stockfish import Stockfish
 stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64")
 ```
 
-There are some default engine's settings:
+There are some default engine settings:
 ```python
 {
     "Debug Log File": "",
@@ -36,7 +36,7 @@ There are some default engine's settings:
     "Min Split Depth": 0,
     "Threads": 1,
     "Ponder": "false",
-    "Hash": 16,
+    "Hash": 1024,
     "MultiPV": 1,
     "Skill Level": 20,
     "Move Overhead": 10,
@@ -55,7 +55,7 @@ stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64",
 
 These parameters can also be updated at any time by calling the "update_engine_parameters" function:
 ```python
-stockfish.update_engine_parameters({"MultiPV": 2, "UCI_Chess960": "true"}) # Gets SF to use 2 principal variations, and also to play Chess960.
+stockfish.update_engine_parameters({"Hash": 2048, "UCI_Chess960": "true"}) # Gets stockfish to use a 2GB hash table, and also to play Chess960.
 ```
 
 ### Set position by a sequence of moves from the starting position
@@ -159,7 +159,7 @@ stockfish.get_parameters()
     "Min Split Depth": 0,
     "Threads": 1,
     "Ponder": "false",
-    "Hash": 16,
+    "Hash": 1024,
     "MultiPV": 1,
     "Skill Level": 20,
     "Move Overhead": 10,
