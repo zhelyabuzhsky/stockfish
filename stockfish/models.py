@@ -54,7 +54,7 @@ class Stockfish:
         self.depth = str(depth)
         self.info: str = ""
 
-        self._parameters = {}
+        self._parameters: dict = {}
         self.update_engine_parameters(self._DEFAULT_STOCKFISH_PARAMS)
         self.update_engine_parameters(parameters)
 
@@ -71,7 +71,7 @@ class Stockfish:
         """
         return self._parameters
 
-    def update_engine_parameters(self, new_param_valuesP: dict) -> None:
+    def update_engine_parameters(self, new_param_valuesP: Optional[dict]) -> None:
         """Updates the stockfish parameters.
 
         Args:
@@ -84,6 +84,7 @@ class Stockfish:
         """
         if not new_param_valuesP:
             return
+
         new_param_values = copy.deepcopy(new_param_valuesP)
 
         if len(self._parameters) > 0:
