@@ -28,21 +28,23 @@ from stockfish import Stockfish
 stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64")
 ```
 
-There are some default engine's settings:
+There are some default engine settings:
 ```python
 {
-    "Write Debug Log": "false",
+    "Debug Log File": "",
     "Contempt": 0,
     "Min Split Depth": 0,
     "Threads": 1,
     "Ponder": "false",
-    "Hash": 16,
+    "Hash": 1024,
     "MultiPV": 1,
     "Skill Level": 20,
-    "Move Overhead": 30,
+    "Move Overhead": 10,
     "Minimum Thinking Time": 20,
-    "Slow Mover": 80,
+    "Slow Mover": 100,
     "UCI_Chess960": "false",
+    "UCI_LimitStrength": "false",
+    "UCI_Elo": 1350
 }
 ```
 
@@ -51,7 +53,12 @@ You can change them, as well as the default search depth, during your Stockfish 
 stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64", depth=18, parameters={"Threads": 2, "Minimum Thinking Time": 30})
 ```
 
-### Set position by sequence of moves
+These parameters can also be updated at any time by calling the "update_engine_parameters" function:
+```python
+stockfish.update_engine_parameters({"Hash": 2048, "UCI_Chess960": "true"}) # Gets stockfish to use a 2GB hash table, and also to play Chess960.
+```
+
+### Set position by a sequence of moves from the starting position
 ```python
 stockfish.set_position(["e2e4", "e7e6"])
 ```
@@ -62,6 +69,7 @@ stockfish.make_moves_from_current_position(["g4d7", "a8b8", "f1d1"])
 ```
 
 ### Set position by Forsyth–Edwards Notation (FEN)
+Note that if you want to play Chess960, it's recommended you first update the "UCI_Chess960" engine parameter to be "true", before calling set_fen_position.
 ```python
 stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
 ```
@@ -87,7 +95,6 @@ Time constraint is in milliseconds
 e2e4
 ```
 
-
 ### Check is move correct with current position
 ```python
 stockfish.is_move_correct('a2a3')
@@ -108,7 +115,9 @@ stockfish.get_top_moves(3)
 ]
 ```
 
-### Get Stockfish's win/draw/loss stats for the side to move in the current position
+### Get Stockfish's win/draw/loss stats for the side to move in the current position  
+Before calling this function, it is recommended that you first check if your version of Stockfish is recent enough to display WDL stats. To do this,  
+use the "does_current_engine_version_have_wdl_option()" function below.
 ```python
 stockfish.get_wdl_stats()
 ```
@@ -122,11 +131,6 @@ stockfish.does_current_engine_version_have_wdl_option()
 ```
 ```text
 True
-```
-
-### Tell Stockfish whether or not to display WDL stats after analyzing a position
-```python
-stockfish.set_show_wdl_option(True)
 ```
 
 ### Set current engine's skill level (ignoring ELO rating)
@@ -150,19 +154,26 @@ stockfish.get_parameters()
 ```
 ```text
 {
-    'Write Debug Log': 'false',
-    'Contempt': 0,
-    'Min Split Depth': 0,
-    'Threads': 1,
-    'Ponder': 'false',
-    'Hash': 16,
-    'MultiPV': 1,
-    'Skill Level': 20,
-    'Move Overhead': 30,
-    'Minimum Thinking Time': 20,
-    'Slow Mover': 80,
-    'UCI_Chess960': 'false'
+    "Debug Log File": "",
+    "Contempt": 0,
+    "Min Split Depth": 0,
+    "Threads": 1,
+    "Ponder": "false",
+    "Hash": 1024,
+    "MultiPV": 1,
+    "Skill Level": 20,
+    "Move Overhead": 10,
+    "Minimum Thinking Time": 20,
+    "Slow Mover": 100,
+    "UCI_Chess960": "false",
+    "UCI_LimitStrength": "false",
+    "UCI_Elo": 1350
 }
+```
+
+### Reset the engine's parameters to the default
+```python
+stockfish.reset_engine_parameters()
 ```
 
 ### Get current board position in Forsyth–Edwards notation (FEN)
@@ -245,6 +256,29 @@ stockfish.is_development_build_of_engine()
 ```
 ```text
 False
+```
+
+### Find what is on a certain square
+If the square is empty, the None object is returned. Otherwise, one of 12 enum members of a custom  
+Stockfish.Piece enum will be returned. Each of the 12 members of this enum is named in the following pattern:  
+*colour* followed by *underscore* followed by *piece name*, where the colour and piece name are in all caps.  
+For example, say the current position is the starting position:  
+```python
+stockfish.get_what_is_on_square("e1") # returns Stockfish.Piece.WHITE_KING
+stockfish.get_what_is_on_square("d8") # returns Stockfish.Piece.BLACK_QUEEN
+stockfish.get_what_is_on_square("h2") # returns Stockfish.Piece.WHITE_PAWN
+stockfish.get_what_is_on_square("b5") # returns None
+```
+
+### Find if a move will be a capture (and if so, what type of capture)
+The argument must be a string that represents the move, using the notation that Stockfish uses (i.e., the coordinate of the starting square followed by the coordinate of the ending square).   
+The function will return one of the following enum members from a custom Stockfish.Capture enum: DIRECT_CAPTURE, EN_PASSANT, or NO_CAPTURE.  
+For example, say the current position is the one after 1.e4 Nf6 2.Nc3 e6 3.e5 d5.
+```python
+stockfish.will_move_be_a_capture("c3d5")  # returns Stockfish.Capture.DIRECT_CAPTURE  
+stockfish.will_move_be_a_capture("e5f6")  # returns Stockfish.Capture.DIRECT_CAPTURE  
+stockfish.will_move_be_a_capture("e5d6")  # returns Stockfish.Capture.EN_PASSANT  
+stockfish.will_move_be_a_capture("f1e2")  # returns Stockfish.Capture.NO_CAPTURE  
 ```
 
 ## Testing

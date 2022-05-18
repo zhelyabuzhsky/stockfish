@@ -10,6 +10,7 @@ from typing import Any, List, Optional
 import copy
 from os import path
 from dataclasses import dataclass
+from enum import Enum
 
 
 class Stockfish:
@@ -18,22 +19,21 @@ class Stockfish:
     def __init__(
         self, path: str = "stockfish", depth: int = 15, parameters: dict = None
     ) -> None:
-        self.default_stockfish_params = {
-            "Write Debug Log": "false",
+        self._DEFAULT_STOCKFISH_PARAMS = {
+            "Debug Log File": "",
             "Contempt": 0,
             "Min Split Depth": 0,
             "Threads": 1,
             "Ponder": "false",
-            "Hash": 16,
+            "Hash": 1024,
             "MultiPV": 1,
             "Skill Level": 20,
-            "Move Overhead": 30,
+            "Move Overhead": 10,
             "Minimum Thinking Time": 20,
-            "Slow Mover": 80,
+            "Slow Mover": 100,
             "UCI_Chess960": "false",
             "UCI_LimitStrength": "false",
             "UCI_Elo": 1350,
-            "UCI_ShowWDL": "false",
         }
         self._stockfish = subprocess.Popen(
             path,
@@ -51,22 +51,15 @@ class Stockfish:
 
         self._put("uci")
 
-        self._already_set_the_has_wdl_option_variable = False
-        self._has_wdl_option = self.does_current_engine_version_have_wdl_option()
-        self._already_set_the_has_wdl_option_variable = True
-
-        if not self._has_wdl_option:
-            del self.default_stockfish_params["UCI_ShowWDL"]
-
         self.depth = str(depth)
         self.info: str = ""
 
-        if parameters is None:
-            parameters = {}
-        self._parameters = copy.deepcopy(self.default_stockfish_params)
-        self._parameters.update(parameters)
-        for name, value in list(self._parameters.items()):
-            self._set_option(name, value)
+        self._parameters: dict = {}
+        self.update_engine_parameters(self._DEFAULT_STOCKFISH_PARAMS)
+        self.update_engine_parameters(parameters)
+
+        if self.does_current_engine_version_have_wdl_option():
+            self._set_option("UCI_ShowWDL", "true", False)
 
         self._prepare_for_new_position(True)
 
@@ -78,15 +71,63 @@ class Stockfish:
         """
         return self._parameters
 
-    def reset_parameters(self) -> None:
+    def update_engine_parameters(self, new_param_valuesP: Optional[dict]) -> None:
+        """Updates the stockfish parameters.
+
+        Args:
+            new_param_values:
+                Contains (key, value) pairs which will be used to update
+                the _parameters dictionary.
+
+        Returns:
+            None
+        """
+        if not new_param_valuesP:
+            return
+
+        new_param_values = copy.deepcopy(new_param_valuesP)
+
+        if len(self._parameters) > 0:
+            for key in new_param_values:
+                if key not in self._parameters:
+                    raise ValueError(f"'{key}' is not a key that exists.")
+
+        if ("Skill Level" in new_param_values) != (
+            "UCI_Elo" in new_param_values
+        ) and "UCI_LimitStrength" not in new_param_values:
+            # This means the user wants to update the Skill Level or UCI_Elo (only one,
+            # not both), and that they didn't specify a new value for UCI_LimitStrength.
+            # So, update UCI_LimitStrength, in case it's not the right value currently.
+            if "Skill Level" in new_param_values:
+                new_param_values.update({"UCI_LimitStrength": "false"})
+            elif "UCI_Elo" in new_param_values:
+                new_param_values.update({"UCI_LimitStrength": "true"})
+
+        if "Threads" in new_param_values:
+            # Recommended to set the hash param after threads.
+            threads_value = new_param_values["Threads"]
+            del new_param_values["Threads"]
+            hash_value = None
+            if "Hash" in new_param_values:
+                hash_value = new_param_values["Hash"]
+                del new_param_values["Hash"]
+            else:
+                hash_value = self._parameters["Hash"]
+            new_param_values["Threads"] = threads_value
+            new_param_values["Hash"] = hash_value
+
+        for name, value in new_param_values.items():
+            self._set_option(name, value, True)
+        self.set_fen_position(self.get_fen_position(), False)
+        # Getting SF to set the position again, since UCI option(s) have been updated.
+
+    def reset_engine_parameters(self) -> None:
         """Resets the stockfish parameters.
 
         Returns:
             None
         """
-        self._parameters = copy.deepcopy(self.default_stockfish_params)
-        for name, value in list(self._parameters.items()):
-            self._set_option(name, value)
+        self.update_engine_parameters(self._DEFAULT_STOCKFISH_PARAMS)
 
     def _prepare_for_new_position(self, send_ucinewgame_token: bool = True) -> None:
         if send_ucinewgame_token:
@@ -108,9 +149,12 @@ class Stockfish:
             raise BrokenPipeError()
         return self._stockfish.stdout.readline().strip()
 
-    def _set_option(self, name: str, value: Any) -> None:
+    def _set_option(
+        self, name: str, value: Any, update_parameters_attribute: bool = True
+    ) -> None:
         self._put(f"setoption name {name} value {value}")
-        self._parameters.update({name: value})
+        if update_parameters_attribute:
+            self._parameters.update({name: value})
         self._is_ready()
 
     def _is_ready(self) -> None:
@@ -214,10 +258,9 @@ class Stockfish:
         Returns:
             None
         """
-        self._set_option("UCI_LimitStrength", "false")
-        self._parameters.update({"UCI_LimitStrength": "false"})
-        self._set_option("Skill Level", skill_level)
-        self._parameters.update({"Skill Level": skill_level})
+        self.update_engine_parameters(
+            {"UCI_LimitStrength": "false", "Skill Level": skill_level}
+        )
 
     def set_elo_rating(self, elo_rating: int = 1350) -> None:
         """Sets current elo rating of stockfish engine, ignoring skill level.
@@ -228,10 +271,9 @@ class Stockfish:
         Returns:
             None
         """
-        self._set_option("UCI_LimitStrength", "true")
-        self._parameters.update({"UCI_LimitStrength": "true"})
-        self._set_option("UCI_Elo", elo_rating)
-        self._parameters.update({"UCI_Elo": elo_rating})
+        self.update_engine_parameters(
+            {"UCI_LimitStrength": "true", "UCI_Elo": elo_rating}
+        )
 
     def set_fen_position(
         self, fen_position: str, send_ucinewgame_token: bool = True
@@ -312,10 +354,7 @@ class Stockfish:
             text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "bestmove":
-                if splitted_text[1] == "(none)":
-                    return False
-                else:
-                    return True
+                return splitted_text[1] != "(none)"
 
     def get_wdl_stats(self) -> Optional[List]:
         """Returns Stockfish's win/draw/loss stats for the side to move.
@@ -329,8 +368,6 @@ class Stockfish:
             raise RuntimeError(
                 "Your version of Stockfish isn't recent enough to have the UCI_ShowWDL option."
             )
-        was_wdl_option_false_before = self._parameters["UCI_ShowWDL"] == "false"
-        self.set_show_wdl_option(True)
         self._go()
         lines = []
         while True:
@@ -341,8 +378,6 @@ class Stockfish:
                 break
         for current_line in reversed(lines):
             if current_line[0] == "bestmove" and current_line[1] == "(none)":
-                if was_wdl_option_false_before:
-                    self.set_show_wdl_option(False)
                 return None
             elif "multipv" in current_line:
                 index_of_multipv = current_line.index("multipv")
@@ -351,8 +386,6 @@ class Stockfish:
                     wdl_stats = []
                     for i in range(1, 4):
                         wdl_stats.append(int(current_line[index_of_wdl + i]))
-                    if was_wdl_option_false_before:
-                        self.set_show_wdl_option(False)
                     return wdl_stats
         raise RuntimeError("Reached the end of the get_wdl_stats function.")
 
@@ -364,8 +397,6 @@ class Stockfish:
             True, if SF has the option -- False otherwise.
         """
 
-        if self._already_set_the_has_wdl_option_variable:
-            return self._has_wdl_option
         self._put("uci")
         while True:
             text = self._read_line()
@@ -374,27 +405,6 @@ class Stockfish:
                 return False
             elif "UCI_ShowWDL" in splitted_text:
                 return True
-
-    def set_show_wdl_option(self, value: bool) -> None:
-        """Sets Stockfish's "UCI_ShowWDL" option to either "true" or "false".
-
-        Args:
-            value:
-              Tells Stockfish whether to set its UCI option "UCI_ShowWDL"
-              to the value "true" or "false".
-
-        Returns:
-            None
-        """
-
-        if not self.does_current_engine_version_have_wdl_option():
-            raise RuntimeError(
-                "Your version of Stockfish isn't recent enough to have the UCI_ShowWDL option."
-            )
-        assert "UCI_ShowWDL" in self._parameters
-        value_as_string = "true" if value else "false"
-        self._parameters["UCI_ShowWDL"] = value_as_string
-        self._set_option("UCI_ShowWDL", value_as_string)
 
     def get_evaluation(self) -> dict:
         """Evaluates current position
@@ -549,6 +559,97 @@ class Stockfish:
             depth_value: Depth option higher than 1
         """
         self.depth = str(depth_value)
+
+    class Piece(Enum):
+        WHITE_PAWN = "P"
+        BLACK_PAWN = "p"
+        WHITE_KNIGHT = "N"
+        BLACK_KNIGHT = "n"
+        WHITE_BISHOP = "B"
+        BLACK_BISHOP = "b"
+        WHITE_ROOK = "R"
+        BLACK_ROOK = "r"
+        WHITE_QUEEN = "Q"
+        BLACK_QUEEN = "q"
+        WHITE_KING = "K"
+        BLACK_KING = "k"
+
+    def get_what_is_on_square(self, square: str) -> Optional[Piece]:
+        """Returns what is on the specified square.
+
+        Args:
+            square:
+                The coordinate of the square in question. E.g., e4.
+
+        Returns:
+            Either one of the 12 enum members in the Piece enum, or the None
+            object if the square is empty.
+        """
+
+        file_letter = square[0].lower()
+        rank_num = int(square[1])
+        if (
+            len(square) != 2
+            or file_letter < "a"
+            or file_letter > "h"
+            or square[1] < "1"
+            or square[1] > "8"
+        ):
+            raise ValueError(
+                "square argument to the get_what_is_on_square function isn't valid."
+            )
+        rank_visual = self.get_board_visual().splitlines()[17 - 2 * rank_num]
+        piece_as_char = rank_visual[2 + (ord(file_letter) - ord("a")) * 4]
+        if piece_as_char == " ":
+            return None
+        else:
+            return Stockfish.Piece(piece_as_char)
+
+    class Capture(Enum):
+        DIRECT_CAPTURE = "direct capture"
+        EN_PASSANT = "en passant"
+        NO_CAPTURE = "no capture"
+
+    def will_move_be_a_capture(self, move_value: str) -> Capture:
+        """Returns whether the proposed move will be a direct capture,
+           en passant, or not a capture at all.
+
+        Args:
+            move_value:
+                The proposed move, in the notation that Stockfish uses.
+                E.g., "e2e4", "g1f3", etc.
+
+        Returns one of the following members of the Capture enum:
+            DIRECT_CAPTURE if the move will be a direct capture.
+            EN_PASSANT if the move is a capture done with en passant.
+            NO_CAPTURE if the move does not capture anything.
+        """
+        if not self.is_move_correct(move_value):
+            raise ValueError("The proposed move is not valid in the current position.")
+        starting_square_piece = self.get_what_is_on_square(move_value[:2])
+        ending_square_piece = self.get_what_is_on_square(move_value[-2:])
+        if ending_square_piece != None:
+            if self._parameters["UCI_Chess960"] == "false":
+                return Stockfish.Capture.DIRECT_CAPTURE
+            else:
+                # Check for Chess960 castling:
+                castling_pieces = [
+                    [Stockfish.Piece.WHITE_KING, Stockfish.Piece.WHITE_ROOK],
+                    [Stockfish.Piece.BLACK_KING, Stockfish.Piece.BLACK_ROOK],
+                ]
+                if [starting_square_piece, ending_square_piece] in castling_pieces:
+                    return Stockfish.Capture.NO_CAPTURE
+                else:
+                    return Stockfish.Capture.DIRECT_CAPTURE
+        elif move_value[-2:] == self.get_fen_position().split()[
+            3
+        ] and starting_square_piece in [
+            Stockfish.Piece.WHITE_PAWN,
+            Stockfish.Piece.BLACK_PAWN,
+        ]:
+            return Stockfish.Capture.EN_PASSANT
+        else:
+            return Stockfish.Capture.NO_CAPTURE
 
     def get_stockfish_major_version(self):
         """Returns Stockfish engine major version.
