@@ -17,7 +17,7 @@ class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
     def __init__(
-        self, path: str = "stockfish_15_x64_avx2", depth: int = 15, parameters: dict = None
+        self, path: str = "fairy-stockfish-largeboard_x86-64", depth: int = 15, parameters: dict = None
     ) -> None:
         self._DEFAULT_STOCKFISH_PARAMS = {
             "Debug Log File": "",
@@ -46,7 +46,7 @@ class Stockfish:
         self._has_quit_command_been_sent = False
 
         self._stockfish_major_version: int = int(
-            self._read_line().split(" ")[1].split(".")[0]
+            self._read_line().split(" ")[1].split(".")[0].replace("-", "")
         )
 
         self._put("uci")
@@ -230,8 +230,9 @@ class Stockfish:
             if "+" in board_str or "|" in board_str:
                 count_lines += 1
                 board_rep += f"{board_str}\n"
-        if self._stockfish_major_version >= 12:
-            board_str = self._read_line()
+        board_str = self._read_line()
+        if "a   b   c" in board_str:
+            # Engine being used is recent enough to have coordinates, so add them:
             board_rep += f"  {board_str}\n"
         while "Checkers" not in self._read_line(): 
             # Gets rid of the remaining lines in _stockfish.stdout.
