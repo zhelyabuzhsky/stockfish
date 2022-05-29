@@ -17,7 +17,7 @@ class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
     def __init__(
-        self, path: str = "fairy-stockfish-largeboard_x86-64", depth: int = 15, parameters: dict = None
+        self, path: str = "stockfish", depth: int = 15, parameters: dict = None
     ) -> None:
         self._DEFAULT_STOCKFISH_PARAMS = {
             "Debug Log File": "",
@@ -234,7 +234,7 @@ class Stockfish:
         if "a   b   c" in board_str:
             # Engine being used is recent enough to have coordinates, so add them:
             board_rep += f"  {board_str}\n"
-        while "Checkers" not in self._read_line(): 
+        while "Checkers" not in self._read_line():
             # Gets rid of the remaining lines in _stockfish.stdout.
             # "Checkers" is in the last line outputted by Stockfish for the "d" command.
             pass
