@@ -17,7 +17,7 @@ class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
     def __init__(
-        self, path: str = "stockfish", depth: int = 15, parameters: dict = None
+        self, path: str = "stockfish_15_x64_avx2", depth: int = 15, parameters: dict = None
     ) -> None:
         self._DEFAULT_STOCKFISH_PARAMS = {
             "Debug Log File": "",
@@ -233,6 +233,10 @@ class Stockfish:
         if self._stockfish_major_version >= 12:
             board_str = self._read_line()
             board_rep += f"  {board_str}\n"
+        while "Checkers" not in self._read_line(): 
+            # Gets rid of the remaining lines in _stockfish.stdout.
+            # "Checkers" is in the last line outputted by Stockfish for the "d" command.
+            pass
         return board_rep
 
     def get_fen_position(self) -> str:
@@ -246,6 +250,8 @@ class Stockfish:
             text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "Fen:":
+                while "Checkers" not in self._read_line():
+                    pass
                 return " ".join(splitted_text[1:])
 
     def set_skill_level(self, skill_level: int = 20) -> None:
@@ -398,13 +404,17 @@ class Stockfish:
         """
 
         self._put("uci")
+        encountered_UCI_ShowWDL = False
         while True:
             text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "uciok":
-                return False
+                return encountered_UCI_ShowWDL
             elif "UCI_ShowWDL" in splitted_text:
-                return True
+                encountered_UCI_ShowWDL = True
+                # Not returning right away, since the remaining lines should be read and
+                # discarded. So continue the loop until reaching "uciok", which is
+                # the last line SF outputs for the "uci" command.
 
     def get_evaluation(self) -> dict:
         """Evaluates current position
