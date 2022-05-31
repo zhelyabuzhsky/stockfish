@@ -46,7 +46,7 @@ class Stockfish:
         self._has_quit_command_been_sent = False
 
         self._stockfish_major_version: int = int(
-            self._read_line().split(" ")[1].split(".")[0]
+            self._read_line().split(" ")[1].split(".")[0].replace("-", "")
         )
 
         self._put("uci")
@@ -230,9 +230,14 @@ class Stockfish:
             if "+" in board_str or "|" in board_str:
                 count_lines += 1
                 board_rep += f"{board_str}\n"
-        if self._stockfish_major_version >= 12:
-            board_str = self._read_line()
+        board_str = self._read_line()
+        if "a   b   c" in board_str:
+            # Engine being used is recent enough to have coordinates, so add them:
             board_rep += f"  {board_str}\n"
+        while "Checkers" not in self._read_line():
+            # Gets rid of the remaining lines in _stockfish.stdout.
+            # "Checkers" is in the last line outputted by Stockfish for the "d" command.
+            pass
         return board_rep
 
     def get_fen_position(self) -> str:
@@ -246,6 +251,8 @@ class Stockfish:
             text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "Fen:":
+                while "Checkers" not in self._read_line():
+                    pass
                 return " ".join(splitted_text[1:])
 
     def set_skill_level(self, skill_level: int = 20) -> None:
@@ -398,13 +405,17 @@ class Stockfish:
         """
 
         self._put("uci")
+        encountered_UCI_ShowWDL = False
         while True:
             text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "uciok":
-                return False
+                return encountered_UCI_ShowWDL
             elif "UCI_ShowWDL" in splitted_text:
-                return True
+                encountered_UCI_ShowWDL = True
+                # Not returning right away, since the remaining lines should be read and
+                # discarded. So continue the loop until reaching "uciok", which is
+                # the last line SF outputs for the "uci" command.
 
     def get_evaluation(self) -> dict:
         """Evaluates current position

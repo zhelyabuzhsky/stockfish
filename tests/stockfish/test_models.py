@@ -343,11 +343,20 @@ class TestStockfish:
 
         assert stockfish.get_board_visual() == expected_result
 
+        stockfish._put("d")
+        stockfish._read_line()  # skip a line
+        assert "+---+---+---+" in stockfish._read_line()
+        # Tests that the previous call to get_board_visual left no remaining lines to be read. This means
+        # the second line read after stockfish._put("d") now will be the +---+---+---+ of the new outputted board.
+
     def test_get_fen_position(self, stockfish):
         assert (
             stockfish.get_fen_position()
             == "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         )
+        stockfish._put("d")
+        stockfish._read_line()  # skip a line
+        assert "+---+---+---+" in stockfish._read_line()
 
     def test_get_fen_position_after_some_moves(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6"])
@@ -583,6 +592,7 @@ class TestStockfish:
         stockfish.set_depth(15)
         stockfish._set_option("MultiPV", 2)
         if stockfish.does_current_engine_version_have_wdl_option():
+            stockfish.get_wdl_stats()  # Testing that this doesn't raise a RuntimeError.
             stockfish.set_fen_position("7k/4R3/4P1pp/7N/8/8/1q5q/3K4 w - - 0 1")
             wdl_stats = stockfish.get_wdl_stats()
             assert wdl_stats[1] > wdl_stats[0] * 7

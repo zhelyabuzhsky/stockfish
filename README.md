@@ -28,15 +28,15 @@ from stockfish import Stockfish
 stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64")
 ```
 
-There are some default engine settings:
+There are some default engine settings used by this wrapper. For increasing Stockfish's strength and speed, the "Threads" and "Hash" parameters can be modified.
 ```python
 {
     "Debug Log File": "",
     "Contempt": 0,
     "Min Split Depth": 0,
-    "Threads": 1,
+    "Threads": 1, # More threads will make the engine stronger, but should be kept at less than the number of logical processors on your computer.
     "Ponder": "false",
-    "Hash": 1024,
+    "Hash": 1024, # 1024 MB for the hash table - you may want to increase/decrease this, depending on how much RAM you want to use. Should also be kept as some power of 2.
     "MultiPV": 1,
     "Skill Level": 20,
     "Move Overhead": 10,
@@ -243,11 +243,15 @@ It is an additional custom non-UCI command, mainly for debugging.
 Do not use this command during a search!
 
 ### Get current major version of stockfish engine
+E.g., if the engine being used is Stockfish 14.1 or Stockfish 14, then the function would return 14.
+Meanwhile, if a development build of the engine is being used (not an official release), then the function returns an 
+int with 5 or 6 digits, representing the date the engine was compiled on. 
+For example, 20122 is returned for the development build compiled on January 2, 2022.
 ```python 
 stockfish.get_stockfish_major_version()
 ```
 ```text
-11
+15
 ```
 
 ### Find if the version of Stockfish being used is a development build
