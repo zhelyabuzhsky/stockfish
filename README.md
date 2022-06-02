@@ -36,7 +36,7 @@ There are some default engine settings used by this wrapper. For increasing Stoc
     "Min Split Depth": 0,
     "Threads": 1, # More threads will make the engine stronger, but should be kept at less than the number of logical processors on your computer.
     "Ponder": "false",
-    "Hash": 1024, # 1024 MB for the hash table - you may want to increase/decrease this, depending on how much RAM you want to use. Should also be kept as some power of 2.
+    "Hash": 16, # Default size is 16 MB. It's recommended that you increase this value, but keep it as some power of 2. E.g., if you're fine using 2 GB of RAM, set Hash to 2048 (11th power of 2).
     "MultiPV": 1,
     "Skill Level": 20,
     "Move Overhead": 10,
@@ -159,7 +159,7 @@ stockfish.get_parameters()
     "Min Split Depth": 0,
     "Threads": 1,
     "Ponder": "false",
-    "Hash": 1024,
+    "Hash": 16,
     "MultiPV": 1,
     "Skill Level": 20,
     "Move Overhead": 10,
