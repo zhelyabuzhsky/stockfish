@@ -147,6 +147,10 @@ class Stockfish:
     def _read_line(self) -> str:
         if not self._stockfish.stdout:
             raise BrokenPipeError()
+        if self._stockfish.poll() is not None:
+            raise ValueError(
+                "Stockfish has crashed. This was probably caused by an invalid FEN."
+            )
         return self._stockfish.stdout.readline().strip()
 
     def _set_option(
