@@ -11,6 +11,7 @@ import copy
 from os import path
 from dataclasses import dataclass
 from enum import Enum
+import re
 
 
 class Stockfish:
@@ -35,8 +36,9 @@ class Stockfish:
             "UCI_LimitStrength": "false",
             "UCI_Elo": 1350,
         }
+        self._path = path
         self._stockfish = subprocess.Popen(
-            path,
+            self._path,
             universal_newlines=True,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
@@ -177,14 +179,27 @@ class Stockfish:
             cmd += f" btime {btime}"
         self._put(cmd)
 
-    @staticmethod
-    def _convert_move_list_to_str(moves: List[str]) -> str:
-        result = ""
-        for move in moves:
-            result += f"{move} "
-        return result.strip()
+    def set_fen_position(
+        self, fen_position: str, send_ucinewgame_token: bool = True
+    ) -> None:
+        """Sets current board position in Forsyth–Edwards notation (FEN).
 
-    def set_position(self, moves: List[str] = None) -> None:
+        Args:
+            fen_position:
+              FEN string of board position.
+
+            send_ucinewgame_token:
+              Whether to send the "ucinewgame" token to the Stockfish engine.
+              The most prominent effect this will have is clearing Stockfish's transposition table,
+              which should be done if the new position is unrelated to the current position.
+
+        Returns:
+            None
+        """
+        self._prepare_for_new_position(send_ucinewgame_token)
+        self._put(f"position fen {fen_position}")
+
+    def set_position(self, moves: Optional[List[str]] = None) -> None:
         """Sets current board position.
 
         Args:
@@ -193,12 +208,12 @@ class Stockfish:
               Must be in full algebraic notation.
               example: ['e2e4', 'e7e5']
         """
-        self._prepare_for_new_position(True)
-        if moves is None:
-            moves = []
-        self._put(f"position startpos moves {self._convert_move_list_to_str(moves)}")
+        self.set_fen_position(
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", True
+        )
+        self.make_moves_from_current_position(moves)
 
-    def make_moves_from_current_position(self, moves: List[str]) -> None:
+    def make_moves_from_current_position(self, moves: Optional[List[str]]) -> None:
         """Sets a new position by playing the moves from the current position.
 
         Args:
@@ -207,14 +222,13 @@ class Stockfish:
               Must be in full algebraic notation.
               Example: ["g4d7", "a8b8", "f1d1"]
         """
-        if moves == []:
-            raise ValueError(
-                "No moves sent in to the make_moves_from_current_position function."
-            )
+        if not moves:
+            return
         self._prepare_for_new_position(False)
-        self._put(
-            f"position fen {self.get_fen_position()} moves {self._convert_move_list_to_str(moves)}"
-        )
+        for move in moves:
+            if not self.is_move_correct(move):
+                raise ValueError(f"Cannot make move: {move}")
+            self._put(f"position fen {self.get_fen_position()} moves {move}")
 
     def get_board_visual(self) -> str:
         """Returns a visual representation of the current board position.
@@ -282,26 +296,6 @@ class Stockfish:
             {"UCI_LimitStrength": "true", "UCI_Elo": elo_rating}
         )
 
-    def set_fen_position(
-        self, fen_position: str, send_ucinewgame_token: bool = True
-    ) -> None:
-        """Sets current board position in Forsyth–Edwards notation (FEN).
-
-        Args:
-            fen_position:
-              FEN string of board position.
-
-            send_ucinewgame_token:
-              Whether to send the "ucinewgame" token to the Stockfish engine.
-              The most prominent effect this will have is clearing Stockfish's transposition table,
-              which should be done if the new position is unrelated to the current position.
-
-        Returns:
-            None
-        """
-        self._prepare_for_new_position(send_ucinewgame_token)
-        self._put(f"position fen {fen_position}")
-
     def get_best_move(self, wtime: int = None, btime: int = None) -> Optional[str]:
         """Returns best move with current position on the board.
         wtime and btime arguments influence the search only if provided.
@@ -313,16 +307,7 @@ class Stockfish:
             self._go_remaining_time(wtime, btime)
         else:
             self._go()
-        last_text: str = ""
-        while True:
-            text = self._read_line()
-            splitted_text = text.split(" ")
-            if splitted_text[0] == "bestmove":
-                if splitted_text[1] == "(none)":
-                    return None
-                self.info = last_text
-                return splitted_text[1]
-            last_text = text
+        return self._get_best_move_from_sf_popen_process()
 
     def get_best_move_time(self, time: int = 1000) -> Optional[str]:
         """Returns best move with current position on the board after a determined time
@@ -335,16 +320,93 @@ class Stockfish:
             A string of move in algebraic notation or None, if it's a mate now.
         """
         self._go_time(time)
+        return self._get_best_move_from_sf_popen_process()
+
+    def _get_best_move_from_sf_popen_process(self) -> Optional[str]:
+        # Precondition - a "go" command must have been sent to SF before calling this function.
+        # This function needs existing output to read from the SF popen process.
         last_text: str = ""
         while True:
             text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "bestmove":
-                if splitted_text[1] == "(none)":
-                    return None
                 self.info = last_text
-                return splitted_text[1]
+                return None if splitted_text[1] == "(none)" else splitted_text[1]
             last_text = text
+
+    def _is_fen_syntax_valid(self, fen: str) -> bool:
+        # Code for this function taken from: https://gist.github.com/Dani4kor/e1e8b439115878f8c6dcf127a4ed5d3e
+        # Some small changes have been made to the code.
+
+        regexMatch = re.match(
+            "\s*^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+)\s([b|w])\s([K|Q|k|q]{1,4})\s(-|[a-h][1-8])\s(\d+\s\d+)$",
+            fen,
+        )
+        if not regexMatch:
+            return False
+        regexList = regexMatch.groups()
+        fen = regexList[0].split("/")
+        if len(fen) != 8:
+            return False  # 8 rows not present.
+        for fenPart in fen:
+            field_sum = 0
+            previous_was_digit = False
+            for c in fenPart:
+                if c in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+                    if previous_was_digit:
+                        return False  # Two digits next to each other.
+                    field_sum += int(c)
+                    previous_was_digit = True
+                elif c.lower() in ["p", "n", "b", "r", "q", "k"]:
+                    field_sum += 1
+                    previous_was_digit = False
+                else:
+                    return False  # Invalid character.
+            if field_sum != 8:
+                return False  # One of the rows doesn't have 8 columns.
+        return True
+
+    def is_fen_valid(self, fen: str) -> bool:
+        if not self._is_fen_syntax_valid(fen):
+            return False
+
+        old_fen = self.get_fen_position()
+        old_self_info = self.info
+
+        is_legal_position = True
+        self.set_fen_position(fen, False)
+        try:
+            self._put("go depth 4")
+            is_legal_position = self._get_best_move_from_sf_popen_process() is not None
+        except ValueError:
+            # If a ValueError isn't thrown, then get_best_move_from_sf_popen_process() ends
+            # naturally, and is_legal_position's value depends on whether None was returned.
+            is_legal_position = False
+            # The new check in read_line will throw this error for certain FENs.
+
+            # It also means the SF process has ended, so restart it here.
+            self._stockfish = subprocess.Popen(
+                self._path,
+                universal_newlines=True,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+            )
+
+            self.update_engine_parameters(self._parameters)
+            # To call set_option for the new SF process on each of the current parameters.
+
+        # Before returning, set the fen position and info back to what they were at the start of this
+        # function, regardless of whether the except block above ran or not.
+        self.set_fen_position(old_fen, False)
+        self.info = old_self_info
+        return is_legal_position
+
+        # CONTINUE HERE:
+        # Done coding (unless finding smthing else to do), so now maybe check diff of commit, and
+        # write tests for all features/changes you made.
+        # E.g., things related to starting a new popen process if a ValueError is thrown above (after
+        # read_line function is modified with poll() check).
 
     def is_move_correct(self, move_value: str) -> bool:
         """Checks new move.
@@ -356,12 +418,11 @@ class Stockfish:
         Returns:
             True, if new move is correct, else False.
         """
+        old_self_info = self.info
         self._put(f"go depth 1 searchmoves {move_value}")
-        while True:
-            text = self._read_line()
-            splitted_text = text.split(" ")
-            if splitted_text[0] == "bestmove":
-                return splitted_text[1] != "(none)"
+        is_move_correct = self._get_best_move_from_sf_popen_process() is not None
+        self.info = old_self_info
+        return is_move_correct
 
     def get_wdl_stats(self) -> Optional[List]:
         """Returns Stockfish's win/draw/loss stats for the side to move.
@@ -426,10 +487,9 @@ class Stockfish:
 
         evaluation = dict()
         fen_position = self.get_fen_position()
-        if "w" in fen_position:  # w can only be in FEN if it is whites move
-            compare = 1
-        else:  # stockfish shows advantage relative to current player, convention is to do white positive
-            compare = -1
+        compare = (
+            1 if "w" in fen_position else -1
+        )  # Stockfish shows advantage relative to current player, convention is to do white positive.
         self._put(f"position {fen_position}")
         self._go()
         while True:
@@ -554,14 +614,11 @@ class Stockfish:
         self._put(
             f"bench {params.ttSize} {params.threads} {params.limit} {params.fenFile} {params.limitType} {params.evalType}"
         )
-        last_text: str = ""
         while True:
             text = self._read_line()
             splitted_text = text.split(" ")
             if splitted_text[0] == "Nodes/second":
-                last_text = text
-                return last_text
-            last_text = text
+                return text
 
     def set_depth(self, depth_value: int = 2) -> None:
         """Sets current depth of stockfish engine.

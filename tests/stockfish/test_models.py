@@ -93,7 +93,7 @@ class TestStockfish:
     def test_set_fen_position_mate(self, stockfish):
         stockfish.set_fen_position("8/8/8/6pp/8/4k1PP/8/r3K3 w - - 12 53")
         assert stockfish.get_best_move() is None
-        assert stockfish.info == ""
+        assert stockfish.info == "info depth 0 score mate 0"
 
     def test_clear_info_after_set_new_fen_position(self, stockfish):
         stockfish.set_fen_position("8/8/8/6pp/8/4k1PP/r7/4K3 b - - 11 52")
@@ -528,8 +528,9 @@ class TestStockfish:
         stockfish.set_fen_position(
             "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"
         )
-        with pytest.raises(ValueError):
-            stockfish.make_moves_from_current_position([])
+        fen_1 = stockfish.get_fen_position()
+        stockfish.make_moves_from_current_position([])
+        assert (fen_1 == stockfish.get_fen_position())
 
         stockfish.make_moves_from_current_position(["e1g1"])
         assert (
