@@ -161,9 +161,8 @@ class Stockfish:
 
     def _is_ready(self) -> None:
         self._put("isready")
-        while True:
-            if self._read_line() == "readyok":
-                return
+        while self._read_line() != "readyok":
+            pass
 
     def _go(self) -> None:
         self._put(f"go depth {self.depth}")
@@ -334,7 +333,8 @@ class Stockfish:
                 return None if splitted_text[1] == "(none)" else splitted_text[1]
             last_text = text
 
-    def _is_fen_syntax_valid(self, fen: str) -> bool:
+    @staticmethod
+    def _is_fen_syntax_valid(fen: str) -> bool:
         # Code for this function taken from: https://gist.github.com/Dani4kor/e1e8b439115878f8c6dcf127a4ed5d3e
         # Some small changes have been made to the code.
 
@@ -367,46 +367,30 @@ class Stockfish:
         return True
 
     def is_fen_valid(self, fen: str) -> bool:
-        if not self._is_fen_syntax_valid(fen):
+        if not Stockfish._is_fen_syntax_valid(fen):
             return False
-
-        old_fen = self.get_fen_position()
-        old_self_info = self.info
-
+        temp_sf = Stockfish(path=self._path)
+        # Using a new temporary SF instance, in case the fen is an illegal position that causes
+        # the SF process to crash.
         is_legal_position = True
-        self.set_fen_position(fen, False)
+        temp_sf.set_fen_position(fen, False)
         try:
-            self._put("go depth 4")
-            is_legal_position = self._get_best_move_from_sf_popen_process() is not None
+            temp_sf._put("go depth 4")
+            is_legal_position = temp_sf._get_best_move_from_sf_popen_process() is not None
         except ValueError:
-            # If a ValueError isn't thrown, then get_best_move_from_sf_popen_process() ends
-            # naturally, and is_legal_position's value depends on whether None was returned.
+            # If a ValueError is thrown, then it happened in read_line() since the SF process crashed.
+            # This is likely due to the position being illegal, so set the var to false:
             is_legal_position = False
-            # The new check in read_line will throw this error for certain FENs.
-
-            # It also means the SF process has ended, so restart it here.
-            self._stockfish = subprocess.Popen(
-                self._path,
-                universal_newlines=True,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-            )
-
-            self.update_engine_parameters(self._parameters)
-            # To call set_option for the new SF process on each of the current parameters.
-
-        # Before returning, set the fen position and info back to what they were at the start of this
-        # function, regardless of whether the except block above ran or not.
-        self.set_fen_position(old_fen, False)
-        self.info = old_self_info
         return is_legal_position
 
         # CONTINUE HERE:
-        # Done coding (unless finding smthing else to do), so now maybe check diff of commit, and
-        # write tests for all features/changes you made.
-        # E.g., things related to starting a new popen process if a ValueError is thrown above (after
-        # read_line function is modified with poll() check).
+        # Write tests for all features/changes you made.
+        # E.g., try to check that the temp process created in this function ends after the function ends,
+        # and also that it only takes up like 16 MB of RAM. Also check that the SF process of the self object
+        # isn't shut down or anything.
+
+        # Also, note that currently this function will hang for testing certain positions, as it relies on
+        # the new poll() check for read_line (so merge master into this branch, when it's updated).
 
     def is_move_correct(self, move_value: str) -> bool:
         """Checks new move.
