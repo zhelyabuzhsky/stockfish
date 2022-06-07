@@ -1,1 +1,1 @@
-from .models import Stockfish
+from .models import Stockfish, StockfishException

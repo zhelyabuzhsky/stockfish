@@ -1,7 +1,7 @@
 import pytest
 from timeit import default_timer
 
-from stockfish import Stockfish
+from stockfish import Stockfish, StockfishException
 
 
 class TestStockfish:
@@ -789,5 +789,5 @@ class TestStockfish:
     def test_invalid_fen(self, stockfish, fen):
         stockfish.set_fen_position(fen)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(StockfishException):
             stockfish.get_evaluation()
