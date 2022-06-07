@@ -13,6 +13,10 @@ from dataclasses import dataclass
 from enum import Enum
 
 
+class StockfishException(Exception):
+    pass
+
+
 class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
@@ -147,6 +151,8 @@ class Stockfish:
     def _read_line(self) -> str:
         if not self._stockfish.stdout:
             raise BrokenPipeError()
+        if self._stockfish.poll() is not None:
+            raise StockfishException("The Stockfish process has crashed")
         return self._stockfish.stdout.readline().strip()
 
     def _set_option(
