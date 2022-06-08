@@ -744,7 +744,7 @@ class TestStockfish:
 
     def test_will_move_be_a_capture(self, stockfish):
         stockfish.set_fen_position(
-            "rnbq1rk1/ppp1ppbp/5np1/3pP3/8/BPN5/P1PP1PPP/R2QKBNR w KQ d6 0 6"
+            "1nbq1rk1/Ppp1ppbp/5np1/3pP3/8/BPN5/P1PP1PPP/R2QKBNR w KQ d6 0 6"
         )
         c3d5_result = stockfish.will_move_be_a_capture("c3d5")
         assert (
@@ -775,6 +775,30 @@ class TestStockfish:
             a3d6_result is Stockfish.Capture.NO_CAPTURE
             and a3d6_result.name == "NO_CAPTURE"
             and a3d6_result.value == "no capture"
+        )
+        a7a8q_result = stockfish.will_move_be_a_capture("a7a8q")
+        assert (
+            a7a8q_result is Stockfish.Capture.NO_CAPTURE
+            and a7a8q_result.name == "NO_CAPTURE"
+            and a7a8q_result.value == "no capture"
+        )
+        a7a8b_result = stockfish.will_move_be_a_capture("a7a8b")
+        assert (
+            a7a8b_result is Stockfish.Capture.NO_CAPTURE
+            and a7a8b_result.name == "NO_CAPTURE"
+            and a7a8b_result.value == "no capture"
+        )
+        a7b8q_result = stockfish.will_move_be_a_capture("a7b8q")
+        assert (
+            a7b8q_result is Stockfish.Capture.DIRECT_CAPTURE
+            and a7b8q_result.name == "DIRECT_CAPTURE"
+            and a7b8q_result.value == "direct capture"
+        )
+        a7b8r_result = stockfish.will_move_be_a_capture("a7b8r")
+        assert (
+            a7b8r_result is Stockfish.Capture.DIRECT_CAPTURE
+            and a7b8r_result.name == "DIRECT_CAPTURE"
+            and a7b8r_result.value == "direct capture"
         )
 
     @pytest.mark.parametrize(
