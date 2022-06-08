@@ -644,7 +644,7 @@ class Stockfish:
         if not self.is_move_correct(move_value):
             raise ValueError("The proposed move is not valid in the current position.")
         starting_square_piece = self.get_what_is_on_square(move_value[:2])
-        ending_square_piece = self.get_what_is_on_square(move_value[-2:])
+        ending_square_piece = self.get_what_is_on_square(move_value[2:4])
         if ending_square_piece != None:
             if self._parameters["UCI_Chess960"] == "false":
                 return Stockfish.Capture.DIRECT_CAPTURE
@@ -658,7 +658,7 @@ class Stockfish:
                     return Stockfish.Capture.NO_CAPTURE
                 else:
                     return Stockfish.Capture.DIRECT_CAPTURE
-        elif move_value[-2:] == self.get_fen_position().split()[
+        elif move_value[2:4] == self.get_fen_position().split()[
             3
         ] and starting_square_piece in [
             Stockfish.Piece.WHITE_PAWN,
