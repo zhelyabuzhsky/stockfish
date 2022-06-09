@@ -302,12 +302,6 @@ stockfish.will_move_be_a_capture("e5d6")  # returns Stockfish.Capture.EN_PASSANT
 stockfish.will_move_be_a_capture("f1e2")  # returns Stockfish.Capture.NO_CAPTURE  
 ```
 
-### Invalid FENs
-
-If the position is set to an invalid FEN (like ```8/8/8/3k4/3K4/8/8/8 w - - 0 1``` with both kings next to each other) and one of functions evaluating the position is called, a ValueError with the text `Stockfish has crashed. This was probably caused by an invalid FEN.` will be raised.
-This error might also occur if the underlying Stockfish process is terminated for some other reason. \
-Not all invalid FENs will result in such an error. For example, positions with pawns on the first rank will still get evaluated.
-
 ## Testing
 ```bash
 $ python setup.py test

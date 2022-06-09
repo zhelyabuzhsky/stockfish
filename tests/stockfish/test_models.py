@@ -777,18 +777,3 @@ class TestStockfish:
             and a3d6_result.name == "NO_CAPTURE"
             and a3d6_result.value == "no capture"
         )
-
-    @pytest.mark.parametrize(
-        "fen",
-        [
-            "2k2q2/8/8/8/8/8/8/2Q2K2 w - - 0 1",
-            "8/8/8/3k4/3K4/8/8/8 b - - 0 1",
-            "1q2nB2/pP1k2KP/NN1Q1qP1/8/1P1p4/4p1br/3R4/6n1 w - - 0 1",
-            "3rk1n1/ppp3pp/8/8/8/8/PPP5/1KR1R3 w - - 0 1",
-        ],
-    )
-    def test_invalid_fen(self, stockfish, fen):
-        stockfish.set_fen_position(fen)
-
-        with pytest.raises(ValueError):
-            stockfish.get_evaluation()
