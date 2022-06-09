@@ -302,6 +302,21 @@ stockfish.will_move_be_a_capture("e5d6")  # returns Stockfish.Capture.EN_PASSANT
 stockfish.will_move_be_a_capture("f1e2")  # returns Stockfish.Capture.NO_CAPTURE  
 ```
 
+### StockfishException
+
+The `StockfishException` is a newly defined Exception type. It is thrown when the underlying Stockfish process created by the wrapper crashes. This can happen when an incorrect input like an invalid FEN (for example ```8/8/8/3k4/3K4/8/8/8 w - - 0 1``` with both kings next to each other) is given to Stockfish. \
+Not all invalid inputs will lead to a `StockfishException`, but only those which cause the Stockfish process to crash. \
+To handle a `StockfishException` when using this library, import the `StockfishException` from the library and use a `try/except`-block:
+```python
+from stockfish import StockfishException
+
+try:
+    # Evaluation routine
+
+except StockfishException:
+    # Error handling
+```
+
 ## Testing
 ```bash
 $ python setup.py test

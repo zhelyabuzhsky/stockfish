@@ -1,7 +1,7 @@
 import pytest
 from timeit import default_timer
 
-from stockfish import Stockfish
+from stockfish import Stockfish, StockfishException
 
 
 class TestStockfish:
@@ -745,7 +745,7 @@ class TestStockfish:
 
     def test_will_move_be_a_capture(self, stockfish):
         stockfish.set_fen_position(
-            "rnbq1rk1/ppp1ppbp/5np1/3pP3/8/BPN5/P1PP1PPP/R2QKBNR w KQ d6 0 6"
+            "1nbq1rk1/Ppp1ppbp/5np1/3pP3/8/BPN5/P1PP1PPP/R2QKBNR w KQ d6 0 6"
         )
         c3d5_result = stockfish.will_move_be_a_capture("c3d5")
         assert (
@@ -777,3 +777,42 @@ class TestStockfish:
             and a3d6_result.name == "NO_CAPTURE"
             and a3d6_result.value == "no capture"
         )
+        a7a8q_result = stockfish.will_move_be_a_capture("a7a8q")
+        assert (
+            a7a8q_result is Stockfish.Capture.NO_CAPTURE
+            and a7a8q_result.name == "NO_CAPTURE"
+            and a7a8q_result.value == "no capture"
+        )
+        a7a8b_result = stockfish.will_move_be_a_capture("a7a8b")
+        assert (
+            a7a8b_result is Stockfish.Capture.NO_CAPTURE
+            and a7a8b_result.name == "NO_CAPTURE"
+            and a7a8b_result.value == "no capture"
+        )
+        a7b8q_result = stockfish.will_move_be_a_capture("a7b8q")
+        assert (
+            a7b8q_result is Stockfish.Capture.DIRECT_CAPTURE
+            and a7b8q_result.name == "DIRECT_CAPTURE"
+            and a7b8q_result.value == "direct capture"
+        )
+        a7b8r_result = stockfish.will_move_be_a_capture("a7b8r")
+        assert (
+            a7b8r_result is Stockfish.Capture.DIRECT_CAPTURE
+            and a7b8r_result.name == "DIRECT_CAPTURE"
+            and a7b8r_result.value == "direct capture"
+        )
+
+    @pytest.mark.parametrize(
+        "fen",
+        [
+            "2k2q2/8/8/8/8/8/8/2Q2K2 w - - 0 1",
+            "8/8/8/3k4/3K4/8/8/8 b - - 0 1",
+            "1q2nB2/pP1k2KP/NN1Q1qP1/8/1P1p4/4p1br/3R4/6n1 w - - 0 1",
+            "3rk1n1/ppp3pp/8/8/8/8/PPP5/1KR1R3 w - - 0 1",
+        ],
+    )
+    def test_invalid_fen(self, stockfish, fen):
+        stockfish.set_fen_position(fen)
+
+        with pytest.raises(StockfishException):
+            stockfish.get_evaluation()
