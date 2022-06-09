@@ -351,10 +351,9 @@ class Stockfish:
         if not regexMatch:
             return False
         regexList = regexMatch.groups()
-        fen = regexList[0].split("/")
-        if len(fen) != 8:
+        if len(regexList[0].split("/")) != 8:
             return False  # 8 rows not present.
-        for fenPart in fen:
+        for fenPart in regexList[0].split("/"):
             field_sum = 0
             previous_was_digit = False
             for c in fenPart:
