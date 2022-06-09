@@ -382,7 +382,9 @@ class Stockfish:
         temp_sf.set_fen_position(fen, False)
         try:
             temp_sf._put("go depth 4")
-            is_legal_position = temp_sf._get_best_move_from_sf_popen_process() is not None
+            is_legal_position = (
+                temp_sf._get_best_move_from_sf_popen_process() is not None
+            )
         except StockfishException:
             # If a StockfishException is thrown, then it happened in read_line() since the SF process crashed.
             # This is likely due to the position being illegal, so set the var to false:

@@ -530,7 +530,7 @@ class TestStockfish:
         )
         fen_1 = stockfish.get_fen_position()
         stockfish.make_moves_from_current_position([])
-        assert (fen_1 == stockfish.get_fen_position())
+        assert fen_1 == stockfish.get_fen_position()
 
         stockfish.make_moves_from_current_position(["e1g1"])
         assert (
