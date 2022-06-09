@@ -377,27 +377,23 @@ class Stockfish:
         temp_sf = Stockfish(path=self._path)
         # Using a new temporary SF instance, in case the fen is an illegal position that causes
         # the SF process to crash.
-        is_legal_position = True
+        best_move = None
         temp_sf.set_fen_position(fen, False)
         try:
             temp_sf._put("go depth 4")
-            is_legal_position = (
-                temp_sf._get_best_move_from_sf_popen_process() is not None
-            )
+            best_move = temp_sf._get_best_move_from_sf_popen_process()
         except StockfishException:
             # If a StockfishException is thrown, then it happened in read_line() since the SF process crashed.
             # This is likely due to the position being illegal, so set the var to false:
-            is_legal_position = False
-        return is_legal_position
+            return False
+        else:
+            return best_move is not None
 
         # CONTINUE HERE:
         # Write tests for all features/changes you made.
         # E.g., try to check that the temp process created in this function ends after the function ends,
         # and also that it only takes up like 16 MB of RAM. Also check that the SF process of the self object
         # isn't shut down or anything.
-
-        # Also, note that currently this function will hang for testing certain positions, as it relies on
-        # the new poll() check for read_line (so merge master into this branch, when it's updated).
 
     def is_move_correct(self, move_value: str) -> bool:
         """Checks new move.
