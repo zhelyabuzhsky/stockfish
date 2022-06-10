@@ -11,3 +11,5 @@ __pycache/
 /venv/
 */__pycache__
 */*/__pycache__
+coverage.xml
+.coverage

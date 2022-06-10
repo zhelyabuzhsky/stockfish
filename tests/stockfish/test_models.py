@@ -29,7 +29,7 @@ class TestStockfish:
         best_move = stockfish.get_best_move(btime=1000)
         assert best_move in ("g1f3", "d2d4", "e2e4", "c2c4")
         best_move = stockfish.get_best_move(wtime=1000, btime=1000)
-        assert best_move in ("g1f3", "e2e4", "d2d4", "c2c4", "e2e3")
+        assert best_move in ("g2g3", "g1f3", "e2e4", "d2d4", "c2c4", "e2e3")
         best_move = stockfish.get_best_move(wtime=5 * 60 * 1000, btime=1000)
         assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3", "d2d4")
 
