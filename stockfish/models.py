@@ -227,7 +227,8 @@ class Stockfish:
 
         Args:
             perspective_white:
-              A bool that indicates whether the board should be displayed from the perspective of white (True: white, False: black)
+              A bool that indicates whether the board should be displayed from the
+              perspective of white (True: white, False: black)
 
         Returns:
             String of visual representation of the chessboard with its pieces in current position.
@@ -242,7 +243,11 @@ class Stockfish:
                 if perspective_white:
                     board_rep_lines.append(f"{board_str}")
                 else:
+                    # If the board is to be shown from black's point of view, all lines are
+                    # inverted horizontally and at the end the order of the lines is reversed.
                     board_part = board_str[:33]
+                    # To keep the displayed numbers on the right side,
+                    # only the string representing the board is flipped.
                     number_part = board_str[33:] if len(board_str) > 33 else ""
                     board_rep_lines.append(f"{board_part[::-1]}{number_part}")
         if not perspective_white:
