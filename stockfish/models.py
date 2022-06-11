@@ -245,6 +245,8 @@ class Stockfish:
                     board_part = board_str[:33]
                     number_part = board_str[33:] if len(board_str) > 33 else ""
                     board_rep_lines.append(f"{board_part[::-1]}{number_part}")
+        if not perspective_white:
+            board_rep_lines = board_rep_lines[::-1]
         board_str = self._read_line()
         if "a   b   c" in board_str:
             # Engine being used is recent enough to have coordinates, so add them:
