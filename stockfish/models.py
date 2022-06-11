@@ -222,8 +222,12 @@ class Stockfish:
             f"position fen {self.get_fen_position()} moves {self._convert_move_list_to_str(moves)}"
         )
 
-    def get_board_visual(self) -> str:
+    def get_board_visual(self, perspective_white: bool = True) -> str:
         """Returns a visual representation of the current board position.
+
+        Args:
+            perspective_white:
+              A bool that indicates whether the board should be displayed from the perspective of white (True: white, False: black)
 
         Returns:
             String of visual representation of the chessboard with its pieces in current position.
