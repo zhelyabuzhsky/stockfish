@@ -233,21 +233,22 @@ class Stockfish:
             String of visual representation of the chessboard with its pieces in current position.
         """
         self._put("d")
-        board_rep = ""
+        board_rep_lines = []
         count_lines = 0
         while count_lines < 17:
             board_str = self._read_line()
             if "+" in board_str or "|" in board_str:
                 count_lines += 1
-                board_rep += f"{board_str}\n"
+                board_rep_lines.append(f"{board_str}")
         board_str = self._read_line()
         if "a   b   c" in board_str:
             # Engine being used is recent enough to have coordinates, so add them:
-            board_rep += f"  {board_str}\n"
+            board_rep_lines.append(f"  {board_str}")
         while "Checkers" not in self._read_line():
             # Gets rid of the remaining lines in _stockfish.stdout.
             # "Checkers" is in the last line outputted by Stockfish for the "d" command.
             pass
+        board_rep = "\n".join(board_rep_lines) + "\n"
         return board_rep
 
     def get_fen_position(self) -> str:
