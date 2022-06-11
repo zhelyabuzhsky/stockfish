@@ -239,11 +239,19 @@ class Stockfish:
             board_str = self._read_line()
             if "+" in board_str or "|" in board_str:
                 count_lines += 1
-                board_rep_lines.append(f"{board_str}")
+                if perspective_white:
+                    board_rep_lines.append(f"{board_str}")
+                else:
+                    board_part = board_str[:33]
+                    number_part = board_str[33:] if len(board_str) > 33 else ""
+                    board_rep_lines.append(f"{board_part[::-1]}{number_part}")
         board_str = self._read_line()
         if "a   b   c" in board_str:
             # Engine being used is recent enough to have coordinates, so add them:
-            board_rep_lines.append(f"  {board_str}")
+            if perspective_white:
+                board_rep_lines.append(f"  {board_str}")
+            else:
+                board_rep_lines.append(f"  {board_str[::-1]}")
         while "Checkers" not in self._read_line():
             # Gets rid of the remaining lines in _stockfish.stdout.
             # "Checkers" is in the last line outputted by Stockfish for the "d" command.
