@@ -22,7 +22,7 @@ class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
     def __init__(
-        self, path: str = "stockfish", depth: int = 15, parameters: dict = None
+        self, path: str = "stockfish_15_x64_avx2", depth: int = 15, parameters: dict = None
     ) -> None:
         self._DEFAULT_STOCKFISH_PARAMS = {
             "Debug Log File": "",

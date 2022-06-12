@@ -1,5 +1,6 @@
 import pytest
 from timeit import default_timer
+import time
 
 from stockfish import Stockfish, StockfishException
 
@@ -811,8 +812,40 @@ class TestStockfish:
             "3rk1n1/ppp3pp/8/8/8/8/PPP5/1KR1R3 w - - 0 1",
         ],
     )
-    def test_invalid_fen(self, stockfish, fen):
+    def test_invalid_fen_king_attacked(self, stockfish, fen):
+        # Each of these FENs have correct syntax, but
+        # involve a king being attacked while it's the opponent's turn.
+        assert Stockfish._is_fen_syntax_valid(fen)
+        assert not stockfish.is_fen_valid(fen)
         stockfish.set_fen_position(fen)
 
         with pytest.raises(StockfishException):
             stockfish.get_evaluation()
+
+    def test_is_fen_valid(self, stockfish):
+        old_params = stockfish.get_parameters()
+        old_info = stockfish.info
+        old_depth = stockfish.depth
+        old_fen = stockfish.get_fen_position()
+        correct_fens = [
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+            "r1bQkb1r/ppp2ppp/2p5/4Pn2/8/5N2/PPP2PPP/RNB2RK1 b kq - 0 8",
+            "4k3/8/4K3/8/8/8/8/8 w - - 10 50",
+        ]
+        invalid_syntax_fens = [
+            "r1bQkb1r/ppp2ppp/2p5/4Pn2/8/5N2/PPP2PPP/RNB2RK b kq - 0 8",
+            "rnbqkb1r/pppp1ppp/4pn2/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 3",
+            "rn1q1rk1/pbppbppp/1p2pn2/8/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w w - 5 7",
+        ]
+        for correct_fen, invalid_syntax_fen in zip(correct_fens, invalid_syntax_fens):
+            assert stockfish.is_fen_valid(correct_fen)
+            assert not stockfish.is_fen_valid(invalid_syntax_fen)
+            assert stockfish._is_fen_syntax_valid(correct_fen)
+            assert not stockfish._is_fen_syntax_valid(invalid_syntax_fen)
+
+        time.sleep(1.0)
+        assert stockfish._stockfish is None
+        assert stockfish.get_parameters() == old_params
+        assert stockfish.info == old_info
+        assert stockfish.depth == old_depth
+        assert stockfish.get_fen_position() == old_fen
