@@ -816,7 +816,10 @@ class TestStockfish:
         # Each of these FENs have correct syntax, but
         # involve a king being attacked while it's the opponent's turn.
         assert Stockfish._is_fen_syntax_valid(fen)
-        if fen != "8/8/8/3k4/3K4/8/8/8 b - - 0 1" or stockfish.get_stockfish_major_version() < 15:
+        if (
+            fen != "8/8/8/3k4/3K4/8/8/8 b - - 0 1"
+            or stockfish.get_stockfish_major_version() < 15
+        ):
             # Since for that FEN, SF 15 actually outputs a best move without crashing (unlike SF 14 and older).
             assert not stockfish.is_fen_valid(fen)
             stockfish.set_fen_position(fen)
