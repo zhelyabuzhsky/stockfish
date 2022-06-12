@@ -77,7 +77,9 @@ stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQ
 
 ### Check whether the given FEN is valid
 This function returns a bool saying whether the passed in FEN is valid (both syntax wise and whether the position represented is legal).  
-The function won't catch all edge cases, but generally it will return the correct answer.
+The function isn't perfect and won't catch all cases, but generally it should return the correct answer.
+For example, one exception is positions which are legal, but have no legal moves. 
+I.e., for checkmates and stalemates, this function will incorrectly say the fen is invalid.
 ```python
 stockfish.is_fen_valid("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 ```

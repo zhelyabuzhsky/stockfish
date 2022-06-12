@@ -412,12 +412,6 @@ class Stockfish:
         else:
             return best_move is not None
 
-        # CONTINUE HERE:
-        # Write tests for all features/changes you made.
-        # E.g., try to check that the temp process created in this function ends after the function ends,
-        # and also that it only takes up like 16 MB of RAM. Also check that the SF process of the self object
-        # isn't shut down or anything.
-
     def is_move_correct(self, move_value: str) -> bool:
         """Checks new move.
 
@@ -497,9 +491,9 @@ class Stockfish:
 
         evaluation = dict()
         fen_position = self.get_fen_position()
-        compare = (
-            1 if "w" in fen_position else -1
-        )  # Stockfish shows advantage relative to current player, convention is to do white positive.
+        compare = 1 if "w" in fen_position else -1
+        # Stockfish shows advantage relative to current player. This function will instead
+        # use positive to represent advantage white, and negative for advantage black.
         self._put(f"position {fen_position}")
         self._go()
         while True:
