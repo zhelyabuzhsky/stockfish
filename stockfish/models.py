@@ -222,28 +222,48 @@ class Stockfish:
             f"position fen {self.get_fen_position()} moves {self._convert_move_list_to_str(moves)}"
         )
 
-    def get_board_visual(self) -> str:
+    def get_board_visual(self, perspective_white: bool = True) -> str:
         """Returns a visual representation of the current board position.
+
+        Args:
+            perspective_white:
+              A bool that indicates whether the board should be displayed from the
+              perspective of white (True: white, False: black)
 
         Returns:
             String of visual representation of the chessboard with its pieces in current position.
         """
         self._put("d")
-        board_rep = ""
+        board_rep_lines = []
         count_lines = 0
         while count_lines < 17:
             board_str = self._read_line()
             if "+" in board_str or "|" in board_str:
                 count_lines += 1
-                board_rep += f"{board_str}\n"
+                if perspective_white:
+                    board_rep_lines.append(f"{board_str}")
+                else:
+                    # If the board is to be shown from black's point of view, all lines are
+                    # inverted horizontally and at the end the order of the lines is reversed.
+                    board_part = board_str[:33]
+                    # To keep the displayed numbers on the right side,
+                    # only the string representing the board is flipped.
+                    number_part = board_str[33:] if len(board_str) > 33 else ""
+                    board_rep_lines.append(f"{board_part[::-1]}{number_part}")
+        if not perspective_white:
+            board_rep_lines = board_rep_lines[::-1]
         board_str = self._read_line()
         if "a   b   c" in board_str:
             # Engine being used is recent enough to have coordinates, so add them:
-            board_rep += f"  {board_str}\n"
+            if perspective_white:
+                board_rep_lines.append(f"  {board_str}")
+            else:
+                board_rep_lines.append(f"  {board_str[::-1]}")
         while "Checkers" not in self._read_line():
             # Gets rid of the remaining lines in _stockfish.stdout.
             # "Checkers" is in the last line outputted by Stockfish for the "d" command.
             pass
+        board_rep = "\n".join(board_rep_lines) + "\n"
         return board_rep
 
     def get_fen_position(self) -> str:
