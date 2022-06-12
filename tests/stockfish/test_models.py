@@ -30,7 +30,7 @@ class TestStockfish:
         best_move = stockfish.get_best_move(btime=1000)
         assert best_move in ("g1f3", "d2d4", "e2e4", "c2c4")
         best_move = stockfish.get_best_move(wtime=1000, btime=1000)
-        assert best_move in ("g1f3", "e2e4", "d2d4", "c2c4", "e2e3")
+        assert best_move in ("g2g3", "g1f3", "e2e4", "d2d4", "c2c4", "e2e3")
         best_move = stockfish.get_best_move(wtime=5 * 60 * 1000, btime=1000)
         assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3", "d2d4")
 
@@ -298,7 +298,7 @@ class TestStockfish:
         assert stockfish.get_evaluation() == {"type": "mate", "value": 1}
         assert stockfish.will_move_be_a_capture("f1g1") is Stockfish.Capture.NO_CAPTURE
 
-    def test_get_board_visual(self, stockfish):
+    def test_get_board_visual_white(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6", "d2d4", "d7d5"])
         if stockfish.get_stockfish_major_version() >= 12:
             expected_result = (
@@ -343,6 +343,58 @@ class TestStockfish:
             )
 
         assert stockfish.get_board_visual() == expected_result
+
+        stockfish._put("d")
+        stockfish._read_line()  # skip a line
+        assert "+---+---+---+" in stockfish._read_line()
+        # Tests that the previous call to get_board_visual left no remaining lines to be read. This means
+        # the second line read after stockfish._put("d") now will be the +---+---+---+ of the new outputted board.
+
+    def test_get_board_visual_black(self, stockfish):
+        stockfish.set_position(["e2e4", "e7e6", "d2d4", "d7d5"])
+        if stockfish.get_stockfish_major_version() >= 12:
+            expected_result = (
+                "+---+---+---+---+---+---+---+---+\n"
+                "| R | N | B | K | Q | B | N | R | 1\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| P | P | P |   |   | P | P | P | 2\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   |   |   |   |   |   | 3\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   | P | P |   |   |   | 4\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   |   | p |   |   |   | 5\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   | p |   |   |   |   | 6\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| p | p | p |   |   | p | p | p | 7\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| r | n | b | k | q | b | n | r | 8\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "  h   g   f   e   d   c   b   a\n"
+            )
+        else:
+            expected_result = (
+                "+---+---+---+---+---+---+---+---+\n"
+                "| R | N | B | K | Q | B | N | R |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| P | P | P |   |   | P | P | P |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   |   |   |   |   |   |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   | P | P |   |   |   |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   |   | p |   |   |   |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   | p |   |   |   |   |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| p | p | p |   |   | p | p | p |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| r | n | b | k | q | b | n | r |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+            )
+
+        assert stockfish.get_board_visual(False) == expected_result
 
         stockfish._put("d")
         stockfish._read_line()  # skip a line

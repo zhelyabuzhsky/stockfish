@@ -225,6 +225,30 @@ stockfish.get_board_visual()
 +---+---+---+---+---+---+---+---+
   a   b   c   d   e   f   g   h
 ```
+This function has an optional boolean (True by default) as a parameter that indicates whether the board should be seen from the view of white. So it is possible to get the board from black's point of view like this:
+```python 
+stockfish.get_board_visual(False)
+```
+```text
++---+---+---+---+---+---+---+---+
+| R | N | B | K | Q | B | N | R | 1
++---+---+---+---+---+---+---+---+
+| P | P | P | P | P | P | P | P | 2
++---+---+---+---+---+---+---+---+
+|   |   |   |   |   |   |   |   | 3
++---+---+---+---+---+---+---+---+
+|   |   |   |   |   |   |   |   | 4
++---+---+---+---+---+---+---+---+
+|   |   |   |   |   |   |   |   | 5
++---+---+---+---+---+---+---+---+
+|   |   |   |   |   |   |   |   | 6
++---+---+---+---+---+---+---+---+
+| p | p | p | p | p | p | p | p | 7
++---+---+---+---+---+---+---+---+
+| r | n | b | k | q | b | n | r | 8
++---+---+---+---+---+---+---+---+
+  h   g   f   e   d   c   b   a
+```
 
 ### Get current board evaluation in centipawns or mate in x
 ```python 
