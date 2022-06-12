@@ -844,7 +844,7 @@ class TestStockfish:
             assert not stockfish._is_fen_syntax_valid(invalid_syntax_fen)
 
         time.sleep(2.0)
-        assert stockfish._stockfish is None
+        assert stockfish._stockfish.poll() is None
         assert stockfish.get_parameters() == old_params
         assert stockfish.info == old_info
         assert stockfish.depth == old_depth
