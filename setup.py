@@ -18,7 +18,7 @@ setup(
     packages=find_packages(include=["stockfish", "stockfish.*"]),
     install_requires=[],
     setup_requires=["pytest-runner"],
-    tests_require=["pytest"],
+    tests_require=["pytest", "pytest-cov"],
     classifiers=[
         "Programming Language :: Python",
         "Natural Language :: English",
