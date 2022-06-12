@@ -870,16 +870,17 @@ class TestStockfish:
         old_del_counter = Stockfish.del_counter
         assert Stockfish._is_fen_syntax_valid(fen)
         if (
-            fen != "8/8/8/3k4/3K4/8/8/8 b - - 0 1"
-            or stockfish.get_stockfish_major_version() < 15
+            fen == "8/8/8/3k4/3K4/8/8/8 b - - 0 1"
+            and stockfish.get_stockfish_major_version() >= 15
         ):
-            # Since for that FEN, SF 15 actually outputs a best move without crashing (unlike SF 14 and older).
-            assert not stockfish.is_fen_valid(fen)
-            assert Stockfish.del_counter == old_del_counter + 1
+            # Since for that FEN, SF 15 actually outputs a best move without crashing (unlike SF 14 and earlier).
+            return
+        assert not stockfish.is_fen_valid(fen)
+        assert Stockfish.del_counter == old_del_counter + 1
 
-            stockfish.set_fen_position(fen)
-            with pytest.raises(StockfishException):
-                stockfish.get_evaluation()
+        stockfish.set_fen_position(fen)
+        with pytest.raises(StockfishException):
+            stockfish.get_evaluation()
 
     def test_is_fen_valid(self, stockfish):
         old_params = stockfish.get_parameters()
