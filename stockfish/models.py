@@ -380,7 +380,7 @@ class Stockfish:
         best_move = None
         temp_sf.set_fen_position(fen, False)
         try:
-            temp_sf._put("go depth 4")
+            temp_sf._put("go depth 10")
             best_move = temp_sf._get_best_move_from_sf_popen_process()
         except StockfishException:
             # If a StockfishException is thrown, then it happened in read_line() since the SF process crashed.
