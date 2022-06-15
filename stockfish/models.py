@@ -21,7 +21,7 @@ class StockfishException(Exception):
 class Stockfish:
     """Integrates the Stockfish chess engine with Python."""
 
-    del_counter = 0
+    _del_counter = 0
     # Used in test_models: will count how many times the del function is called.
 
     def __init__(
@@ -748,7 +748,7 @@ class Stockfish:
         )
 
     def __del__(self) -> None:
-        Stockfish.del_counter += 1
+        Stockfish._del_counter += 1
         if self._stockfish.poll() is None:
             self._put("quit")
             self._stockfish.kill()

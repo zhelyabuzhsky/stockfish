@@ -867,7 +867,7 @@ class TestStockfish:
     def test_invalid_fen_king_attacked(self, stockfish, fen):
         # Each of these FENs have correct syntax, but
         # involve a king being attacked while it's the opponent's turn.
-        old_del_counter = Stockfish.del_counter
+        old_del_counter = Stockfish._del_counter
         assert Stockfish._is_fen_syntax_valid(fen)
         if (
             fen == "8/8/8/3k4/3K4/8/8/8 b - - 0 1"
@@ -876,7 +876,7 @@ class TestStockfish:
             # Since for that FEN, SF 15 actually outputs a best move without crashing (unlike SF 14 and earlier).
             return
         assert not stockfish.is_fen_valid(fen)
-        assert Stockfish.del_counter == old_del_counter + 1
+        assert Stockfish._del_counter == old_del_counter + 1
 
         stockfish.set_fen_position(fen)
         with pytest.raises(StockfishException):
@@ -898,12 +898,12 @@ class TestStockfish:
             "rn1q1rk1/pbppbppp/1p2pn2/8/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w w - 5 7",
         ]
         for correct_fen, invalid_syntax_fen in zip(correct_fens, invalid_syntax_fens):
-            old_del_counter = Stockfish.del_counter
+            old_del_counter = Stockfish._del_counter
             assert stockfish.is_fen_valid(correct_fen)
             assert not stockfish.is_fen_valid(invalid_syntax_fen)
             assert stockfish._is_fen_syntax_valid(correct_fen)
             assert not stockfish._is_fen_syntax_valid(invalid_syntax_fen)
-            assert Stockfish.del_counter == old_del_counter + 1
+            assert Stockfish._del_counter == old_del_counter + 1
 
         time.sleep(2.0)
         assert stockfish._stockfish.poll() is None
