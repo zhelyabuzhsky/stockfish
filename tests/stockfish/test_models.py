@@ -865,6 +865,9 @@ class TestStockfish:
             and a7b8r_result.value == "direct capture"
         )
 
+        with pytest.raises(ValueError):
+            stockfish.will_move_be_a_capture("c3c5")
+
     @pytest.mark.parametrize(
         "fen",
         [
