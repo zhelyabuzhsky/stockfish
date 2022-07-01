@@ -288,14 +288,17 @@ class TestStockfish:
         stockfish.update_engine_parameters({"UCI_Chess960": "true"})
         assert "HAha" in stockfish.get_fen_position()
         assert stockfish.get_parameters() == expected_parameters
-        stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
+        stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/4nK1R w K - 0 100")
         assert stockfish.get_best_move() == "f1h1"
-        assert stockfish.get_evaluation() == {"type": "mate", "value": 1}
+        assert stockfish.get_evaluation() == {"type": "mate", "value": 2}
         assert stockfish.will_move_be_a_capture("f1h1") is Stockfish.Capture.NO_CAPTURE
+        assert (
+            stockfish.will_move_be_a_capture("f1e1") is Stockfish.Capture.DIRECT_CAPTURE
+        )
         stockfish.update_engine_parameters({"UCI_Chess960": "false"})
         assert stockfish.get_parameters() == old_parameters
         assert stockfish.get_best_move() == "f1g1"
-        assert stockfish.get_evaluation() == {"type": "mate", "value": 1}
+        assert stockfish.get_evaluation() == {"type": "mate", "value": 2}
         assert stockfish.will_move_be_a_capture("f1g1") is Stockfish.Capture.NO_CAPTURE
 
     def test_get_board_visual_white(self, stockfish):
