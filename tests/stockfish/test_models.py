@@ -901,11 +901,13 @@ class TestStockfish:
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
             "r1bQkb1r/ppp2ppp/2p5/4Pn2/8/5N2/PPP2PPP/RNB2RK1 b kq - 0 8",
             "4k3/8/4K3/8/8/8/8/8 w - - 10 50",
+            "r1b1kb1r/ppp2ppp/3q4/8/P2Q4/8/1PP2PPP/RNB2RK1 w kq - 8 15",
         ]
         invalid_syntax_fens = [
             "r1bQkb1r/ppp2ppp/2p5/4Pn2/8/5N2/PPP2PPP/RNB2RK b kq - 0 8",
             "rnbqkb1r/pppp1ppp/4pn2/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 3",
             "rn1q1rk1/pbppbppp/1p2pn2/8/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w w - 5 7",
+            "4k3/8/4K3/71/8/8/8/8 w - - 10 50",
         ]
         for correct_fen, invalid_syntax_fen in zip(correct_fens, invalid_syntax_fens):
             old_del_counter = Stockfish._del_counter
