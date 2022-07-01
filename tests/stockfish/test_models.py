@@ -607,6 +607,16 @@ class TestStockfish:
             == "r1b1kb1r/ppp1n1pp/2p5/4Pp2/8/2N2N1P/PPP2PP1/R1BR2K1 w - f6 0 9"
         )
 
+        stockfish.set_fen_position(
+            "r1bqk2r/pppp1ppp/8/8/1b2n3/2N5/PPP2PPP/R1BQK2R w Qkq - 0 1"
+        )
+
+        invalid_moves = ["d1e3", "e1g1", "c3d5", "c1d4", "a7a6", "e1d2", "word"]
+
+        for invalid_move in invalid_moves:
+            with pytest.raises(ValueError):
+                stockfish.make_moves_from_current_position([invalid_move])
+
     def test_make_moves_transposition_table_speed(self, stockfish):
         """
         make_moves_from_current_position won't send the "ucinewgame" token to Stockfish, since it
