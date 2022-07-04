@@ -288,14 +288,17 @@ class TestStockfish:
         stockfish.update_engine_parameters({"UCI_Chess960": "true"})
         assert "HAha" in stockfish.get_fen_position()
         assert stockfish.get_parameters() == expected_parameters
-        stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/5K1R w H - 0 100")
+        stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/4nK1R w K - 0 100")
         assert stockfish.get_best_move() == "f1h1"
-        assert stockfish.get_evaluation() == {"type": "mate", "value": 1}
+        assert stockfish.get_evaluation() == {"type": "mate", "value": 2}
         assert stockfish.will_move_be_a_capture("f1h1") is Stockfish.Capture.NO_CAPTURE
+        assert (
+            stockfish.will_move_be_a_capture("f1e1") is Stockfish.Capture.DIRECT_CAPTURE
+        )
         stockfish.update_engine_parameters({"UCI_Chess960": "false"})
         assert stockfish.get_parameters() == old_parameters
         assert stockfish.get_best_move() == "f1g1"
-        assert stockfish.get_evaluation() == {"type": "mate", "value": 1}
+        assert stockfish.get_evaluation() == {"type": "mate", "value": 2}
         assert stockfish.will_move_be_a_capture("f1g1") is Stockfish.Capture.NO_CAPTURE
 
     def test_get_board_visual_white(self, stockfish):
@@ -607,6 +610,16 @@ class TestStockfish:
             == "r1b1kb1r/ppp1n1pp/2p5/4Pp2/8/2N2N1P/PPP2PP1/R1BR2K1 w - f6 0 9"
         )
 
+        stockfish.set_fen_position(
+            "r1bqk2r/pppp1ppp/8/8/1b2n3/2N5/PPP2PPP/R1BQK2R w Qkq - 0 1"
+        )
+
+        invalid_moves = ["d1e3", "e1g1", "c3d5", "c1d4", "a7a6", "e1d2", "word"]
+
+        for invalid_move in invalid_moves:
+            with pytest.raises(ValueError):
+                stockfish.make_moves_from_current_position([invalid_move])
+
     def test_make_moves_transposition_table_speed(self, stockfish):
         """
         make_moves_from_current_position won't send the "ucinewgame" token to Stockfish, since it
@@ -855,6 +868,9 @@ class TestStockfish:
             and a7b8r_result.value == "direct capture"
         )
 
+        with pytest.raises(ValueError):
+            stockfish.will_move_be_a_capture("c3c5")
+
     @pytest.mark.parametrize(
         "fen",
         [
@@ -891,11 +907,13 @@ class TestStockfish:
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
             "r1bQkb1r/ppp2ppp/2p5/4Pn2/8/5N2/PPP2PPP/RNB2RK1 b kq - 0 8",
             "4k3/8/4K3/8/8/8/8/8 w - - 10 50",
+            "r1b1kb1r/ppp2ppp/3q4/8/P2Q4/8/1PP2PPP/RNB2RK1 w kq - 8 15",
         ]
         invalid_syntax_fens = [
             "r1bQkb1r/ppp2ppp/2p5/4Pn2/8/5N2/PPP2PPP/RNB2RK b kq - 0 8",
             "rnbqkb1r/pppp1ppp/4pn2/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 3",
             "rn1q1rk1/pbppbppp/1p2pn2/8/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w w - 5 7",
+            "4k3/8/4K3/71/8/8/8/8 w - - 10 50",
         ]
         for correct_fen, invalid_syntax_fen in zip(correct_fens, invalid_syntax_fens):
             old_del_counter = Stockfish._del_counter
