@@ -892,7 +892,7 @@ class TestStockfish:
             # Since for that FEN, SF 15 actually outputs a best move without crashing (unlike SF 14 and earlier).
             return
         assert not stockfish.is_fen_valid(fen)
-        assert Stockfish._del_counter == old_del_counter + 1
+        assert Stockfish._del_counter == old_del_counter + 2
 
         stockfish.set_fen_position(fen)
         with pytest.raises(StockfishException):
@@ -921,7 +921,7 @@ class TestStockfish:
             assert not stockfish.is_fen_valid(invalid_syntax_fen)
             assert stockfish._is_fen_syntax_valid(correct_fen)
             assert not stockfish._is_fen_syntax_valid(invalid_syntax_fen)
-            assert Stockfish._del_counter == old_del_counter + 1
+            assert Stockfish._del_counter == old_del_counter + 2
 
         time.sleep(2.0)
         assert stockfish._stockfish.poll() is None
