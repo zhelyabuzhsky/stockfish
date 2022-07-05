@@ -397,7 +397,7 @@ class Stockfish:
     def is_fen_valid(self, fen: str) -> bool:
         if not Stockfish._is_fen_syntax_valid(fen):
             return False
-        temp_sf = Stockfish(path=self._path)
+        temp_sf = Stockfish(path=self._path, parameters={"Hash": 1})
         # Using a new temporary SF instance, in case the fen is an illegal position that causes
         # the SF process to crash.
         best_move = None
@@ -411,6 +411,11 @@ class Stockfish:
             return False
         else:
             return best_move is not None
+        finally:
+            temp_sf.__del__()
+            # Calling this function before returning from either the except or else block above.
+            # The __del__ function should generally be called implicitly by python when this
+            # temp_sf object goes out of scope, but calling it explicitly guarantees this will happen.
 
     def is_move_correct(self, move_value: str) -> bool:
         """Checks new move.
