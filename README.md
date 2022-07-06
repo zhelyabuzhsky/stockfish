@@ -62,7 +62,7 @@ When you're done using the Stockfish engine process, you can send the "quit" uci
 ```python
 stockfish.send_quit_command()
 ```
-The `__del__()` method of the Stockfish class will call send_quit_command(), but it's technically not guaranteed python will call `__del__()` when the Stockfish object goes out of scope. So even though it'll likely not be necessary, it doesn't hurt to explicitly call send_quit_command() yourself.
+The `__del__()` method of the Stockfish class will call send_quit_command(), but it's technically not guaranteed python will call `__del__()` when the Stockfish object goes out of scope. So even though it'll probably not be needed, it doesn't hurt to call send_quit_command() yourself.
 
 ### Set position by a sequence of moves from the starting position
 ```python
