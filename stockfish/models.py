@@ -728,12 +728,8 @@ class Stockfish:
         else:
             return Stockfish.Capture.NO_CAPTURE
 
-    def get_stockfish_major_version(self):
-        """Returns Stockfish engine major version.
-
-        Returns:
-            Current stockfish major version
-        """
+    def get_stockfish_major_version(self) -> int:
+        """Returns Stockfish engine major version."""
 
         return self._stockfish_major_version
 
@@ -752,9 +748,15 @@ class Stockfish:
             and self._stockfish_major_version <= 311299
         )
 
-    def __del__(self) -> None:
-        Stockfish._del_counter += 1
+    def send_quit_command(self) -> None:
+        """Sends the 'quit' command to the Stockfish engine, getting the process
+        to stop."""
+
         if self._stockfish.poll() is None:
             self._put("quit")
             while self._stockfish.poll() is None:
                 pass
+
+    def __del__(self) -> None:
+        Stockfish._del_counter += 1
+        self.send_quit_command()
