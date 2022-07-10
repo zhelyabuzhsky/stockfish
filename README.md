@@ -58,6 +58,12 @@ These parameters can also be updated at any time by calling the "update_engine_p
 stockfish.update_engine_parameters({"Hash": 2048, "UCI_Chess960": "true"}) # Gets stockfish to use a 2GB hash table, and also to play Chess960.
 ```
 
+When you're done using the Stockfish engine process, you can send the "quit" uci command to it with:
+```python
+stockfish.send_quit_command()
+```
+The `__del__()` method of the Stockfish class will call send_quit_command(), but it's technically not guaranteed python will call `__del__()` when the Stockfish object goes out of scope. So even though it'll probably not be needed, it doesn't hurt to call send_quit_command() yourself.
+
 ### Set position by a sequence of moves from the starting position
 ```python
 stockfish.set_position(["e2e4", "e7e6"])

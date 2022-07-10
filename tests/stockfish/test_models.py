@@ -929,3 +929,12 @@ class TestStockfish:
         assert stockfish.info == old_info
         assert stockfish.depth == old_depth
         assert stockfish.get_fen_position() == old_fen
+
+    def test_send_quit_command(self, stockfish):
+        assert stockfish._stockfish.poll() is None
+        old_del_counter = Stockfish._del_counter
+        stockfish.send_quit_command()
+        assert stockfish._stockfish.poll() is not None
+        stockfish.__del__()
+        assert stockfish._stockfish.poll() is not None
+        assert Stockfish._del_counter == old_del_counter + 1
