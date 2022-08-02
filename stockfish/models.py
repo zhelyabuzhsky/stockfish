@@ -25,7 +25,7 @@ class Stockfish:
     # Used in test_models: will count how many times the del function is called.
 
     def __init__(
-        self, path: str = "stockfish_15_x64_avx2", depth: int = 15, parameters: dict = None
+        self, path: str = "stockfish", depth: int = 15, parameters: dict = None
     ) -> None:
         self._DEFAULT_STOCKFISH_PARAMS = {
             "Debug Log File": "",
@@ -740,6 +740,8 @@ class Stockfish:
         """
 
         move = move.replace(" ", "").replace("-", "")
+        while move[-1:] in ["+", "#"]:
+            move = move[:-1]
         is_whites_turn = "w" in self.get_fen_position()
         if len(move) == 0:
             return "Empty move"
@@ -750,9 +752,8 @@ class Stockfish:
             else:
                 raise ValueError("Invalid move.")
         else:
-            # castling
-            if move.lower() == "oo":
-                # castle king side
+            if move.lower() in ["oo", "00"]:
+                # castle kingside
                 # Need to check if it's actually a king there as another piece could also have a valid move.
                 if (
                     is_whites_turn
@@ -770,8 +771,8 @@ class Stockfish:
                     return move
                 else:
                     raise ValueError("Cannot castle kingside.")
-            elif move.lower() == "ooo":
-                # castle queen side
+            elif move.lower() in ["ooo", "000"]:
+                # castle queenside
                 if (
                     is_whites_turn
                     and self.get_what_is_on_square("e1") == Stockfish.Piece.WHITE_KING
@@ -789,9 +790,9 @@ class Stockfish:
                 else:
                     raise ValueError("Cannot castle queenside.")
 
-            # resolve the rest with regex
-            # do not allow lower case 'b' in first group because it conflicts with second group
-            # allow other lower case letters for convenience
+            # Resolve the rest with regex.
+            # Do not allow lower case 'b' in first group because it conflicts with second group.
+            # Allow other lower case letters for convenience.
             match = re.match(
                 "^([RNBKQrnkq]?)([a-h]?)([1-8]?)(x?)([a-h][1-8])(=?[RNBKQrnbkq]?)$",
                 move,
@@ -869,12 +870,12 @@ class Stockfish:
             else:
                 possibleSrc = []
                 # run through all the squares and check all the pieces if they can move to the square
-                for file in range(ord("a"), ord("h") + 1):
-                    file = chr(file)
+                for file_as_unicode_int in range(ord("a"), ord("h") + 1):
+                    file = chr(file_as_unicode_int)
                     if src_file is not None and src_file != file:
                         continue
-                    for rank in range(1, 8 + 1):
-                        rank = str(rank)
+                    for rank_as_int in range(1, 8 + 1):
+                        rank = str(rank_as_int)
                         if src_rank is not None and src_rank != rank:
                             continue
                         src = f"{file}{rank}"
