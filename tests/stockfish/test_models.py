@@ -941,7 +941,7 @@ class TestStockfish:
 
     def test_convert_human_notation_to_sf_notation(self, stockfish):
         stockfish.set_fen_position(
-            "rnbbk1nr/pPP1pp1p/1p2B3/1NPpPN1Q/3p1B2/4Pq2/P4PPP/R3K2R w KQkq d6 0 2"
+            "rnbbk1nr/pPP1pp1p/1p2B3/2PpPN1Q/3p1B2/1N2Pq2/P4PPP/R3K2R w KQkq d6 0 2"
         )
         input_test_moves_1 = "exd6 Bxc8 cxd8Q+ cxd8R bxc8=Q bxc8Q bxa8=N cxd6".split()
         expected_outputs_1 = "e5d6 e6c8 c7d8Q  c7d8R b7c8Q  b7c8Q b7a8N  c5d6".split()
@@ -952,8 +952,8 @@ class TestStockfish:
                 == expected_outputs_1[i]
             )
 
-        input_test_moves_2 = "gxf3 g2xf3 Bxf7+ Bxf7 Nbd6+ nfd6 Nxe7 0-0  00  ".split()
-        expected_outputs_2 = "g2f3 g2f3  e6f7  e6f7 b5d6  f5d6 f5e7 e1g1 e1g1".split()
+        input_test_moves_2 = "gxf3 g2xf3 Bxf7+ Bxf7 nd6+ Nxe7 0-0  00  ".split()
+        expected_outputs_2 = "g2f3 g2f3  e6f7  e6f7 b5d6 f5e7 e1g1 e1g1".split()
 
         for i in range(len(input_test_moves_2)):
             assert (
@@ -961,8 +961,8 @@ class TestStockfish:
                 == expected_outputs_2[i]
             )
 
-        input_test_moves_3 = "Qxf7 Qxf7# e1g1 h1f1 O-O".split()
-        expected_outputs_3 = "h5f7 h5f7  e1g1 h1f1 e1g1".split()
+        input_test_moves_3 = "Qxf7 Qxf7# e1g1 h1f1 O-O  nbd4 Nfxd4".split()
+        expected_outputs_3 = "h5f7 h5f7  e1g1 h1f1 e1g1 b3d4 f5d4 ".split()
 
         for i in range(len(input_test_moves_3)):
             assert (
