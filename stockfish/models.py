@@ -12,6 +12,7 @@ from os import path
 from dataclasses import dataclass
 from enum import Enum
 import re
+import regex
 
 
 class StockfishException(Exception):
@@ -727,6 +728,205 @@ class Stockfish:
             return Stockfish.Capture.EN_PASSANT
         else:
             return Stockfish.Capture.NO_CAPTURE
+
+    def convert_human_notation_into_sf_notation(self, move: str) -> str:
+        """
+        Args:
+            move:
+                A string which is the notation for a move, in a format that's used
+                by humans. E.g., stuff like Nf3, bxe5, etc.
+        Returns:
+            A string representation the notation for this move, in the form that
+            SF uses. E.g., Nf3 might become g1f3.
+        """
+
+        move = move.replace(" ", "").replace("-", "")
+        is_whites_turn = "w" in self.get_fen_position()
+        if len(move) == 0:
+            return "Empty move"
+        if regex.match("^(?:[a-h][1-8]){2}[qrnb]$", move.lower()):
+            move = move.lower()
+            if self.is_move_correct(move):
+                return move
+            else:
+                return "Invalid move."
+        else:
+            # castling
+            if move.lower() == "oo":
+                # castle king side
+                # need to check if it's actually a king there as another piece could also have a valid move.
+                if (
+                    is_whites_turn
+                    and self.get_what_is_on_square("e1") == Stockfish.Piece.WHITE_KING
+                ):
+                    move = "e1g1"
+                elif (
+                    not is_whites_turn
+                    and self.get_what_is_on_square("e8") == Stockfish.Piece.BLACK_KING
+                ):
+                    move = "e8g8"
+                else:
+                    move = "Invalid"
+                if self.is_move_correct(move):
+                    return move
+                else:
+                    return "Cannot castle king side."
+            elif move.lower() == "ooo":
+                # castle queen side
+                if (
+                    is_whites_turn
+                    and self.get_what_is_on_square("e1") == Stockfish.Piece.WHITE_KING
+                ):
+                    move = "e1c1"
+                elif (
+                    not is_whites_turn
+                    and self.get_what_is_on_square("e8") == Stockfish.Piece.BLACK_KING
+                ):
+                    move = "e8c8"
+                else:
+                    move = "Invalid"
+                if self.is_move_correct(move):
+                    return move
+                else:
+                    return "Cannot castle queen side."
+
+            # resolve the rest with regex
+            # do not allow lower case 'b' in first group because it conflicts with second group
+            # allow other lower case letters for convenience
+            match = regex.match(
+                "^([RNBKQrnkq]?)([a-h]?)([1-8]?)(x?)([a-h][1-8])(=?[RNBKQrnbkq]?)$",
+                move,
+            )
+            if match == None:
+                return "Not a valid move string."
+            groups = match.groups()
+            piece = None
+
+            # resolve piece class
+            if len(groups[0]) == 0:
+                piece = (
+                    Stockfish.Piece.WHITE_PAWN
+                    if is_whites_turn
+                    else Stockfish.Piece.BLACK_PAWN
+                )
+            else:
+                if groups[0].lower() == "r":
+                    piece = (
+                        Stockfish.Piece.WHITE_ROOK
+                        if is_whites_turn
+                        else Stockfish.Piece.BLACK_ROOK
+                    )
+                elif groups[0] == "B":  # bxc6 is a pawn from b, not a bishop.
+                    piece = (
+                        Stockfish.Piece.WHITE_BISHOP
+                        if is_whites_turn
+                        else Stockfish.Piece.BLACK_BISHOP
+                    )
+                elif groups[0].lower() == "n":
+                    piece = (
+                        Stockfish.Piece.WHITE_KNIGHT
+                        if is_whites_turn
+                        else Stockfish.Piece.BLACK_KNIGHT
+                    )
+                elif groups[0].lower() == "k":
+                    piece = (
+                        Stockfish.Piece.WHITE_KING
+                        if is_whites_turn
+                        else Stockfish.Piece.BLACK_KING
+                    )
+                elif groups[0].lower() == "q":
+                    piece = (
+                        Stockfish.Piece.WHITE_QUEEN
+                        if is_whites_turn
+                        else Stockfish.Piece.BLACK_QUEEN
+                    )
+                else:
+                    return f"Can not determine piece to move ('{groups[0]}')."
+
+            # resolve source file
+            src_file = None
+            if len(groups[1]) == 1:
+                src_file = groups[1]
+
+            # resolve source rank
+            src_rank = None
+            if len(groups[2]) == 1:
+                src_rank = groups[2]
+
+            # resolve capture
+            isCapture = groups[3] == "x"
+
+            # pawn conversion
+            turnsInto = groups[5].lstrip("=")
+
+            # resolve dst
+            dst = groups[4]
+
+            # resolve src
+            src = None
+            # find src
+            if src_file != None and src_rank != None:
+                src = f"{src_file}{src_rank}"
+            else:
+                possibleSrc = []
+                # run through all the squares and check all the pieces if they can move to the square
+                for file in range(ord("a"), ord("h") + 1):
+                    file = chr(file)
+                    if src_file != None and src_file != file:
+                        continue
+                    for rank in range(1, 8 + 1):
+                        rank = str(rank)
+                        if src_rank != None and src_rank != rank:
+                            continue
+                        src = f"{file}{rank}"
+                        if piece == self.get_what_is_on_square(
+                            src
+                        ) and self.is_move_correct(f"{src}{dst}{turnsInto}"):
+                            possibleSrc.append(src)
+                if len(possibleSrc) == 1:
+                    src = possibleSrc[0]
+                elif len(possibleSrc) == 0:
+                    pieceDesc = str(piece).replace("Piece.", "")
+                    if src_rank != None and src_file == None:
+                        pieceDesc = pieceDesc + f" from rank {src_rank}"
+                    elif src_rank == None and src_file != None:
+                        pieceDesc = pieceDesc + f" from file {src_file}"
+                    # no need to check for both since that is already covered above
+                    # no need to check for neither since no additional description is needed
+                    return f"No {pieceDesc} can go to {dst}"
+                else:
+                    pieceDesc = str(piece).replace("Piece.", "")
+                    return f"Could not determine which {pieceDesc} you want to move to {dst}"
+            # build stockfish move
+            move = f"{src}{dst}{turnsInto}"
+            # check if resolved move is indeed a capture
+            if self.is_move_correct(move):
+                if (
+                    isCapture
+                    and turnsInto != ""
+                    and self.get_what_is_on_square(dst) == None
+                ) or (
+                    isCapture
+                    and turnsInto == ""
+                    and self.will_move_be_a_capture(move)
+                    == Stockfish.Capture.NO_CAPTURE
+                ):
+                    return "Move is no Capture"
+                elif (
+                    not isCapture
+                    and turnsInto != ""
+                    and self.get_what_is_on_square(dst) != None
+                ) or (
+                    not isCapture
+                    and turnsInto == ""
+                    and self.will_move_be_a_capture(move)
+                    != Stockfish.Capture.NO_CAPTURE
+                ):
+                    print(
+                        "Warning: Move results in a capture, but capture was not indicated by the move string."
+                    )
+                return move
+        return "Invalid Move"
 
     def get_stockfish_major_version(self) -> int:
         """Returns Stockfish engine major version."""
