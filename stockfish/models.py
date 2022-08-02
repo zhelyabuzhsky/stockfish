@@ -706,7 +706,7 @@ class Stockfish:
             raise ValueError("The proposed move is not valid in the current position.")
         starting_square_piece = self.get_what_is_on_square(move_value[:2])
         ending_square_piece = self.get_what_is_on_square(move_value[2:4])
-        if ending_square_piece != None:
+        if ending_square_piece is not None:
             if self._parameters["UCI_Chess960"] == "false":
                 return Stockfish.Capture.DIRECT_CAPTURE
             else:
@@ -749,12 +749,12 @@ class Stockfish:
             if self.is_move_correct(move):
                 return move
             else:
-                return "Invalid move."
+                raise ValueError("Invalid move.")
         else:
             # castling
             if move.lower() == "oo":
                 # castle king side
-                # need to check if it's actually a king there as another piece could also have a valid move.
+                # Need to check if it's actually a king there as another piece could also have a valid move.
                 if (
                     is_whites_turn
                     and self.get_what_is_on_square("e1") == Stockfish.Piece.WHITE_KING
@@ -766,11 +766,11 @@ class Stockfish:
                 ):
                     move = "e8g8"
                 else:
-                    move = "Invalid"
+                    raise ValueError("Cannot castle kingside.")
                 if self.is_move_correct(move):
                     return move
                 else:
-                    return "Cannot castle king side."
+                    raise ValueError("Cannot castle kingside.")
             elif move.lower() == "ooo":
                 # castle queen side
                 if (
@@ -784,11 +784,11 @@ class Stockfish:
                 ):
                     move = "e8c8"
                 else:
-                    move = "Invalid"
+                    raise ValueError("Cannot castle queenside.")
                 if self.is_move_correct(move):
                     return move
                 else:
-                    return "Cannot castle queen side."
+                    raise ValueError("Cannot castle queenside.")
 
             # resolve the rest with regex
             # do not allow lower case 'b' in first group because it conflicts with second group
@@ -797,8 +797,8 @@ class Stockfish:
                 "^([RNBKQrnkq]?)([a-h]?)([1-8]?)(x?)([a-h][1-8])(=?[RNBKQrnbkq]?)$",
                 move,
             )
-            if match == None:
-                return "Not a valid move string."
+            if match is None:
+                raise ValueError("Not a valid move string.")
             groups = match.groups()
             piece = None
 
@@ -841,7 +841,7 @@ class Stockfish:
                         else Stockfish.Piece.BLACK_QUEEN
                     )
                 else:
-                    return f"Can not determine piece to move ('{groups[0]}')."
+                    raise ValueError(f"Cannot determine piece to move ('{groups[0]}').")
 
             # resolve source file
             src_file = None
@@ -865,18 +865,18 @@ class Stockfish:
             # resolve src
             src = None
             # find src
-            if src_file != None and src_rank != None:
+            if src_file is not None and src_rank is not None:
                 src = f"{src_file}{src_rank}"
             else:
                 possibleSrc = []
                 # run through all the squares and check all the pieces if they can move to the square
                 for file in range(ord("a"), ord("h") + 1):
                     file = chr(file)
-                    if src_file != None and src_file != file:
+                    if src_file is not None and src_file != file:
                         continue
                     for rank in range(1, 8 + 1):
                         rank = str(rank)
-                        if src_rank != None and src_rank != rank:
+                        if src_rank is not None and src_rank != rank:
                             continue
                         src = f"{file}{rank}"
                         if piece == self.get_what_is_on_square(
@@ -887,16 +887,18 @@ class Stockfish:
                     src = possibleSrc[0]
                 elif len(possibleSrc) == 0:
                     pieceDesc = str(piece).replace("Piece.", "")
-                    if src_rank != None and src_file == None:
+                    if src_rank is not None and src_file is None:
                         pieceDesc = pieceDesc + f" from rank {src_rank}"
-                    elif src_rank == None and src_file != None:
+                    elif src_rank is None and src_file is not None:
                         pieceDesc = pieceDesc + f" from file {src_file}"
                     # no need to check for both since that is already covered above
                     # no need to check for neither since no additional description is needed
-                    return f"No {pieceDesc} can go to {dst}"
+                    raise ValueError(f"No {pieceDesc} can go to {dst}")
                 else:
                     pieceDesc = str(piece).replace("Piece.", "")
-                    return f"Could not determine which {pieceDesc} you want to move to {dst}"
+                    raise ValueError(
+                        f"Could not determine which {pieceDesc} you want to move to {dst}"
+                    )
             # build stockfish move
             move = f"{src}{dst}{turnsInto}"
             # check if resolved move is indeed a capture
@@ -904,18 +906,18 @@ class Stockfish:
                 if (
                     isCapture
                     and turnsInto != ""
-                    and self.get_what_is_on_square(dst) == None
+                    and self.get_what_is_on_square(dst) is None
                 ) or (
                     isCapture
                     and turnsInto == ""
                     and self.will_move_be_a_capture(move)
                     == Stockfish.Capture.NO_CAPTURE
                 ):
-                    return "Move is no Capture"
+                    raise ValueError("Move is not a capture")
                 elif (
                     not isCapture
                     and turnsInto != ""
-                    and self.get_what_is_on_square(dst) != None
+                    and self.get_what_is_on_square(dst) is not None
                 ) or (
                     not isCapture
                     and turnsInto == ""
@@ -926,7 +928,7 @@ class Stockfish:
                         "Warning: Move results in a capture, but capture was not indicated by the move string."
                     )
                 return move
-        return "Invalid Move"
+        raise ValueError("Invalid Move")
 
     def get_stockfish_major_version(self) -> int:
         """Returns Stockfish engine major version."""
