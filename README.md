@@ -140,6 +140,16 @@ stockfish.get_top_moves(3)
 ]
 ```
 
+### Get current board evaluation in centipawns or mate in x
+```python 
+stockfish.get_evaluation()
+```
+Positive is advantage white, negative is advantage black
+```text
+{"type":"cp", "value":12}
+{"type":"mate", "value":-3}
+```
+
 ### Get Stockfish's win/draw/loss stats for the side to move in the current position  
 Before calling this function, it is recommended that you first check if your version of Stockfish is recent enough to display WDL stats. To do this,  
 use the "does_current_engine_version_have_wdl_option()" function below.
@@ -258,16 +268,6 @@ stockfish.get_board_visual(False)
   h   g   f   e   d   c   b   a
 ```
 
-### Get current board evaluation in centipawns or mate in x
-```python 
-stockfish.get_evaluation()
-```
-Positive is advantage white, negative is advantage black
-```text
-{"type":"cp", "value":12}
-{"type":"mate", "value":-3}
-```
-
 ### Run benchmark
 
 #### BenchmarkParameters
@@ -333,6 +333,19 @@ stockfish.will_move_be_a_capture("e5f6")  # returns Stockfish.Capture.DIRECT_CAP
 stockfish.will_move_be_a_capture("e5d6")  # returns Stockfish.Capture.EN_PASSANT  
 stockfish.will_move_be_a_capture("f1e2")  # returns Stockfish.Capture.NO_CAPTURE  
 ```
+
+### Convert human-style notation into the notation Stockfish uses
+The argument is a string representing the move, written in some form that's used by humans. E.g., for using an e4-pawn to capture on d5, a string like
+"e4xd5" or "exd5" could be sent in as a valid argument. The function would then return "e4d5".
+```python
+stockfish.convert_human_notation_to_sf_notation("e4xd5") # returns "e4d5"
+```
+Or, say there are two rooks on a5 and b6, and an enemy piece on a6. The following are all valid "human-style" notations for the a5-rook capturing on a6: "Raxa6", "Raa6", "R5xa6", "R5a6".
+```python
+stockfish.convert_human_notation_to_sf_notation("Raxa6") # returns "a5a6"
+```
+It's also valid for the argument to already be in the style Stockfish uses. E.g., sending in "a5a6" to the function just gets "a5a6" back.
+If an invalid argument (bad syntax, or an illegal move) is sent to the function, a ValueError will be raised.
 
 ### StockfishException
 
