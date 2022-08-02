@@ -953,7 +953,7 @@ class TestStockfish:
             )
 
         input_test_moves_2 = "gxf3 g2xf3 Bxf7+ Bxf7 nd6+ Nxe7 0-0  00  ".split()
-        expected_outputs_2 = "g2f3 g2f3  e6f7  e6f7 b5d6 f5e7 e1g1 e1g1".split()
+        expected_outputs_2 = "g2f3 g2f3  e6f7  e6f7 f5d6 f5e7 e1g1 e1g1".split()
 
         for i in range(len(input_test_moves_2)):
             assert (
