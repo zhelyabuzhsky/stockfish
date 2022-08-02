@@ -938,3 +938,20 @@ class TestStockfish:
         stockfish.__del__()
         assert stockfish._stockfish.poll() is not None
         assert Stockfish._del_counter == old_del_counter + 1
+    
+    def test_convert_human_notation_to_sf_notation(self, stockfish):
+        stockfish.set_fen_position("rnbbk1nr/pPP1pp1p/1p2B3/1NPpP2Q/3p1B2/4Pq2/P4PPP/R3K2R w KQkq d6 0 2")
+        input_test_moves_1 = "exd6 Bxc8 cxd8Q+ cxd8R bxc8=Q bxc8Q bxa8=N cxd6 Qxf7 Qxf7#".split()
+        expected_outputs_1 = "e5d6 e6c8 c7d8q  c7d8r b7c8q  b7c8q b7a8n  c5d6 h5f7 h5f7".split()
+        
+        for i in range(len(input_test_moves_1)):
+            assert stockfish.convert_human_notation_to_sf_notation(input_test_moves_1[i]) == expected_outputs_1[i]
+        
+        input_test_moves_2 = "gxf3 g2xf3 Bxf7+ Bxf7"
+        expected_outputs_2 = "g2f3 g2f3  e6f7  e6f7"
+        
+        wrong_test_moves = "ed bxc8 bxa8"
+        
+        
+        
+        

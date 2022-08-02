@@ -12,7 +12,6 @@ from os import path
 from dataclasses import dataclass
 from enum import Enum
 import re
-import regex
 
 
 class StockfishException(Exception):
@@ -26,7 +25,7 @@ class Stockfish:
     # Used in test_models: will count how many times the del function is called.
 
     def __init__(
-        self, path: str = "stockfish", depth: int = 15, parameters: dict = None
+        self, path: str = "stockfish_15_x64_avx2", depth: int = 15, parameters: dict = None
     ) -> None:
         self._DEFAULT_STOCKFISH_PARAMS = {
             "Debug Log File": "",
@@ -729,7 +728,7 @@ class Stockfish:
         else:
             return Stockfish.Capture.NO_CAPTURE
 
-    def convert_human_notation_into_sf_notation(self, move: str) -> str:
+    def convert_human_notation_to_sf_notation(self, move: str) -> str:
         """
         Args:
             move:
@@ -744,7 +743,7 @@ class Stockfish:
         is_whites_turn = "w" in self.get_fen_position()
         if len(move) == 0:
             return "Empty move"
-        if regex.match("^(?:[a-h][1-8]){2}[qrnb]$", move.lower()):
+        if re.match("^(?:[a-h][1-8]){2}[qrnb]$", move.lower()):
             move = move.lower()
             if self.is_move_correct(move):
                 return move
@@ -793,7 +792,7 @@ class Stockfish:
             # resolve the rest with regex
             # do not allow lower case 'b' in first group because it conflicts with second group
             # allow other lower case letters for convenience
-            match = regex.match(
+            match = re.match(
                 "^([RNBKQrnkq]?)([a-h]?)([1-8]?)(x?)([a-h][1-8])(=?[RNBKQrnbkq]?)$",
                 move,
             )
