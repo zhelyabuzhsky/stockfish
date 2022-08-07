@@ -104,7 +104,7 @@ class TestStockfish:
 
         stockfish.set_fen_position("8/8/8/6pp/8/4k1PP/r7/4K3 b - - 11 52")
         stockfish.get_best_move()
-        stockfish.set_fen_position("8/8/8/6pp/8/4k1PP/8/r3K3 w - - 12 53", False)
+        stockfish.set_fen_position("8/8/8/6pp/8/4k1PP/8/r3K3 w - - 12 53")
         assert stockfish.info == ""
 
     def test_set_fen_position_starts_new_game(self, stockfish):
@@ -116,20 +116,21 @@ class TestStockfish:
         stockfish.set_fen_position("3kn3/p5rp/1p3p2/3B4/3P1P2/2P5/1P3K2/8 w - - 0 53")
         assert stockfish.info == ""
 
-    def test_set_fen_position_second_argument(self, stockfish):
+    def test_set_fen_position_ucinewgame(self, stockfish):
         stockfish.set_depth(16)
+        stockfish.send_ucinewgame_command()
         stockfish.set_fen_position(
-            "rnbqk2r/pppp1ppp/3bpn2/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 1", True
+            "rnbqk2r/pppp1ppp/3bpn2/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 1"
         )
         assert stockfish.get_best_move() == "e4e5"
 
         stockfish.set_fen_position(
-            "rnbqk2r/pppp1ppp/3bpn2/4P3/3P4/2N5/PPP2PPP/R1BQKBNR b KQkq - 0 1", False
+            "rnbqk2r/pppp1ppp/3bpn2/4P3/3P4/2N5/PPP2PPP/R1BQKBNR b KQkq - 0 1"
         )
         assert stockfish.get_best_move() == "d6e7"
 
         stockfish.set_fen_position(
-            "rnbqk2r/pppp1ppp/3bpn2/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 1", False
+            "rnbqk2r/pppp1ppp/3bpn2/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 1"
         )
         assert stockfish.get_best_move() == "e4e5"
 
@@ -622,14 +623,8 @@ class TestStockfish:
 
     def test_make_moves_transposition_table_speed(self, stockfish):
         """
-        make_moves_from_current_position won't send the "ucinewgame" token to Stockfish, since it
-        will reach a new position similar to the current one. Meanwhile, set_fen_position will send this
-        token (unless the user specifies otherwise), since it could be going to a completely new position.
-
-        A big effect of sending this token is that it resets SF's transposition table. If the
-        new position is similar to the current one, this will affect SF's speed. This function tests
-        that make_moves_from_current_position doesn't reset the transposition table, by verifying SF is faster in
-        evaluating a consecutive set of positions when the make_moves_from_current_position function is used.
+        Test if not sending the ucinewgame token allows SF to calculate a bit faster,
+        since it can use data in its TT from previous calculations.
         """
 
         stockfish.set_depth(16)
@@ -648,6 +643,7 @@ class TestStockfish:
 
         total_time_calculating_second = 0.0
         for i in range(len(positions_considered)):
+            stockfish.send_ucinewgame_command()
             stockfish.set_fen_position(positions_considered[i])
             start = default_timer()
             stockfish.get_best_move()

@@ -58,6 +58,11 @@ These parameters can also be updated at any time by calling the "update_engine_p
 stockfish.update_engine_parameters({"Hash": 2048, "UCI_Chess960": "true"}) # Gets stockfish to use a 2GB hash table, and also to play Chess960.
 ```
 
+If you'd like to send the "ucinewgame" command to the Stockfish engine process, use this function. The main effect this command has is clearing SF's transposition table, and for most use cases it's probably not worth doing this. Frequently sending this command can end up being a bottleneck.
+```python
+stockfish.send_ucinewgame_command()
+```
+
 When you're done using the Stockfish engine process, you can send the "quit" uci command to it with:
 ```python
 stockfish.send_quit_command()

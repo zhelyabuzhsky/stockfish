@@ -70,7 +70,7 @@ class Stockfish:
         if self.does_current_engine_version_have_wdl_option():
             self._set_option("UCI_ShowWDL", "true", False)
 
-        self._prepare_for_new_position(True)
+        self._prepare_for_new_position()
 
     def get_parameters(self) -> dict:
         """Returns current board position.
@@ -127,7 +127,7 @@ class Stockfish:
 
         for name, value in new_param_values.items():
             self._set_option(name, value, True)
-        self.set_fen_position(self.get_fen_position(), False)
+        self.set_fen_position(self.get_fen_position())
         # Getting SF to set the position again, since UCI option(s) have been updated.
 
     def reset_engine_parameters(self) -> None:
@@ -138,9 +138,7 @@ class Stockfish:
         """
         self.update_engine_parameters(self._DEFAULT_STOCKFISH_PARAMS)
 
-    def _prepare_for_new_position(self, send_ucinewgame_token: bool = True) -> None:
-        if send_ucinewgame_token:
-            self._put("ucinewgame")
+    def _prepare_for_new_position(self) -> None:
         self._is_ready()
         self.info = ""
 
@@ -187,24 +185,17 @@ class Stockfish:
             cmd += f" btime {btime}"
         self._put(cmd)
 
-    def set_fen_position(
-        self, fen_position: str, send_ucinewgame_token: bool = True
-    ) -> None:
+    def set_fen_position(self, fen_position: str) -> None:
         """Sets current board position in Forsyth–Edwards notation (FEN).
 
         Args:
             fen_position:
               FEN string of board position.
 
-            send_ucinewgame_token:
-              Whether to send the "ucinewgame" token to the Stockfish engine.
-              The most prominent effect this will have is clearing Stockfish's transposition table,
-              which should be done if the new position is unrelated to the current position.
-
         Returns:
             None
         """
-        self._prepare_for_new_position(send_ucinewgame_token)
+        self._prepare_for_new_position()
         self._put(f"position fen {fen_position}")
 
     def set_position(self, moves: Optional[List[str]] = None) -> None:
@@ -217,7 +208,7 @@ class Stockfish:
               example: ['e2e4', 'e7e5']
         """
         self.set_fen_position(
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", True
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         )
         self.make_moves_from_current_position(moves)
 
@@ -232,7 +223,7 @@ class Stockfish:
         """
         if not moves:
             return
-        self._prepare_for_new_position(False)
+        self._prepare_for_new_position()
         for move in moves:
             if not self.is_move_correct(move):
                 raise ValueError(f"Cannot make move: {move}")
@@ -401,7 +392,7 @@ class Stockfish:
         # Using a new temporary SF instance, in case the fen is an illegal position that causes
         # the SF process to crash.
         best_move = None
-        temp_sf.set_fen_position(fen, False)
+        temp_sf.set_fen_position(fen)
         try:
             temp_sf._put("go depth 10")
             best_move = temp_sf._get_best_move_from_sf_popen_process()
@@ -949,6 +940,13 @@ class Stockfish:
             self._stockfish_major_version >= 10109
             and self._stockfish_major_version <= 311299
         )
+
+    def send_ucinewgame_command(self) -> None:
+        """Sends the 'ucinewgame' command to the Stockfish engine. The most
+        prominent effect this has is clearing SF's transposition table."""
+
+        if self._stockfish.poll() is None:
+            self._put("ucinewgame")
 
     def send_quit_command(self) -> None:
         """Sends the 'quit' command to the Stockfish engine, getting the process
