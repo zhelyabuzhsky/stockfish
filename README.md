@@ -121,6 +121,7 @@ e2e4
 ```
 
 ### Check is move correct with current position
+Returns True if the passed in move is legal in the current position.
 ```python
 stockfish.is_move_correct('a2a3')
 ```
@@ -129,14 +130,19 @@ True
 ```
 
 ### Get info on the top n moves
+Returns a list of dictionaries, where each dictionary represents a move's info. Each dictionary will contain a value for the 'Move' key,
+and either the 'Centipawn' or 'Mate' value will be a number (the other will be None). Positive values mean advantage for White, negative means
+advantage for Black. E.g., 'Mate': 3 means that White can mate in three moves, 'Mate': -2 means Black mates in two moves, 'Centipawn': -20 means the
+evaluation is -0.20 (0.20 advantage in Black's favour).
+E.g., for an example position where White is to move, and the top moves are either a mate, winning material, or being slightly worse:
 ```python
 stockfish.get_top_moves(3)
 ```
 ```text
 [
-    {'Move': 'f5h7', 'Centipawn': None, 'Mate': 1},
-    {'Move': 'f5d7', 'Centipawn': 713, 'Mate': None},
-    {'Move': 'f5h5', 'Centipawn': -31, 'Mate': None}
+    {'Move': 'f5h7', 'Centipawn': None, 'Mate': 1}, # the move f5h7 leads to a mate in 1
+    {'Move': 'f5d7', 'Centipawn': 713, 'Mate': None}, # f5d7 leads to an evaluation of +7.13
+    {'Move': 'f5h5', 'Centipawn': -31, 'Mate': None} # f5h5 leads to an evaluation of -0.31
 ]
 ```
 
@@ -144,10 +150,11 @@ stockfish.get_top_moves(3)
 ```python 
 stockfish.get_evaluation()
 ```
-Positive is advantage white, negative is advantage black
+Positive is advantage white, negative is advantage black.
 ```text
-{"type":"cp", "value":12}
-{"type":"mate", "value":-3}
+{"type":"cp", "value":12} # This being the return value would mean White is better by 0.12.
+
+{"type":"mate", "value":-3} # This being the return value would mean Black can checkmate in 3.
 ```
 
 ### Get Stockfish's win/draw/loss stats for the side to move in the current position  
