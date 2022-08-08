@@ -48,7 +48,7 @@ There are some default engine settings used by this wrapper. For increasing Stoc
 }
 ```
 
-You can change them, as well as the default search depth, during your Stockfish class initialization:
+You can change them, as well as the search depth, during your Stockfish class initialization:
 ```python
 stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64", depth=18, parameters={"Threads": 2, "Minimum Thinking Time": 30})
 ```
@@ -58,9 +58,9 @@ These parameters can also be updated at any time by calling the "update_engine_p
 stockfish.update_engine_parameters({"Hash": 2048, "UCI_Chess960": "true"}) # Gets stockfish to use a 2GB hash table, and also to play Chess960.
 ```
 
-If you'd like to send the "ucinewgame" command to the Stockfish engine process, use this function. The main effect this command has is clearing SF's transposition table, and for most use cases it's probably not worth doing this. Frequently sending this command can end up being a bottleneck.
+As for the depth, it can also be updated, by using the following function. Note that if you don't set depth to a value yourself, the python module will initialize it to 15 by default.
 ```python
-stockfish.send_ucinewgame_command()
+stockfish.set_depth(12)
 ```
 
 When you're done using the Stockfish engine process, you can send the "quit" uci command to it with:
@@ -190,11 +190,6 @@ stockfish.set_skill_level(15)
 stockfish.set_elo_rating(1350)
 ```
 
-### Set current engine's depth
-```python
-stockfish.set_depth(15)
-```
-
 ### Get current engine's parameters
 ```python
 stockfish.get_parameters()
@@ -321,6 +316,12 @@ stockfish.is_development_build_of_engine()
 ```
 ```text
 False
+```
+
+### Send the "ucinewgame" command to the Stockfish engine process. 
+The main effect this command has is clearing SF's transposition table, and for most use cases it's probably not worth doing this. Frequently sending this command can end up being a bottleneck on performance.
+```python
+stockfish.send_ucinewgame_command()
 ```
 
 ### Find what is on a certain square
