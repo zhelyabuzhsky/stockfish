@@ -735,7 +735,7 @@ class Stockfish:
             move = move[:-1]
         is_whites_turn = "w" in self.get_fen_position()
         if len(move) == 0:
-            return "Empty move"
+            raise ValueError("Empty move")
         if re.match("^(?:[a-h][1-8]){2}[qrnb]$", move.lower()):
             move = move.lower()
             if self.is_move_correct(move):
@@ -896,27 +896,17 @@ class Stockfish:
             if self.is_move_correct(move):
                 if (
                     isCapture
-                    and turnsInto != ""
-                    and self.get_what_is_on_square(dst) is None
-                ) or (
-                    isCapture
-                    and turnsInto == ""
                     and self.will_move_be_a_capture(move)
                     == Stockfish.Capture.NO_CAPTURE
                 ):
-                    raise ValueError("Move is not a capture")
+                    raise ValueError(f"{move} is not a capture.")
                 elif (
                     not isCapture
-                    and turnsInto != ""
-                    and self.get_what_is_on_square(dst) is not None
-                ) or (
-                    not isCapture
-                    and turnsInto == ""
                     and self.will_move_be_a_capture(move)
                     != Stockfish.Capture.NO_CAPTURE
                 ):
-                    print(
-                        "Warning: Move results in a capture, but capture was not indicated by the move string."
+                    raise ValueError(
+                        f"{move} results in a capture, but there isn't an 'x' indicating this in its notation."
                     )
                 return move
         raise ValueError("Invalid Move")

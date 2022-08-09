@@ -966,7 +966,7 @@ class TestStockfish:
                 == expected_outputs_3[i]
             )
 
-        wrong_test_moves = "ed bxc8 bxa8 0-0-0 OOO".split()
+        wrong_test_moves = "ed bxc8 bxa8 0-0-0 OOO Bd5 Nxg3".split()
 
         for move in wrong_test_moves:
             with pytest.raises(ValueError):
