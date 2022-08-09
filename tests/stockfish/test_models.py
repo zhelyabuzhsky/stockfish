@@ -957,17 +957,22 @@ class TestStockfish:
                 == expected_outputs_2[i]
             )
 
-        input_test_moves_3 = (
-            "Qxf7 Qxf7# e1g1 h1f1 O-O  nbxd4 Nfxd4 b3xd4 b3d4 Nb3xd4".split()
-        )
-        expected_outputs_3 = (
-            "h5f7 h5f7  e1g1 h1f1 e1g1 b3d4  f5d4  b3d4  b3d4 b3d4".split()
-        )
+        input_test_moves_3 = "Qxf7 Qxf7# e1g1 h1f1 O-O  nbxd4 Nfxd4 b3xd4 b3d4".split()
+        expected_outputs_3 = "h5f7 h5f7  e1g1 h1f1 e1g1 b3d4  f5d4  b3d4  b3d4".split()
 
         for i in range(len(input_test_moves_3)):
             assert (
                 stockfish.convert_human_notation_to_sf_notation(input_test_moves_3[i])
                 == expected_outputs_3[i]
+            )
+
+        input_test_moves_4 = "Nb3xd4 c5c6 c6".split()
+        expected_outputs_4 = "b3d4   c5c6 c5c6".split()
+
+        for i in range(len(input_test_moves_4)):
+            assert (
+                stockfish.convert_human_notation_to_sf_notation(input_test_moves_4[i])
+                == expected_outputs_4[i]
             )
 
         wrong_test_moves = "ed bxc8 bxa8 0-0-0 OOO Bd5 Nxg3 nbd4".split()
