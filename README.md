@@ -354,11 +354,11 @@ The argument is a string representing the move, written in some form that's used
 stockfish.convert_human_notation_to_sf_notation("e4xd5") # returns "e4d5"
 ```
 For advancing a pawn (e.g., e4-pawn to e5), both "e5" and "e4e5" would be valid arguments to the function. For kingside castling, "0-0", "00", "O-O", "OO" all work (the function's return value for each would be "e1g1").
-Or, say there are two rooks on a5 and b6, and an enemy piece on a6. The following would all be treated as valid "human-style" notations for the a5-rook capturing on a6: "Raxa6", "R5xa6", a5xa6. Note that "Raa6", "R5a6", "a5a6" wouldn't be valid "human-style" notations here, since the move is a capture but there isn't an 'x' indicating this.
+Or, say there are two rooks on a5 and b6, and an enemy piece on a6. The following would all be treated as valid "human-style" notations for the a5-rook capturing on a6: "Raxa6", "R5xa6", "a5xa6". Note that "Raa6" and "R5a6" wouldn't be valid "human-style" notations here, since the move is a capture but there isn't an 'x' indicating this. If an invalid argument (bad syntax, or an illegal move) is sent to the function, a ValueError will be raised.
 ```python
 stockfish.convert_human_notation_to_sf_notation("Raxa6") # returns "a5a6"
 ```
-If an invalid argument (bad syntax, or an illegal move) is sent to the function, a ValueError will be raised.
+Also, if the move passed to the function is already in Stockfish notation (beginning coordinate followed by ending coordinate, with the promotion piece type if applicable), then it's treated as valid and just returned as is. E.g., in the above case, passing in "a5a6" would also be a valid input (despite not having an 'x' to signify a capture), and the return value is the same "a5a6".
 
 ### StockfishException
 
