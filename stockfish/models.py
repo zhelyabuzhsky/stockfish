@@ -730,18 +730,19 @@ class Stockfish:
             SF uses. E.g., Nf3 might become g1f3.
         """
 
+        move_param = move
         move = move.replace(" ", "").replace("-", "")
         while move[-1:] in ["+", "#"]:
             move = move[:-1]
         is_whites_turn = "w" in self.get_fen_position()
         if len(move) == 0:
-            raise ValueError("Empty move")
+            raise ValueError("Empty move sent in to function.")
         if re.match("^(?:[a-h][1-8]){2}[qrnb]$", move.lower()):
             move = move.lower()
             if self.is_move_correct(move):
                 return move
             else:
-                raise ValueError("Invalid move.")
+                raise ValueError(f"{move_param} is an invalid move.")
         else:
             if move.lower() in ["oo", "00"]:
                 # castle kingside
@@ -789,7 +790,7 @@ class Stockfish:
                 move,
             )
             if match is None:
-                raise ValueError("Not a valid move string.")
+                raise ValueError(f"{move_param} is not a valid move string.")
             groups = match.groups()
             piece = None
 
@@ -899,17 +900,17 @@ class Stockfish:
                     and self.will_move_be_a_capture(move)
                     == Stockfish.Capture.NO_CAPTURE
                 ):
-                    raise ValueError(f"{move} is not a capture.")
+                    raise ValueError(f"{move_param} is not a capture.")
                 elif (
                     not isCapture
                     and self.will_move_be_a_capture(move)
                     != Stockfish.Capture.NO_CAPTURE
                 ):
                     raise ValueError(
-                        f"{move} results in a capture, but there isn't an 'x' indicating this in its notation."
+                        f"{move_param} results in a capture, but there isn't an 'x' indicating this in its notation."
                     )
                 return move
-        raise ValueError("Invalid Move")
+        raise ValueError(f"{move_param} is an invalid move.")
 
     def get_stockfish_major_version(self) -> int:
         """Returns Stockfish engine major version."""
