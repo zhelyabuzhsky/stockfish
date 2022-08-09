@@ -737,7 +737,7 @@ class Stockfish:
         is_whites_turn = "w" in self.get_fen_position()
         if len(move) == 0:
             raise ValueError("Empty move sent in to function.")
-        if re.match("^(?:[a-h][1-8]){2}[qrnb]$", move.lower()):
+        if re.match("^(?:[a-h][1-8]){2}[qrnb]?$", move.lower()):
             move = move.lower()
             if self.is_move_correct(move):
                 return move
