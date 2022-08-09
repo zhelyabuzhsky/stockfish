@@ -353,11 +353,10 @@ The argument is a string representing the move, written in some form that's used
 ```python
 stockfish.convert_human_notation_to_sf_notation("e4xd5") # returns "e4d5"
 ```
-Or, say there are two rooks on a5 and b6, and an enemy piece on a6. The following are all valid "human-style" notations for the a5-rook capturing on a6: "Raxa6", "Raa6", "R5xa6", "R5a6".
+Or, say there are two rooks on a5 and b6, and an enemy piece on a6. The following would all be treated as valid "human-style" notations for the a5-rook capturing on a6: "Raxa6", "R5xa6", a5xa6. Note that "Raa6", "R5a6", "a5a6" wouldn't be valid "human-style" notations here, since the move is a capture but there isn't an 'x' indicating this.
 ```python
 stockfish.convert_human_notation_to_sf_notation("Raxa6") # returns "a5a6"
 ```
-It's also valid for the argument to already be in the style Stockfish uses. E.g., sending in "a5a6" to the function just gets "a5a6" back.
 If an invalid argument (bad syntax, or an illegal move) is sent to the function, a ValueError will be raised.
 
 ### StockfishException
