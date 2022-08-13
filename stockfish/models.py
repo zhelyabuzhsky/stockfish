@@ -24,6 +24,8 @@ class Stockfish:
     _del_counter = 0
     # Used in test_models: will count how many times the del function is called.
 
+    _PIECE_CHARS = ["P", "N", "B", "R", "Q", "K", "p", "n", "b", "r", "q", "k"]
+
     def __init__(
         self, path: str = "stockfish", depth: int = 15, parameters: dict = None
     ) -> None:
@@ -718,16 +720,16 @@ class Stockfish:
             return Stockfish.Capture.EN_PASSANT
         else:
             return Stockfish.Capture.NO_CAPTURE
-    
-    def get_num_pieces(self, count_white_pieces: bool = True, count_black_pieces: bool = True,
-                       specific_file: str = None, specific_rank: int = None) -> int:
+
+    def get_num_pieces(
+        self,
+        specific_file: str = None,
+        specific_rank: int = None,
+        pieces_to_count: List = copy.deepcopy(_PIECE_CHARS),
+    ) -> int:
         """
         Parameters
         ----------
-        count_white_pieces : bool, optional
-            Whether to count white pieces for the total. The default is True.
-        count_black_pieces : bool, optional
-            Whether to count black pieces for the total. The default is True.
         specific_file : str, optional
             If only wanting the number of pieces in a given file, this param will
             be some letter from "a" to "h". The default is None (which means all files
@@ -736,22 +738,35 @@ class Stockfish:
             If only wanting the number of pieces in a given rank, this param will
             be some int from 1 to 8. The default is None (which means all ranks
             in the board are counted).
+        pieces_to_count : List, optional
+            Which pieces to count as part of the sum. The default is
+            all types of pieces: ["P", "N", "B", "R", "Q", "K", "p", "n", "b", "r", "q", "k"].
+            To specify a piece, each element can either be of type char, or an enum member of
+            the Stockfish.Piece enum.
 
         Returns
         -------
         int
             The number of pieces.
         """
-        
+
+        if not pieces_to_count:
+            return 0
         if specific_rank is not None and not (1 <= specific_rank <= 8):
             raise ValueError(f"{specific_rank} is not in the range of 1 to 8.")
-        
-        pieces_to_count = []
+
+        pieces_to_count = [
+            x.value if isinstance(x, Stockfish.Piece) else x for x in pieces_to_count
+        ]
+        for piece in pieces_to_count:
+            if not isinstance(piece, str) or piece not in [
+                e.value for e in Stockfish.Piece
+            ]:
+                raise ValueError(f"{piece} does not represent a piece.")
+        pieces_to_count = list(dict.fromkeys(pieces_to_count))
+        # In case of any duplicates, remove them.
+
         num_pieces_counter = 0
-        if count_white_pieces:
-            pieces_to_count.extend(['P', 'N', 'B', 'R', 'Q', 'K'])
-        if count_black_pieces:
-            pieces_to_count.extend(['p', 'n', 'b', 'r', 'q', 'k'])
 
         if specific_file is None:
             fen_portion = self.get_fen_position().split()[0]
@@ -773,8 +788,6 @@ class Stockfish:
                         num_pieces_counter += 1
 
         return num_pieces_counter
-    # CONTINUE HERE - Done coding this function, now just test it,
-    # and write stuff for it in the readme.
 
     def convert_human_notation_to_sf_notation(self, move: str) -> str:
         """

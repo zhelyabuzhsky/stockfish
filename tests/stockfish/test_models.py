@@ -980,3 +980,24 @@ class TestStockfish:
         for move in wrong_test_moves:
             with pytest.raises(ValueError):
                 stockfish.convert_human_notation_to_sf_notation(move)
+
+    def test_get_num_pieces(self, stockfish):
+        stockfish.set_fen_position(
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        )
+        assert stockfish.get_num_pieces() == 32
+        assert stockfish.get_num_pieces(specific_file="H") == 4
+        assert (
+            stockfish.get_num_pieces(specific_file="A", pieces_to_count=["P", "r", "P"])
+            == 2
+        )
+        assert stockfish.get_num_pieces(specific_rank=2) == 8
+        assert stockfish.get_num_pieces(specific_rank=2, pieces_to_count=["p"]) == 0
+        assert stockfish.get_num_pieces(specific_rank=-1, pieces_to_count=[]) == 0
+        with pytest.raises(ValueError):
+            stockfish.get_num_pieces(specific_rank=-1)
+        with pytest.raises(ValueError):
+            stockfish.get_num_pieces(pieces_to_count=["K", "q", "L"])
+
+        # CONTINUE HERE - Test this function more, and also
+        # write stuff in the readme for it.
