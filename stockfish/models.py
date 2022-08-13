@@ -718,6 +718,63 @@ class Stockfish:
             return Stockfish.Capture.EN_PASSANT
         else:
             return Stockfish.Capture.NO_CAPTURE
+    
+    def get_num_pieces(self, count_white_pieces: bool = True, count_black_pieces: bool = True,
+                       specific_file: str = None, specific_rank: int = None) -> int:
+        """
+        Parameters
+        ----------
+        count_white_pieces : bool, optional
+            Whether to count white pieces for the total. The default is True.
+        count_black_pieces : bool, optional
+            Whether to count black pieces for the total. The default is True.
+        specific_file : str, optional
+            If only wanting the number of pieces in a given file, this param will
+            be some letter from "a" to "h". The default is None (which means all files
+            in the board are counted).
+        specific_rank : int, optional
+            If only wanting the number of pieces in a given rank, this param will
+            be some int from 1 to 8. The default is None (which means all ranks
+            in the board are counted).
+
+        Returns
+        -------
+        int
+            The number of pieces.
+        """
+        
+        if specific_rank is not None and not (1 <= specific_rank <= 8):
+            raise ValueError(f"{specific_rank} is not in the range of 1 to 8.")
+        
+        pieces_to_count = []
+        num_pieces_counter = 0
+        if count_white_pieces:
+            pieces_to_count.extend(['P', 'N', 'B', 'R', 'Q', 'K'])
+        if count_black_pieces:
+            pieces_to_count.extend(['p', 'n', 'b', 'r', 'q', 'k'])
+
+        if specific_file is None:
+            fen_portion = self.get_fen_position().split()[0]
+            if specific_rank is not None:
+                fen_portion = fen_portion.split("/")[8 - specific_rank]
+            for c in pieces_to_count:
+                num_pieces_counter += fen_portion.count(c)
+        else:
+            specific_file = specific_file.lower()
+            if len(specific_file) != 1:
+                raise ValueError(f"{specific_file} should be a single letter.")
+            if not ("a" <= specific_file <= "h"):
+                raise ValueError(f"{specific_file} is not between 'a' and 'h'.")
+            for rank in range(1, 9):
+                if specific_rank is None or specific_rank == rank:
+                    coordinates = specific_file + str(rank)
+                    piece = self.get_what_is_on_square(coordinates)
+                    if piece is not None and piece.value in pieces_to_count:
+                        num_pieces_counter += 1
+
+        return num_pieces_counter
+    # CONTINUE HERE - Done coding this function, now just test it,
+    # and write stuff for it in the readme.
 
     def convert_human_notation_to_sf_notation(self, move: str) -> str:
         """
