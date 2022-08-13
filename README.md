@@ -328,8 +328,8 @@ stockfish.send_ucinewgame_command()
 If the square is empty, the None object is returned. Otherwise, one of 12 enum members of a custom  
 Stockfish.Piece enum will be returned. Each of the 12 members of this enum is named in the following pattern:  
 *colour* followed by *underscore* followed by *piece name*, where the colour and piece name are in all caps.  
-The value of each enum member is a char representing the piece (uppercase is white, lowercase is black).
-For white, it will be one of "P", "N", "B", "R", "Q", or "K". For black the same chars, except lowercase.
+The value of each enum member is a char representing the piece (uppercase is white, lowercase is black).  
+For white, it will be one of "P", "N", "B", "R", "Q", or "K". For black the same chars, except lowercase.  
 For example, say the current position is the starting position:  
 ```python
 stockfish.get_what_is_on_square("e1") # returns Stockfish.Piece.WHITE_KING
