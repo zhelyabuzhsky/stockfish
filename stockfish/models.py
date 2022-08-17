@@ -360,16 +360,22 @@ class Stockfish:
         # Code for this function taken from: https://gist.github.com/Dani4kor/e1e8b439115878f8c6dcf127a4ed5d3e
         # Some small changes have been made to the code.
 
-        regexMatch = re.match(
+        if not re.match(
             r"\s*^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+)\s([b|w])\s(-|[K|Q|k|q]{1,4})\s(-|[a-h][1-8])\s(\d+\s\d+)$",
             fen,
-        )
-        if not regexMatch:
+        ):
             return False
-        regexList = regexMatch.groups()
-        if len(regexList[0].split("/")) != 8:
+
+        fen_fields = fen.split()
+
+        if len(fen_fields) != 6:
+            return False  # An FEN must have 6 fields.
+        if len(fen_fields[0].split("/")) != 8:
             return False  # 8 rows not present.
-        for fenPart in regexList[0].split("/"):
+        if "K" not in fen_fields[0] or "k" not in fen_fields[0]:
+            return False
+
+        for fenPart in fen_fields[0].split("/"):
             field_sum = 0
             previous_was_digit = False
             for c in fenPart:
@@ -378,13 +384,17 @@ class Stockfish:
                         return False  # Two digits next to each other.
                     field_sum += int(c)
                     previous_was_digit = True
-                elif c.lower() in ["p", "n", "b", "r", "q", "k"]:
+                elif c in Stockfish._PIECE_CHARS:
                     field_sum += 1
                     previous_was_digit = False
                 else:
                     return False  # Invalid character.
             if field_sum != 8:
                 return False  # One of the rows doesn't have 8 columns.
+
+        if int(fen_fields[4]) >= int(fen_fields[5]) * 2:
+            return False  # The max value the halfmove clock field can be is 1 less than 2x the fullmove counter.
+
         return True
 
     def is_fen_valid(self, fen: str) -> bool:
