@@ -981,10 +981,16 @@ class TestStockfish:
             with pytest.raises(ValueError):
                 stockfish.convert_human_notation_to_sf_notation(move)
 
-    def test_get_num_pieces(self, stockfish):
-        stockfish.set_fen_position(
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-        )
+    @pytest.mark.parametrize(
+        "fen",
+        [
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b - - 10 20"
+        ],
+    )
+
+    def test_get_num_pieces(self, stockfish, fen):
+        stockfish.set_fen_position(fen)
         assert stockfish.get_num_pieces() == 32
         assert stockfish.get_num_pieces(specific_file="H") == 4
         assert (
