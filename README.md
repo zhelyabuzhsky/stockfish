@@ -367,6 +367,26 @@ stockfish.convert_human_notation_to_sf_notation("Raxa6") # returns "a5a6"
 ```
 Also, if the move passed to the function is already in Stockfish notation (beginning coordinate followed by ending coordinate, with the promotion piece type if applicable), then it's treated as valid and just returned as is. E.g., in the above case, passing in "a5a6" would also be a valid input (despite not having an 'x' to signify a capture), and the return value is the same "a5a6".
 
+### Get the number of pieces in the current position
+```python
+stockfish.get_num_pieces() # Would return the int 32, if say the current position were the starting chess position.
+```
+This function also has 3 optional arguments, which can be used to give you more specialized info. They are:
+  * specific_file: str  
+    * The default value is just the None object, which gets the function to not deal with any one file, but all 8 of them. If you send a value to this parameter, it should be a string representing a letter between "a" and "h". This will get the function to only count on the specified file.  
+  * specific_rank: int  
+    * Similarly, this parameter allows you to only count on a specific rank, if you wish. The default is again None, which gets the function to count on all the board's 8 ranks. If you send in a value, make it an int between 1 and 8 inclusive.  
+  * pieces_to_count: List  
+    * This parameter allows you to control which pieces are counted. The default value for this parameter is \["P", "N", "B", "R", "Q", "K", "p", "n", "b", "r", "q", "k"\], which gets the function to count all types of pieces. If, for example, you only want to count pawns and white rooks, you can send in \["P", "p", "R"\]. The list can also contain members of the Stockfish.Piece enum, if you'd prefer to use this custom enum of the Stockfish class. E.g., sending in \[Stockfish.Piece.WHITE_PAWN, Stockfish.Piece.BLACK_PAWN, Stockfish.Piece.WHITE_ROOK\] as the argument will yield the same behaviour.  
+
+Some example calls to the function (let's assume the current position is the starting chess position):  
+```python
+stockfish.get_num_pieces(specific_rank=2) # returns 8
+stockfish.get_num_pieces(specific_file="b", pieces_to_count=['N', 'p']) # returns 2, since on the b-file there is one white knight and one black pawn.
+stockfish.get_num_pieces(specific_file="e") # returns 4
+stockfish.get_num_pieces(specific_rank=8, pieces_to_count=[Stockfish.Piece.BLACK_PAWN]) # returns 0, since there are no black pawns on the 8th rank.
+```
+
 ### StockfishException
 
 The `StockfishException` is a newly defined Exception type. It is thrown when the underlying Stockfish process created by the wrapper crashes. This can happen when an incorrect input like an invalid FEN (for example ```8/8/8/3k4/3K4/8/8/8 w - - 0 1``` with both kings next to each other) is given to Stockfish. \
