@@ -1010,23 +1010,23 @@ class TestStockfish:
     def test_get_num_pieces(self, stockfish, fen):
         stockfish.set_fen_position(fen)
         assert stockfish.get_num_pieces() == 32
-        assert stockfish.get_num_pieces(specific_file="H") == 4
+        assert stockfish.get_num_pieces(file_range=["h", "H"]) == 4
         assert (
             stockfish.get_num_pieces(
-                specific_file="A",
+                file_range=["a", "a"],
                 pieces_to_count=[Stockfish.Piece.WHITE_PAWN, "r", "P"],
             )
             == 2
         )
-        assert stockfish.get_num_pieces(specific_rank=2) == 8
-        assert stockfish.get_num_pieces(specific_rank=2, pieces_to_count=["p"]) == 0
+        assert stockfish.get_num_pieces(rank_range=[2, 2]) == 8
+        assert stockfish.get_num_pieces(rank_range=[2, 2], pieces_to_count=["p"]) == 0
         assert (
             stockfish.get_num_pieces(
-                specific_rank=2, pieces_to_count=[Stockfish.Piece.BLACK_PAWN]
+                rank_range=[2, 2], pieces_to_count=[Stockfish.Piece.BLACK_PAWN]
             )
             == 0
         )
-        assert stockfish.get_num_pieces(specific_rank=-1, pieces_to_count=[]) == 0
+        assert stockfish.get_num_pieces(rank_range=[-1, -1], pieces_to_count=[]) == 0
 
         expected_num_pieces_per_rank = [8, 8, 0, 0, 0, 0, 8, 8]
         expected_num_pawns_per_rank = [0, 8, 0, 0, 0, 0, 8, 0]
@@ -1037,20 +1037,22 @@ class TestStockfish:
         back_rank_pieces = ["R", "N", "B", "Q", "K", "B", "N", "R"]
 
         for i in range(8):
+            a_file_plus_i = [chr(ord("a") + i), chr(ord("a") + i)]
+            a_file_plus_7_minus_i = [chr(ord("a") + 7 - i), chr(ord("a") + 7 - i)]
             assert (
-                stockfish.get_num_pieces(specific_rank=8 - i)
+                stockfish.get_num_pieces(rank_range=[8 - i, 8 - i])
                 == expected_num_pieces_per_rank[i]
             )
             assert (
                 stockfish.get_num_pieces(
-                    specific_rank=8 - i, specific_file=chr(ord("a") + i)
+                    rank_range=[8 - i, 8 - i], file_range=a_file_plus_i
                 )
                 == expected_num_pieces_per_rank[i] / 8
             )
 
             assert (
                 stockfish.get_num_pieces(
-                    specific_rank=8 - i,
+                    rank_range=[8 - i, 8 - i],
                     pieces_to_count=[
                         Stockfish.Piece.WHITE_PAWN,
                         Stockfish.Piece.BLACK_PAWN,
@@ -1060,87 +1062,117 @@ class TestStockfish:
             )
             assert (
                 stockfish.get_num_pieces(
-                    specific_rank=8 - i,
+                    rank_range=[8 - i, 8 - i],
                     pieces_to_count=["P", "p"],
-                    specific_file=chr(ord("a") + 7 - i),
+                    file_range=a_file_plus_7_minus_i,
                 )
                 == expected_num_pawns_per_rank[i] / 8
             )
 
             assert (
                 stockfish.get_num_pieces(
-                    specific_rank=8 - i, pieces_to_count=[Stockfish.Piece.WHITE_PAWN]
+                    rank_range=[8 - i, 8 - i],
+                    pieces_to_count=[Stockfish.Piece.WHITE_PAWN],
                 )
                 == expected_num_white_pawns_per_rank[i]
             )
             assert (
                 stockfish.get_num_pieces(
-                    specific_rank=8 - i,
+                    rank_range=[8 - i, 8 - i],
                     pieces_to_count=["P"],
-                    specific_file=chr(ord("a") + i),
+                    file_range=a_file_plus_i,
                 )
                 == expected_num_white_pawns_per_rank[i] / 8
             )
 
             assert (
-                stockfish.get_num_pieces(specific_rank=8 - i, pieces_to_count=["p"])
+                stockfish.get_num_pieces(
+                    rank_range=[8 - i, 8 - i], pieces_to_count=["p"]
+                )
                 == expected_num_black_pawns_per_rank[i]
             )
             assert (
                 stockfish.get_num_pieces(
-                    specific_rank=8 - i,
+                    rank_range=[8 - i, 8 - i],
                     pieces_to_count=[Stockfish.Piece.BLACK_PAWN],
-                    specific_file=chr(ord("a") + 7 - i),
+                    file_range=a_file_plus_7_minus_i,
                 )
                 == expected_num_black_pawns_per_rank[i] / 8
             )
 
-            assert stockfish.get_num_pieces(specific_file=chr(ord("a") + i)) == 4
+            assert stockfish.get_num_pieces(file_range=a_file_plus_i) == 4
             assert stockfish.get_num_pieces(
-                specific_file=chr(ord("a") + i), specific_rank=8 - i
+                file_range=a_file_plus_i,
+                rank_range=[8 - i, 8 - i],
             ) == (0 if 3 <= 8 - i <= 6 else 1)
 
             assert (
                 stockfish.get_num_pieces(
-                    specific_file=chr(ord("a") + i),
+                    file_range=a_file_plus_i,
                     pieces_to_count=[Stockfish.Piece.WHITE_PAWN, "p"],
                 )
                 == 2
             )
             assert stockfish.get_num_pieces(
-                specific_file=chr(ord("a") + i),
-                specific_rank=i + 1,
+                file_range=a_file_plus_i,
+                rank_range=[i + 1, i + 1],
                 pieces_to_count=["P"],
             ) == (1 if i + 1 == 2 else 0)
             assert stockfish.get_num_pieces(
-                specific_file=chr(ord("a") + i),
-                specific_rank=8 - i,
+                file_range=a_file_plus_i,
+                rank_range=[8 - i, 8 - i],
                 pieces_to_count=[Stockfish.Piece.BLACK_PAWN],
             ) == (1 if 8 - i == 7 else 0)
 
             for j in range(len(back_rank_pieces)):
                 i_j_in_sync = (i == j) or (i == 7 - j and i not in [3, 4])
                 assert stockfish.get_num_pieces(
-                    specific_file=chr(ord("a") + i),
+                    file_range=a_file_plus_i,
                     pieces_to_count=[
                         back_rank_pieces[j],
                         back_rank_pieces[j].lower(),
                     ],
                 ) == (2 if i_j_in_sync else 0)
                 assert stockfish.get_num_pieces(
-                    specific_file=chr(ord("a") + i),
+                    file_range=a_file_plus_i,
                     pieces_to_count=[back_rank_pieces[j]],
                 ) == (1 if i_j_in_sync else 0)
                 assert stockfish.get_num_pieces(
-                    specific_file=chr(ord("a") + i),
+                    file_range=a_file_plus_i,
                     pieces_to_count=[back_rank_pieces[j].lower()],
                 ) == (1 if i_j_in_sync else 0)
 
         with pytest.raises(ValueError):
-            stockfish.get_num_pieces(specific_rank=-1)
+            stockfish.get_num_pieces(rank_range=[-1, -1])
+        with pytest.raises(ValueError):
+            stockfish.get_num_pieces(rank_range=[2, 9])
+        with pytest.raises(ValueError):
+            stockfish.get_num_pieces(rank_range=[9, 2])
+        with pytest.raises(ValueError):
+            stockfish.get_num_pieces(file_range=["ah"])
+        with pytest.raises(ValueError):
+            stockfish.get_num_pieces(file_range=["a", "j"])
         with pytest.raises(ValueError):
             stockfish.get_num_pieces(pieces_to_count=["K", "q", "L"])
+        with pytest.raises(ValueError):
+            stockfish.get_num_pieces(pieces_to_count=["K", 3, "r"])
         with pytest.raises(ValueError):
             stockfish.get_num_pieces(
                 pieces_to_count=["K", Stockfish.Piece.BLACK_QUEEN, "L"]
             )
+
+    def test_get_num_pieces_custom_ranges(self, stockfish):
+        stockfish.set_fen_position(
+            "r4rk1/pp1bbpp1/1qp2n2/3p4/3PnN1p/1PNQ2P1/PB2PPBP/2R1R1K1 w q - 0 1"
+        )
+        assert stockfish.get_num_pieces() == 30
+        assert stockfish.get_num_pieces(file_range=["a", "d"]) == 14
+        assert stockfish.get_num_pieces(file_range=["a", "d"], rank_range=[1, 4]) == 7
+        assert (
+            stockfish.get_num_pieces(file_range=["f", "h"], pieces_to_count=["P", "p"])
+            == 6
+        )
+        assert (
+            stockfish.get_num_pieces(rank_range=[4, 6], pieces_to_count=["P", "p"]) == 4
+        )
+        assert stockfish.get_num_pieces(rank_range=[7, 8], file_range=["e", "H"]) == 5

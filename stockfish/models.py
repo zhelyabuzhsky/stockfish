@@ -733,21 +733,20 @@ class Stockfish:
 
     def get_num_pieces(
         self,
-        specific_file: str = None,
-        specific_rank: int = None,
+        file_range: List[str] = ["a", "h"],
+        rank_range: List[int] = [1, 8],
         pieces_to_count: List = copy.deepcopy(_PIECE_CHARS),
     ) -> int:
         """
         Parameters
         ----------
-        specific_file : str, optional
-            If only wanting the number of pieces in a given file, this param will
-            be some letter from "a" to "h". The default is None (which means all files
-            in the board are counted).
-        specific_rank : int, optional
-            If only wanting the number of pieces in a given rank, this param will
-            be some int from 1 to 8. The default is None (which means all ranks
-            in the board are counted).
+        file_range : List[str], optional
+            A list of two strings, each being a letter representing a file. The function
+            will count the number of pieces within the range between these two files.
+            The default is ["a", "h"], which means all files in the board are counted.
+        rank_range : List[int], optional
+            A list of two ints, representing the range of rows to include in the
+            count. The default is [1, 8], meaning all ranks in the board get counted.
         pieces_to_count : List, optional
             Which pieces to count as part of the sum. The default is
             all types of pieces: ["P", "N", "B", "R", "Q", "K", "p", "n", "b", "r", "q", "k"].
@@ -762,41 +761,44 @@ class Stockfish:
 
         if not pieces_to_count:
             return 0
-        if specific_rank is not None and not (1 <= specific_rank <= 8):
-            raise ValueError(f"{specific_rank} is not in the range of 1 to 8.")
-
+        # Get parameters in ideal formats, if not already:
+        file_range = sorted([x.lower() for x in file_range])
+        rank_range.sort()
         pieces_to_count = [
             x.value if isinstance(x, Stockfish.Piece) else x for x in pieces_to_count
         ]
-        for piece in pieces_to_count:
-            if not isinstance(piece, str) or piece not in [
-                e.value for e in Stockfish.Piece
-            ]:
-                raise ValueError(f"{piece} does not represent a piece.")
-        pieces_to_count = list(dict.fromkeys(pieces_to_count))
-        # In case of any duplicates, remove them.
+        pieces_to_count = list(
+            dict.fromkeys(pieces_to_count)
+        )  # In case of any duplicates, remove them.
 
+        # Error checking:
+        if len(file_range) != 2 or len(rank_range) != 2:
+            raise ValueError(
+                "At least one of file_rank or rank_range doesn't have a length of 2 elements."
+            )
+        if not all([(len(x) == 1 and ("a" <= x <= "h")) for x in file_range]):
+            raise ValueError(
+                "The letters in file_range must be in the range of 'a' to 'h'."
+            )
+        if not all([1 <= x <= 8 for x in rank_range]):
+            raise ValueError("The ints in rank_range must be in the range of 1 to 8.")
+        if not all(
+            [
+                (isinstance(x, str) and x in Stockfish._PIECE_CHARS)
+                for x in pieces_to_count
+            ]
+        ):
+            raise ValueError(
+                f"{pieces_to_count} contains an element which doesn't represent a piece."
+            )
+
+        # Count:
         num_pieces_counter = 0
-
-        if specific_file is None:
-            fen_portion = self.get_fen_position().split()[0]
-            if specific_rank is not None:
-                fen_portion = fen_portion.split("/")[8 - specific_rank]
-            for c in pieces_to_count:
-                num_pieces_counter += fen_portion.count(c)
-        else:
-            specific_file = specific_file.lower()
-            if len(specific_file) != 1:
-                raise ValueError(f"{specific_file} should be a single letter.")
-            if not ("a" <= specific_file <= "h"):
-                raise ValueError(f"{specific_file} is not between 'a' and 'h'.")
-            for rank in range(1, 9):
-                if specific_rank is None or specific_rank == rank:
-                    coordinates = specific_file + str(rank)
-                    piece = self.get_what_is_on_square(coordinates)
-                    if piece is not None and piece.value in pieces_to_count:
-                        num_pieces_counter += 1
-
+        for rank in range(rank_range[0], rank_range[1] + 1):
+            for file_as_int in range(ord(file_range[0]), ord(file_range[1]) + 1):
+                piece = self.get_what_is_on_square(chr(file_as_int) + str(rank))
+                if piece is not None and piece.value in pieces_to_count:
+                    num_pieces_counter += 1
         return num_pieces_counter
 
     def convert_human_notation_to_sf_notation(self, move: str) -> str:
