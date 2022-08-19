@@ -372,19 +372,20 @@ Also, if the move passed to the function is already in Stockfish notation (begin
 stockfish.get_num_pieces() # Would return the int 32, if say the current position were the starting chess position.
 ```
 This function also has 3 optional arguments, which can be used to give you more specialized info. They are:
-  * specific_file: str  
-    * The default value is just the None object, which gets the function to not deal with any one file, but all 8 of them. If you send a value to this parameter, it should be a string representing a letter between "a" and "h". This will get the function to only count on the specified file.  
-  * specific_rank: int  
-    * Similarly, this parameter allows you to only count on a specific rank, if you wish. The default is again None, which gets the function to count on all the board's 8 ranks. If you send in a value, make it an int between 1 and 8 inclusive.  
+  * file_range: List\[str\]  
+    *  This parameter is a list of 2 strings, where each string is a letter between "a" and "h" inclusive. The two strings represent the start and end of the range of files which will be included for the count. The default value is \["a", "h"\], which gets the function to count pieces on all 8 of the board's files.  
+  * rank_range: List\[int\]  
+    * Similarly, this parameter allows you to only count on specific ranks, if you wish. The default value is \[1, 8\], which gets the function to count on all 8 ranks. If you specify a value for this parameter, make it a list of length 2, where the elements are both ints between 1 and 8 inclusive. E.g., rank_range=\[2, 5\] would be to count on just ranks 2, 3, 4, and 5.  
   * pieces_to_count: List  
     * This parameter allows you to control which pieces are counted. The default value for this parameter is \["P", "N", "B", "R", "Q", "K", "p", "n", "b", "r", "q", "k"\], which gets the function to count all types of pieces. If, for example, you only want to count pawns and white rooks, you can send in \["P", "p", "R"\]. The list can also contain members of the Stockfish.Piece enum, if you'd prefer to use this custom enum of the Stockfish class. E.g., sending in \[Stockfish.Piece.WHITE_PAWN, Stockfish.Piece.BLACK_PAWN, Stockfish.Piece.WHITE_ROOK\] as the argument will yield the same behaviour.  
 
 Some example calls to the function (let's assume the current position is the starting chess position):  
 ```python
-stockfish.get_num_pieces(specific_rank=2) # returns 8
-stockfish.get_num_pieces(specific_file="b", pieces_to_count=['N', 'p']) # returns 2, since on the b-file there is one white knight and one black pawn.
-stockfish.get_num_pieces(specific_file="e") # returns 4
-stockfish.get_num_pieces(specific_rank=8, pieces_to_count=[Stockfish.Piece.BLACK_PAWN]) # returns 0, since there are no black pawns on the 8th rank.
+stockfish.get_num_pieces(rank_range=[2, 2]) # returns 8, since the function counts all pieces on just the second rank.
+stockfish.get_num_pieces(file_range=["a", "d"], pieces_to_count=["N", "P", "p"]) # returns 9, since between files a-d, there is one white knight, four white pawns, and four black pawns.
+stockfish.get_num_pieces(file_range=["d", "e"], rank_range=[1, 2]) # returns 4, since in this area there is a white king, queen, and two pawns.
+stockfish.get_num_pieces(rank_range=[1, 6], pieces_to_count=[Stockfish.Piece.BLACK_PAWN]) # returns 0, since currently all the black pawns are on the 7th rank.
+stockfish.get_num_pieces(pieces_to_count=["R", "r"]) # returns 4, since there are 4 rooks on the board.
 ```
 
 ### StockfishException
