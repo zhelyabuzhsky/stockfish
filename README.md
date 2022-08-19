@@ -73,10 +73,17 @@ The `__del__()` method of the Stockfish class will call send_quit_command(), but
 ```python
 stockfish.set_position(["e2e4", "e7e6"])
 ```
+If you'd just like to set up the starting position without making any moves from it, just call this function without sending an argument:
+```python
+stockfish.set_position()
+```
 
 ### Update position by making a sequence of moves from the current position
+Function takes a list of strings as its argument. Each string represents a move, and must have the format of the starting coordinate followed by the ending coordinate. If a move leads to a pawn promoting, then an additional character must be appended at the end (to indicate what piece the pawn promotes into).  
+Other types of special moves (e.g., checks, captures, checkmates, en passants) do not need any special notation; the starting coordinate followed by the ending coordinate is all the information that's needed. Note that castling is represented by the starting coordinate of the king followed by the ending coordinate of the king. So "e1g1" would be used for white castling kingside, assuming the white king is still on e1 and castling is legal.  
+Example call (assume in the current position, it is White's turn):
 ```python
-stockfish.make_moves_from_current_position(["g4d7", "a8b8", "f1d1"])
+stockfish.make_moves_from_current_position(["g4d7", "a8b8", "f1d1", "b2b1q"]) # Moves the white piece on g4 to d7, then the black piece on a8 to b8, then the white piece on f1 to d1, and finally pushes the black b2-pawn to b1, promoting it into a queen.
 ```
 
 ### Set position by Forsyth–Edwards Notation (FEN)
