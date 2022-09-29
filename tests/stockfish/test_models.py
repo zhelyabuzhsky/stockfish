@@ -571,6 +571,31 @@ class TestStockfish:
         assert stockfish.get_top_moves() == []
         assert stockfish.get_parameters()["MultiPV"] == 3
 
+    def test_get_top_moves_with_info(self, stockfish):
+        stockfish.set_depth(15)
+        stockfish._set_option("MultiPV", 4)
+        stockfish.set_fen_position("1rQ1r1k1/5ppp/8/8/1R6/8/2r2PPP/4R1K1 w - - 0 1")
+        assert stockfish.get_top_moves(2, include_info=False) == [
+            {"Move": "e1e8", "Centipawn": None, "Mate": 1},
+            {"Move": "c8e8", "Centipawn": None, "Mate": 2},
+        ]
+        moves = stockfish.get_top_moves(2, include_info=True)
+        assert all(
+            k in moves[0]
+            for k in (
+                "Move",
+                "Centipawn",
+                "Mate",
+                "MultiPVLine",
+                "N/s",
+                "Nodes",
+                "SelectiveDepth",
+                "Time",
+            )
+        )
+        if stockfish.does_current_engine_version_have_wdl_option():
+            assert "WDL" in moves[0]
+
     def test_get_top_moves_raising_error(self, stockfish):
         stockfish.set_fen_position(
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"

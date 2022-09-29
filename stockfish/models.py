@@ -514,7 +514,9 @@ class Stockfish:
             elif splitted_text[0] == "bestmove":
                 return evaluation
 
-    def get_top_moves(self, num_top_moves: int = 5) -> List[dict]:
+    def get_top_moves(
+        self, num_top_moves: int = 5, include_info: bool = False
+    ) -> List[dict]:
         """Returns info on the top moves in the position.
 
         Args:
@@ -522,10 +524,18 @@ class Stockfish:
                 The number of moves to return info on, assuming there are at least
                 those many legal moves.
 
+            include_info:
+                Option to include the full info from the engine in the returned dictionary,
+                including seldepth, multipv, time, nodes, nps, and wdl if available.
+                Boolean. Default is False.
+
         Returns:
             A list of dictionaries. In each dictionary, there are keys for Move, Centipawn, and Mate;
             the corresponding value for either the Centipawn or Mate key will be None.
             If there are no moves in the position, an empty list is returned.
+
+            If include_info is True, the dictionary will also include the keys SelectiveDepth, Time,
+            Nodes, N/s, MultiPVLine, and WDL (if available). WDL is set from the White player's perspective.
         """
 
         if num_top_moves <= 0:
@@ -562,20 +572,44 @@ class Stockfish:
                         raise RuntimeError(
                             "Having a centipawn value and mate value should be mutually exclusive."
                         )
-                    top_moves.insert(
-                        0,
-                        {
-                            "Move": current_line[current_line.index("pv") + 1],
-                            "Centipawn": int(current_line[current_line.index("cp") + 1])
-                            * multiplier
-                            if has_centipawn_value
-                            else None,
-                            "Mate": int(current_line[current_line.index("mate") + 1])
-                            * multiplier
-                            if has_mate_value
-                            else None,
-                        },
-                    )
+                    move_evaluation = {
+                        "Move": current_line[current_line.index("pv") + 1],
+                        "Centipawn": int(current_line[current_line.index("cp") + 1])
+                        * multiplier
+                        if has_centipawn_value
+                        else None,
+                        "Mate": int(current_line[current_line.index("mate") + 1])
+                        * multiplier
+                        if has_mate_value
+                        else None,
+                    }
+                    if include_info == True:
+                        move_evaluation.update(
+                            {
+                                "Nodes": current_line[current_line.index("nodes") + 1],
+                                "N/s": current_line[current_line.index("nps") + 1],
+                                "Time": current_line[current_line.index("time") + 1],
+                                "SelectiveDepth": current_line[
+                                    current_line.index("seldepth") + 1
+                                ],
+                                "MultiPVLine": current_line[
+                                    current_line.index("multipv") + 1
+                                ],
+                            }
+                        )
+                        if self.does_current_engine_version_have_wdl_option():
+                            move_evaluation.update(
+                                {
+                                    "WDL": " ".join(
+                                        [
+                                            current_line[current_line.index("wdl") + 1],
+                                            current_line[current_line.index("wdl") + 2],
+                                            current_line[current_line.index("wdl") + 3],
+                                        ][::multiplier]
+                                    )
+                                }
+                            )
+                    top_moves.insert(0, move_evaluation)
             else:
                 break
         if old_MultiPV_value != self._parameters["MultiPV"]:
