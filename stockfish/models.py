@@ -75,12 +75,12 @@ class Stockfish:
         self._prepare_for_new_position()
 
     def get_parameters(self) -> dict:
-        """Returns current board position.
+        """Returns the engine's current parameters.
 
         Returns:
-            Dictionary of current Stockfish engine's parameters.
+            A deep copy of the self._parameters field.
         """
-        return self._parameters
+        return copy.deepcopy(self._parameters)
 
     def update_engine_parameters(self, new_param_valuesP: Optional[dict]) -> None:
         """Updates the stockfish parameters.

@@ -187,17 +187,18 @@ stockfish.does_current_engine_version_have_wdl_option()
 True
 ```
 
-### Set current engine's skill level (ignoring ELO rating)
+### Set engine's current skill level (ignoring ELO rating)
 ```python
 stockfish.set_skill_level(15)
 ```
 
-### Set current engine's ELO rating (ignoring skill level)
+### Set engine's current ELO rating (ignoring skill level)
 ```python
 stockfish.set_elo_rating(1350)
 ```
 
-### Get current engine's parameters
+### Get engine's current parameters
+Returns a deep copy of the dictionary storing the engine's current parameters.
 ```python
 stockfish.get_parameters()
 ```

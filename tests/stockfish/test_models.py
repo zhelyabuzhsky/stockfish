@@ -12,13 +12,7 @@ class TestStockfish:
 
     def test_get_best_move_first_move(self, stockfish):
         best_move = stockfish.get_best_move()
-        assert best_move in (
-            "e2e3",
-            "e2e4",
-            "g1f3",
-            "b1c3",
-            "d2d4",
-        )
+        assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3", "d2d4")
 
     def test_get_best_move_time_first_move(self, stockfish):
         best_move = stockfish.get_best_move_time(1000)
@@ -457,11 +451,7 @@ class TestStockfish:
         stockfish.set_depth(2)
         wrong_fen = "3kk3/8/8/8/8/8/8/3KK3 w - - 0 0"
         stockfish.set_fen_position(wrong_fen)
-        assert stockfish.get_best_move() in (
-            "d1e2",
-            "d1c1",
-            "d1c2",
-        )
+        assert stockfish.get_best_move() in ("d1e2", "d1c1", "d1c2")
 
     def test_constructor(self, stockfish):
         # Will also use a new stockfish instance in order to test sending
@@ -1102,8 +1092,7 @@ class TestStockfish:
 
             assert stockfish.get_num_pieces(file_range=a_file_plus_i) == 4
             assert stockfish.get_num_pieces(
-                file_range=a_file_plus_i,
-                rank_range=[8 - i, 8 - i],
+                file_range=a_file_plus_i, rank_range=[8 - i, 8 - i]
             ) == (0 if 3 <= 8 - i <= 6 else 1)
 
             assert (
@@ -1128,14 +1117,10 @@ class TestStockfish:
                 i_j_in_sync = (i == j) or (i == 7 - j and i not in [3, 4])
                 assert stockfish.get_num_pieces(
                     file_range=a_file_plus_i,
-                    pieces_to_count=[
-                        back_rank_pieces[j],
-                        back_rank_pieces[j].lower(),
-                    ],
+                    pieces_to_count=[back_rank_pieces[j], back_rank_pieces[j].lower()],
                 ) == (2 if i_j_in_sync else 0)
                 assert stockfish.get_num_pieces(
-                    file_range=a_file_plus_i,
-                    pieces_to_count=[back_rank_pieces[j]],
+                    file_range=a_file_plus_i, pieces_to_count=[back_rank_pieces[j]]
                 ) == (1 if i_j_in_sync else 0)
                 assert stockfish.get_num_pieces(
                     file_range=a_file_plus_i,
@@ -1176,3 +1161,9 @@ class TestStockfish:
             stockfish.get_num_pieces(rank_range=[4, 6], pieces_to_count=["P", "p"]) == 4
         )
         assert stockfish.get_num_pieces(rank_range=[7, 8], file_range=["e", "H"]) == 5
+
+    def test_get_parameters(self, stockfish):
+        params = stockfish.get_parameters()
+        params.update({"Skill Level": 10})
+        assert params["Skill Level"] == 10
+        assert stockfish._parameters["Skill Level"] == 20
