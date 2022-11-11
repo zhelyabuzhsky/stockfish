@@ -487,7 +487,7 @@ class Stockfish:
                 # discarded. So continue the loop until reaching "uciok", which is
                 # the last line SF outputs for the "uci" command.
 
-    def get_evaluation(self) -> dict:
+    def get_evaluation(self, time: int = None) -> dict:
         """Evaluates current position
 
         Returns:
@@ -500,7 +500,11 @@ class Stockfish:
         # Stockfish shows advantage relative to current player. This function will instead
         # use positive to represent advantage white, and negative for advantage black.
         self._put(f"position {fen_position}")
-        self._go()
+        if time is none:
+            self._go()
+        else:
+            self._go_time(time)
+
         while True:
             text = self._read_line()
             splitted_text = text.split(" ")
