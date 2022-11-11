@@ -487,7 +487,7 @@ class Stockfish:
                 # discarded. So continue the loop until reaching "uciok", which is
                 # the last line SF outputs for the "uci" command.
 
-    def get_evaluation(self, subjective=False) -> dict:
+    def get_evaluation(self, subjective = False) -> dict:
         """Evaluates current position
 
         Args:
