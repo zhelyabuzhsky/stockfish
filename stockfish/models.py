@@ -500,7 +500,7 @@ class Stockfish:
         # Stockfish shows advantage relative to current player. This function will instead
         # use positive to represent advantage white, and negative for advantage black.
         self._put(f"position {fen_position}")
-        if time is none:
+        if time is None:
             self._go()
         else:
             self._go_time(time)
