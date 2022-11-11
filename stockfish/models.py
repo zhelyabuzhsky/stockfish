@@ -487,8 +487,11 @@ class Stockfish:
                 # discarded. So continue the loop until reaching "uciok", which is
                 # the last line SF outputs for the "uci" command.
 
-    def get_evaluation(self) -> dict:
+    def get_evaluation(self, subjective=False) -> dict:
         """Evaluates current position
+
+        Args:
+            subjective (bool): If true, an advantageous position for black will be negative.
 
         Returns:
             A dictionary of the current advantage with "type" as "cp" (centipawns) or "mate" (checkmate in)
@@ -496,7 +499,7 @@ class Stockfish:
 
         evaluation = dict()
         fen_position = self.get_fen_position()
-        compare = 1 if "w" in fen_position else -1
+        compare = 1 if subjective or ("w" in fen_position) else -1
         # Stockfish shows advantage relative to current player. This function will instead
         # use positive to represent advantage white, and negative for advantage black.
         self._put(f"position {fen_position}")
