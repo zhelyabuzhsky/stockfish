@@ -39,9 +39,17 @@ class Stockfish:
             "Move Overhead": 10,
             "Minimum Thinking Time": 20,
             "Slow Mover": 100,
+            "nodestime": 0,
+            "Use NNUE": "false",
             "UCI_Chess960": "false",
+            "UCI_AnalyseMode": "false",
             "UCI_LimitStrength": "false",
             "UCI_Elo": 1350,
+            "UCI_ShowWDL": "false",
+            "SyzygyPath": "",
+            "SyzygyProbeDepth": 1,
+            "Syzygy50MoveRule": "true",
+            "SyzygyProbeLimit": 7,
         }
         self._path = path
         self._stockfish = subprocess.Popen(
