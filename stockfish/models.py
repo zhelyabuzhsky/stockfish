@@ -715,6 +715,7 @@ class Stockfish:
 
                     # yield the top moves once the current depth changed, the current depth might be smaller than the old depth
                     if move.depth != current_depth:
+                        current_depth = move.depth
                         top_moves.sort(reverse=True)
                         yield top_moves[:num_top_moves]
 
