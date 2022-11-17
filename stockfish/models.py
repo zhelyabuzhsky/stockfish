@@ -657,7 +657,7 @@ class Stockfish:
     def generate_top_moves(
         self, num_top_moves: int = 5
     ) -> Generator[List[TopMove], None, None]:
-        """Returns a generator that yield top moves in the position at every depth
+        """Returns a generator that yields top moves in the position at each depth
 
         Args:
             num_top_moves:
@@ -665,7 +665,7 @@ class Stockfish:
                 those many legal moves.
 
         Returns:
-            A generator that yield top moves in the position at every depth.
+            A generator that yields top moves in the position at each depth.
 
             The evaluation could be stopped early by calling Generator.close();
                 this however will take some time for stockfish to stop.
@@ -674,7 +674,7 @@ class Stockfish:
             a list of `Stockfish.TopMove` instead, and the score (cp/mate) is relative
             to which side is playing instead of absolute like `get_top_moves`.
 
-            The score is either `cp` or `mate`; higher `cp` is better, positive `mate`
+            The score is either `cp` or `mate`; a higher `cp` is better, a positive `mate`
             is winning and vice versa.
 
             If there are no moves in the position, an empty list is returned.
