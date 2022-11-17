@@ -729,9 +729,25 @@ class Stockfish:
                     else:
                         # sort the list once again
                         top_moves.sort(reverse=True)
+
+                        # if the move at index 0 is not the best move returned by stockfish
+                        if best_move != top_moves[0].move:
+                            for move in top_moves:
+                                if best_move == move.move:
+                                    top_moves.remove(move)
+                                    top_moves.insert(0, move)
+                                    break
+                            else:
+                                raise ValueError(f"Stockfish returned the best move: {best_move}, but it's not in the list")
+                            
+
                         yield top_moves[:num_top_moves]
 
                     break
+
+        except BaseException as e:
+            raise e from e
+
         finally:
             # stockfish has not returned the best move, but the generator was signaled to close
             if not foundBestMove:
