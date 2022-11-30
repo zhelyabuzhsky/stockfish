@@ -25,7 +25,10 @@ class Stockfish:
     # Used in test_models: will count how many times the del function is called.
 
     def __init__(
-        self, path: str = "stockfish", depth: int = 15, parameters: dict = None
+        self,
+        path: str = "stockfish",
+        depth: int = 15,
+        parameters: Optional[dict] = None,
     ) -> None:
         self._DEFAULT_STOCKFISH_PARAMS = {
             "Debug Log File": "",
@@ -324,7 +327,9 @@ class Stockfish:
             {"UCI_LimitStrength": "true", "UCI_Elo": elo_rating}
         )
 
-    def get_best_move(self, wtime: int = None, btime: int = None) -> Optional[str]:
+    def get_best_move(
+        self, wtime: Optional[int] = None, btime: Optional[int] = None
+    ) -> Optional[str]:
         """Returns best move with current position on the board.
         wtime and btime arguments influence the search only if provided.
 
@@ -622,8 +627,12 @@ class Stockfish:
                 # both moves has no mate, compare the depth first than centipawn
                 if self.depth == other.depth:
                     if self.cp == other.cp:
+                        if self.seldepth is None or other.seldepth is None:
+                            raise RuntimeError("None value when it should be an int.")
                         return self.seldepth > other.seldepth
                     else:
+                        if self.cp is None or other.cp is None:
+                            raise RuntimeError("None value when it should be an int.")
                         return self.cp > other.cp
                 else:
                     return self.depth > other.depth
@@ -651,7 +660,9 @@ class Stockfish:
             return not self.__gt__(other)
 
         # equal move, by "move", not by score/evaluation
-        def __eq__(self, other: Stockfish.TopMove) -> bool:
+        def __eq__(self, other: object) -> bool:
+            if not isinstance(other, Stockfish.TopMove):
+                return False
             return self.move == other.move
 
     def generate_top_moves(
@@ -738,8 +749,9 @@ class Stockfish:
                                     top_moves.insert(0, move)
                                     break
                             else:
-                                raise ValueError(f"Stockfish returned the best move: {best_move}, but it's not in the list")
-                            
+                                raise ValueError(
+                                    f"Stockfish returned the best move: {best_move}, but it's not in the list"
+                                )
 
                         yield top_moves[:num_top_moves]
 
