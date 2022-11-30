@@ -87,8 +87,7 @@ stockfish.make_moves_from_current_position(["g4d7", "a8b8", "f1d1", "b2b1q"]) # 
 ```
 
 ### Set position by Forsyth–Edwards Notation (FEN)
-If you'd like to first check if your fen is valid, call the is_fen_valid() function below.  
-Also, if you want to play Chess960, it's recommended you first update the "UCI_Chess960" engine parameter to be "true", before calling set_fen_position.
+Note that if you want to play Chess960, it's recommended you first update the "UCI_Chess960" engine parameter to be "true", before calling set_fen_position.
 ```python
 stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
 ```
@@ -98,6 +97,11 @@ This function returns a bool saying whether the passed in FEN is valid (both syn
 The function isn't perfect and won't catch all cases, but generally it should return the correct answer.
 For example, one exception is positions which are legal, but have no legal moves. 
 I.e., for checkmates and stalemates, this function will incorrectly say the fen is invalid.
+
+Note that the function checks whether a position is legal by temporarily creating a new Stockfish process, and
+then seeing if it can return a best move (and also not crash). Whatever the outcome may be though, this
+temporary SF process should terminate after the function call.
+
 ```python
 stockfish.is_fen_valid("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 ```
