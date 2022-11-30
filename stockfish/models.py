@@ -27,7 +27,10 @@ class Stockfish:
     _PIECE_CHARS = ["P", "N", "B", "R", "Q", "K", "p", "n", "b", "r", "q", "k"]
 
     def __init__(
-        self, path: str = "stockfish", depth: int = 15, parameters: dict = None
+        self,
+        path: str = "stockfish",
+        depth: int = 15,
+        parameters: Optional[dict] = None,
     ) -> None:
         self._DEFAULT_STOCKFISH_PARAMS = {
             "Debug Log File": "",
@@ -317,7 +320,9 @@ class Stockfish:
             {"UCI_LimitStrength": "true", "UCI_Elo": elo_rating}
         )
 
-    def get_best_move(self, wtime: int = None, btime: int = None) -> Optional[str]:
+    def get_best_move(
+        self, wtime: Optional[int] = None, btime: Optional[int] = None
+    ) -> Optional[str]:
         """Returns best move with current position on the board.
         wtime and btime arguments influence the search only if provided.
 
