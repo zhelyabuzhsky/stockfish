@@ -54,9 +54,19 @@ class Stockfish:
 
         self._has_quit_command_been_sent = False
 
-        self._stockfish_major_version: int = int(
-            self._read_line().split(" ")[1].split(".")[0].replace("-", "")
-        )
+        # Get the major version
+        version = self._read_line().split(" ")[1].split(".")[0].replace("-", "")
+
+        # Some extra work is needed if it is the dev version
+        if "dev" in version:
+            # Remove the dev string and keep the timestamp only
+            version = version.replace("dev", "")[:8]
+
+            # Invert the timestamp to match the versioning scheme
+            # ex. from 20220530 to 300522
+            version = version[6:8] + version[4:6] + version[2:4]
+
+        self._stockfish_major_version: int = int(version)
 
         self._put("uci")
 
