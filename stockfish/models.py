@@ -25,7 +25,10 @@ class Stockfish:
     # Used in test_models: will count how many times the del function is called.
 
     def __init__(
-        self, path: str = "stockfish", depth: int = 15, parameters: dict = None
+        self,
+        path: str = "stockfish",
+        depth: int = 15,
+        parameters: Optional[dict] = None,
     ) -> None:
         self._DEFAULT_STOCKFISH_PARAMS = {
             "Debug Log File": "",
@@ -54,9 +57,19 @@ class Stockfish:
 
         self._has_quit_command_been_sent = False
 
-        self._stockfish_major_version: int = int(
-            self._read_line().split(" ")[1].split(".")[0].replace("-", "")
-        )
+        # Get the major version
+        version = self._read_line().split(" ")[1].split(".")[0].replace("-", "")
+
+        # Some extra work is needed if it is the dev version
+        if "dev" in version:
+            # Remove the dev string and keep the timestamp only
+            version = version.replace("dev", "")[:8]
+
+            # Invert the timestamp to match the versioning scheme
+            # ex. from 20220530 to 300522
+            version = version[6:8] + version[4:6] + version[2:4]
+
+        self._stockfish_major_version: int = int(version)
 
         self._put("uci")
 
@@ -324,7 +337,9 @@ class Stockfish:
             {"UCI_LimitStrength": "true", "UCI_Elo": elo_rating}
         )
 
-    def get_best_move(self, wtime: int = None, btime: int = None) -> Optional[str]:
+    def get_best_move(
+        self, wtime: Optional[int] = None, btime: Optional[int] = None
+    ) -> Optional[str]:
         """Returns best move with current position on the board.
         wtime and btime arguments influence the search only if provided.
 
