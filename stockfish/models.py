@@ -12,6 +12,7 @@ from os import path
 from dataclasses import dataclass
 from enum import Enum
 import re
+from .color import Color
 
 
 class StockfishException(Exception):
@@ -296,6 +297,77 @@ class Stockfish:
                 while "Checkers" not in self._read_line():
                     pass
                 return " ".join(splitted_text[1:])
+    
+    def get_board_visual_ANSI(self) -> str:
+        """Returns a visual representation of the current board position using ANSI color encoding.
+
+        Returns:
+            Returns a visual representation of the current board position using ANSI color encoding.
+        """
+        BLACK_SQUARE = (118,150,86)
+        WHITE_SQUARE = (206,222,88)
+        WHITE_PIECES = (255,255,255)
+        BLACK_PIECES = (0, 0, 0)
+        
+        PAWN = "\u265f "
+        KNIGHT = "\u265e "
+        BISHOP = "\u265d "
+        ROOK = "\u265c "
+        QUEEN = "\u265b "
+        KING = "\u265a "
+        
+        pieces_on_black = {
+            "P" : Color(PAWN).fg_color(WHITE_PIECES).bg_color(BLACK_SQUARE),
+            "R" : Color(ROOK).fg_color(WHITE_PIECES).bg_color(BLACK_SQUARE),
+            "N" : Color(KNIGHT).fg_color(WHITE_PIECES).bg_color(BLACK_SQUARE),
+            "B" : Color(BISHOP).fg_color(WHITE_PIECES).bg_color(BLACK_SQUARE),
+            "Q" : Color(QUEEN).fg_color(WHITE_PIECES).bg_color(BLACK_SQUARE),
+            "K" : Color(KING).fg_color(WHITE_PIECES).bg_color(BLACK_SQUARE),
+            "p" : Color(PAWN).fg_color(BLACK_PIECES).bg_color(BLACK_SQUARE),
+            "r" : Color(ROOK).fg_color(BLACK_PIECES).bg_color(BLACK_SQUARE),
+            "n" : Color(KNIGHT).fg_color(BLACK_PIECES).bg_color(BLACK_SQUARE),
+            "b" : Color(BISHOP).fg_color(BLACK_PIECES).bg_color(BLACK_SQUARE),
+            "q" : Color(QUEEN).fg_color(BLACK_PIECES).bg_color(BLACK_SQUARE),
+            "k" : Color(KING).fg_color(BLACK_PIECES).bg_color(BLACK_SQUARE),
+            " " : Color("  ").bg_color(BLACK_SQUARE)
+            }
+        
+        pieces_on_white = {
+            "P" : Color(PAWN).fg_color(WHITE_PIECES).bg_color(WHITE_SQUARE),
+            "R" : Color(ROOK).fg_color(WHITE_PIECES).bg_color(WHITE_SQUARE),
+            "N" : Color(KNIGHT).fg_color(WHITE_PIECES).bg_color(WHITE_SQUARE),
+            "B" : Color(BISHOP).fg_color(WHITE_PIECES).bg_color(WHITE_SQUARE),
+            "Q" : Color(QUEEN).fg_color(WHITE_PIECES).bg_color(WHITE_SQUARE),
+            "K" : Color(KING).fg_color(WHITE_PIECES).bg_color(WHITE_SQUARE),
+            "p" : Color(PAWN).fg_color(BLACK_PIECES).bg_color(WHITE_SQUARE),
+            "r" : Color(ROOK).fg_color(BLACK_PIECES).bg_color(WHITE_SQUARE),
+            "n" : Color(KNIGHT).fg_color(BLACK_PIECES).bg_color(WHITE_SQUARE),
+            "b" : Color(BISHOP).fg_color(BLACK_PIECES).bg_color(WHITE_SQUARE),
+            "q" : Color(QUEEN).fg_color(BLACK_PIECES).bg_color(WHITE_SQUARE),
+            "k" : Color(KING).fg_color(BLACK_PIECES).bg_color(WHITE_SQUARE),
+            " " : Color("  ").bg_color(WHITE_SQUARE)
+            }
+        
+        fen_str = self.get_fen_position()
+        board = fen_str.split(' ')[0].split('/')
+        for i, line in enumerate(board):
+            new_line = ""
+            for square in line:
+                if square.isdigit():
+                    new_line += " " * int(square)
+                else:
+                    new_line += square
+            board[i] = new_line
+        
+        for i, line in enumerate(board):
+            starting =  1 if i%2 == 0 else -1
+            new_line = ""
+            for square in line:
+                new_line += str(pieces_on_white[square]) if starting == 1 else str(pieces_on_black[square])
+                starting *= -1
+            board[i] = new_line
+            
+        return "\n".join(board)
 
     def set_skill_level(self, skill_level: int = 20) -> None:
         """Sets current skill level of stockfish engine.
