@@ -1,5 +1,11 @@
 # Stockfish
+
+> **Note**
+> This section refers to the technical application. If you are looking for information regarding the status of this project and the original repo, please look [here](https://github.com/py-stockfish/stockfish/tree/master#status-of-the-project).
+
 Implements an easy-to-use Stockfish class to integrates the Stockfish chess engine with Python.
+
+
 
 ## Install
 ```bash
@@ -355,11 +361,18 @@ $ python setup.py test
 ```
 
 ## Security
-If you discover any security related issues, please email zhelyabuzhsky@icloud.com instead of using the issue tracker.
+If you discover any security related issues, please report it via the [Private vulnerability reporting](https://github.com/py-stockfish/stockfish/security) instead of using the issue tracker.
+
+## Status of the project
+
+Due to the [unfortunate death](https://github.com/zhelyabuzhsky/stockfish/pull/112#issuecomment-1367800036) of [Ilya Zhelyabuzhsky](https://github.com/zhelyabuzhsky), the original [repo](https://github.com/zhelyabuzhsky/stockfish) is no longer maintained. For this reason, this fork was created, which continues the project and is currently maintained by [johndoknjas](https://github.com/johndoknjas) and [kieferro](https://github.com/kieferro).
+The official PyPi releases for the [Stockfish package](https://pypi.org/project/stockfish/) will also be created from this repo in the future. [More information about this](https://github.com/pypi/support/issues/2628)
+
+Please submit all bug reports and PRs to this repo instead of the old one.
 
 ## Credits
-- [Ilya Zhelyabuzhsky](https://github.com/zhelyabuzhsky)
-- [All Contributors](https://github.com/zhelyabuzhsky/stockfish/graphs/contributors)
+- We want to sincerely thank [Ilya Zhelyabuzhsky](https://github.com/zhelyabuzhsky), the original founder of this project for writing and maintaining the code and for his contributions to the open source community.
+- We also want to thank all the [other contributors](https://github.com/py-stockfish/stockfish/graphs/contributors) for working on this project.
 
 ## License
-MIT License. Please see [License File](https://github.com/zhelyabuzhsky/stockfish/blob/master/LICENSE) for more information.
+MIT License. Please see [License File](https://github.com/py-stockfish/stockfish/blob/master/LICENSE) for more information.
