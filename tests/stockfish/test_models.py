@@ -870,6 +870,12 @@ class TestStockfish:
         # involve a king being attacked while it's the opponent's turn.
         old_del_counter = Stockfish._del_counter
         assert Stockfish._is_fen_syntax_valid(fen)
+        if (
+            fen == "8/8/8/3k4/3K4/8/8/8 b - - 0 1"
+            and stockfish.get_stockfish_major_version() >= 14
+        ):
+            # Since for that FEN, SF 15 actually outputs a best move without crashing (unlike SF 14 and earlier).
+            return
         assert not stockfish.is_fen_valid(fen)
         assert Stockfish._del_counter == old_del_counter + 2
 

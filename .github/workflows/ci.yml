@@ -45,7 +45,7 @@ jobs:
         env:
           COVERAGE_FILE: ".coverage.${{ matrix.python_version }}"
       - name: Store coverage file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage
           path: .coverage.${{ matrix.python_version }}
@@ -57,9 +57,9 @@ jobs:
         python-version: ['3.7', '3.8', '3.9', '3.10']
     name: Python Windows ${{ matrix.python-version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -71,17 +71,20 @@ jobs:
     name: Coverage
     runs-on: ubuntu-latest
     needs: build-linux
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         id: download
         with:
           name: 'coverage'
 
       - name: Coverage comment
         id: coverage_comment
-        uses: ewjoachim/python-coverage-comment-action@v2
+        uses: py-cov-action/python-coverage-comment-action@v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MERGE_COVERAGE_FILES: true
@@ -89,7 +92,7 @@ jobs:
           MINIMUM_ORANGE: 80
 
       - name: Store Pull Request comment to be posted
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: steps.coverage_comment.outputs.COMMENT_FILE_WRITTEN == 'true'
         with:
           name: python-coverage-comment-action

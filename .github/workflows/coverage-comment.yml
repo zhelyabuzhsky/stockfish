@@ -11,11 +11,15 @@ jobs:
   comment:
     name: Add coverage comment
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+      actions: read
     if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
     steps:
-      # Doesn't use actions/checkout@v2 for security reasons
+      # Doesn't use actions/checkout@v3 for security reasons
       - name: Post comment
-        uses: ewjoachim/python-coverage-comment-action@v2
+        uses: py-cov-action/python-coverage-comment-action@v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_PR_RUN_ID: ${{ github.event.workflow_run.id }}
