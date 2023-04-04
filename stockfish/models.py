@@ -584,6 +584,8 @@ class Stockfish:
                             else None,
                         },
                     )
+                elif len(top_moves) >= num_top_moves:
+                    break
             else:
                 break
         if old_MultiPV_value != self._parameters["MultiPV"]:
