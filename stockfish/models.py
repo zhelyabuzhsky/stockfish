@@ -523,7 +523,7 @@ class Stockfish:
         Args:
             num_top_moves:
                 The number of moves to return info on, assuming there are at least
-                those many legal moves.
+                that many legal moves.
 
             num_nodes:
                 The number of nodes/positions that stockfish searches in the game tree.
