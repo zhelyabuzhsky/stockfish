@@ -583,7 +583,7 @@ class Stockfish:
                         if has_mate_value
                         else None,
                     }
-                    if include_info == True:
+                    if include_info:
                         move_evaluation.update(
                             {
                                 "Nodes": current_line[current_line.index("nodes") + 1],
