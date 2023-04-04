@@ -525,6 +525,9 @@ class Stockfish:
                 The number of moves to return info on, assuming there are at least
                 those many legal moves.
 
+            num_nodes:
+                The number of nodes/positions that stockfish searches in the game tree.
+
         Returns:
             A list of dictionaries. In each dictionary, there are keys for Move, Centipawn, and Mate;
             the corresponding value for either the Centipawn or Mate key will be None.
@@ -538,7 +541,7 @@ class Stockfish:
             self._set_option("MultiPV", num_top_moves)
             self._parameters.update({"MultiPV": num_top_moves})
 
-        self._go() if not num_nodes > 0 else self._go_nodes(num_nodes)
+        self._go() if num_nodes == 0 else self._go_nodes(num_nodes)
 
         lines = []
         while True:
