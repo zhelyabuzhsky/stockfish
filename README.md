@@ -133,13 +133,7 @@ True
 stockfish.get_top_moves(3, num_nodes=0)
 ```
 Optional parameter "num_nodes" specifies the number of nodes to search. If num_nodes is 0, then the engine will search until it finds the top n moves.
-```text
-[
-    {'Move': 'd2d4', 'Centipawn': 0, 'Mate': None},
-    {'Move': 'd2d3', 'Centipawn': 0, 'Mate': None},
-    {'Move': 'g1f3', 'Centipawn': 0, 'Mate': None}
-]
-```
+
 ```text
 [
     {'Move': 'f5h7', 'Centipawn': None, 'Mate': 1},
