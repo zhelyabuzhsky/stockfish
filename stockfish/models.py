@@ -522,15 +522,15 @@ class Stockfish:
 
         Args:
             num_top_moves:
-                The number of moves to return info on, assuming there are at least
-                that many legal moves.
+                The number of moves for which to return information, assuming there
+                are at least that many legal moves.
 
             num_nodes:
-                The number of nodes/positions that stockfish searches in the game tree.
+                The number of nodes/positions that Stockfish searches in the game tree.
 
         Returns:
-            A list of dictionaries. In each dictionary, there are keys for Move, Centipawn, and Mate;
-            the corresponding value for either the Centipawn or Mate key will be None.
+            A list of dictionaries, where each dictionary contains keys for Move, Centipawn,
+            and Mate. The corresponding value for either the Centipawn or Mate key will be None.
             If there are no moves in the position, an empty list is returned.
         """
 
