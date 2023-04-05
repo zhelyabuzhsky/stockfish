@@ -130,8 +130,9 @@ True
 
 ### Get info on the top n moves
 ```python
-stockfish.get_top_moves(3)
+stockfish.get_top_moves(3, include_info=False)
 ```
+Optional parameter `include_info` specifies whether to include the full info from the engine in the returned dictionary, including seldepth, multipv, time, nodes, nps, and wdl if available. Boolean. Default is `False`.
 ```text
 [
     {'Move': 'f5h7', 'Centipawn': None, 'Mate': 1},
