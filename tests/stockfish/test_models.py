@@ -10,6 +10,36 @@ class TestStockfish:
     def stockfish(self):
         return Stockfish()
 
+    def test_constructor_defaults(self):
+        sf = Stockfish()
+        assert sf is not None
+        assert sf._path == "stockfish"
+        assert sf._parameters == sf._DEFAULT_STOCKFISH_PARAMS
+        assert sf._depth == 15
+        assert sf._num_nodes == 1000000
+        assert sf._turn_perspective is True
+
+    def test_constructor_options(self):
+        sf = Stockfish(
+            depth=20,
+            num_nodes=1000,
+            turn_perspective=False,
+            parameters={"Threads": 2, "UCI_Elo": 1500},
+        )
+        assert sf._depth == 20
+        assert sf._num_nodes == 1000
+        assert sf._turn_perspective is False
+        assert sf._parameters["Threads"] == 2
+        assert sf._parameters["UCI_Elo"] == 1500
+
+    @pytest.mark.parametrize(
+        "parameters",
+        [{"depth": "20"}, {"num_nodes": "100"}, {"turn_perspective": "False"}],
+    )
+    def test_constructor_raises_type_errors(self, parameters):
+        with pytest.raises(TypeError):
+            Stockfish(**parameters)
+
     def test_get_best_move_first_move(self, stockfish):
         best_move = stockfish.get_best_move()
         assert best_move in (
@@ -448,9 +478,43 @@ class TestStockfish:
 
     def test_set_depth(self, stockfish):
         stockfish.set_depth(12)
-        assert stockfish.depth == "12"
+        assert stockfish._depth == 12
         stockfish.get_best_move()
         assert "depth 12" in stockfish.info
+        stockfish.set_depth()
+        assert stockfish._depth == 15
+        stockfish.get_best_move()
+        assert "depth 15" in stockfish.info
+
+    @pytest.mark.parametrize("depth", ["12", True, 12.1, 0, None])
+    def test_set_depth_raises_type_error(self, stockfish, depth):
+        with pytest.raises(TypeError):
+            stockfish.set_depth(depth)
+
+    def test_get_depth(self, stockfish):
+        stockfish.set_depth(12)
+        assert stockfish.get_depth() == 12
+        assert stockfish._depth == 12
+        stockfish.set_depth(20)
+        assert stockfish.get_depth() == 20
+        assert stockfish._depth == 20
+
+    def test_set_num_nodes(self, stockfish):
+        stockfish.set_num_nodes(100)
+        assert stockfish._num_nodes == 100
+        stockfish.set_num_nodes()
+        assert stockfish._num_nodes == 1000000
+
+    @pytest.mark.parametrize("num_nodes", ["100", 100.1, None, True])
+    def test_set_num_nodes_raises_type_error(self, stockfish, num_nodes):
+        with pytest.raises(TypeError):
+            stockfish.set_num_nodes(num_nodes)
+
+    def test_get_num_nodes(self, stockfish):
+        stockfish.set_num_nodes(100)
+        assert stockfish.get_num_nodes() == 100
+        stockfish.set_num_nodes()
+        assert stockfish.get_num_nodes() == 1000000
 
     def test_get_best_move_wrong_position(self, stockfish):
         stockfish.set_depth(2)
@@ -482,10 +546,10 @@ class TestStockfish:
         stockfish.get_best_move()
         assert "multipv 2" in stockfish_2.info
         assert "depth 16" in stockfish_2.info
-        assert stockfish_2.depth == "16"
+        assert stockfish_2._depth == 16
         assert "multipv 1" in stockfish.info
         assert "depth 15" in stockfish.info
-        assert stockfish.depth == "15"
+        assert stockfish._depth == 15
 
         stockfish_1_params = stockfish.get_parameters()
         stockfish_2_params = stockfish_2.get_parameters()
@@ -571,7 +635,44 @@ class TestStockfish:
         assert stockfish.get_top_moves() == []
         assert stockfish.get_parameters()["MultiPV"] == 3
 
-    def test_get_top_moves_raising_error(self, stockfish):
+    def test_get_top_moves_verbose(self, stockfish):
+        stockfish.set_depth(15)
+        stockfish.set_fen_position("1rQ1r1k1/5ppp/8/8/1R6/8/2r2PPP/4R1K1 w - - 0 1")
+        assert stockfish.get_top_moves(2, verbose=False) == [
+            {"Move": "e1e8", "Centipawn": None, "Mate": 1},
+            {"Move": "c8e8", "Centipawn": None, "Mate": 2},
+        ]
+        moves = stockfish.get_top_moves(2, verbose=True)
+        assert all(
+            k in moves[0]
+            for k in (
+                "Move",
+                "Centipawn",
+                "Mate",
+                "MultiPVLine",
+                "NodesPerSecond",
+                "Nodes",
+                "SelectiveDepth",
+                "Time",
+            )
+        )
+        if stockfish.does_current_engine_version_have_wdl_option():
+            assert "WDL" in moves[0]
+
+    def test_get_top_moves_num_nodes(self, stockfish):
+        stockfish.set_fen_position("8/2q2pk1/4b3/1p6/7P/Q1p3P1/2B2P2/6K1 b - - 3 50")
+        moves = stockfish.get_top_moves(2, num_nodes=1000000, verbose=True)
+        assert int(moves[0]["Nodes"]) >= 1000000
+
+    def test_get_top_moves_preserve_globals(self, stockfish):
+        stockfish._set_option("MultiPV", 4)
+        stockfish.set_num_nodes(2000000)
+        stockfish.set_fen_position("1rQ1r1k1/5ppp/8/8/1R6/8/2r2PPP/4R1K1 w - - 0 1")
+        stockfish.get_top_moves(2, num_nodes=100000)
+        assert stockfish.get_num_nodes() == 2000000
+        assert stockfish.get_parameters()["MultiPV"] == 4
+
+    def test_get_top_moves_raises_value_error(self, stockfish):
         stockfish.set_fen_position(
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         )
@@ -579,6 +680,20 @@ class TestStockfish:
             stockfish.get_top_moves(0)
         assert len(stockfish.get_top_moves(2)) == 2
         assert stockfish.get_parameters()["MultiPV"] == 1
+
+    def test_turn_perspective(self, stockfish):
+        stockfish.set_depth(15)
+        stockfish.set_fen_position("8/2q2pk1/4b3/1p6/7P/Q1p3P1/2B2P2/6K1 b - - 3 50")
+        moves = stockfish.get_top_moves(1)
+        assert moves[0]["Centipawn"] > 0
+        stockfish.set_turn_perspective(False)
+        assert stockfish.get_turn_perspective() is False
+        moves = stockfish.get_top_moves(1)
+        assert moves[0]["Centipawn"] < 0
+
+    def test_turn_perspective_raises_type_error(self, stockfish):
+        with pytest.raises(TypeError):
+            stockfish.set_turn_perspective("not a bool")
 
     def test_make_moves_from_current_position(self, stockfish):
         stockfish.set_fen_position(
@@ -901,7 +1016,7 @@ class TestStockfish:
     def test_is_fen_valid(self, stockfish):
         old_params = stockfish.get_parameters()
         old_info = stockfish.info
-        old_depth = stockfish.depth
+        old_depth = stockfish._depth
         old_fen = stockfish.get_fen_position()
         correct_fens = [
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -927,7 +1042,7 @@ class TestStockfish:
         assert stockfish._stockfish.poll() is None
         assert stockfish.get_parameters() == old_params
         assert stockfish.info == old_info
-        assert stockfish.depth == old_depth
+        assert stockfish._depth == old_depth
         assert stockfish.get_fen_position() == old_fen
 
     def test_send_quit_command(self, stockfish):
@@ -938,3 +1053,16 @@ class TestStockfish:
         stockfish.__del__()
         assert stockfish._stockfish.poll() is not None
         assert Stockfish._del_counter == old_del_counter + 1
+
+    def test_set_option(self, stockfish):
+        stockfish._set_option("MultiPV", 3)
+        assert stockfish.get_parameters()["MultiPV"] == 3
+        stockfish._set_option("MultiPV", 6, False)  # update_parameters_attribute
+        assert stockfish.get_parameters()["MultiPV"] == 3
+
+    def test_pick(self, stockfish):
+        info = "info depth 10 seldepth 15 multipv 1 score cp -677 wdl 0 0 1000"
+        line = info.split(" ")
+        assert stockfish._pick(line, "depth") == "10"
+        assert stockfish._pick(line, "multipv") == "1"
+        assert stockfish._pick(line, "wdl", 3) == "1000"
