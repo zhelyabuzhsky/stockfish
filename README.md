@@ -43,15 +43,15 @@ There are some default engine settings used by this wrapper. For increasing Stoc
     "Contempt": 0,
     "Min Split Depth": 0,
     "Threads": 1, # More threads will make the engine stronger, but should be kept at less than the number of logical processors on your computer.
-    "Ponder": "false",
+    "Ponder": False,
     "Hash": 16, # Default size is 16 MB. It's recommended that you increase this value, but keep it as some power of 2. E.g., if you're fine using 2 GB of RAM, set Hash to 2048 (11th power of 2).
     "MultiPV": 1,
     "Skill Level": 20,
     "Move Overhead": 10,
     "Minimum Thinking Time": 20,
     "Slow Mover": 100,
-    "UCI_Chess960": "false",
-    "UCI_LimitStrength": "false",
+    "UCI_Chess960": False,
+    "UCI_LimitStrength": False,
     "UCI_Elo": 1350
 }
 ```
@@ -65,7 +65,7 @@ stockfish = Stockfish(path="/Users/zhelyabuzhsky/Work/stockfish/stockfish-9-64",
 These parameters can also be updated at any time by calling the "update_engine_parameters" function:
 
 ```python
-stockfish.update_engine_parameters({"Hash": 2048, "UCI_Chess960": "true"}) # Gets stockfish to use a 2GB hash table, and also to play Chess960.
+stockfish.update_engine_parameters({"Hash": 2048, "UCI_Chess960": True}) # Gets stockfish to use a 2GB hash table, and also to play Chess960.
 ```
 
 When you're done using the Stockfish engine process, you can send the "quit" uci command to it with:
@@ -91,7 +91,7 @@ stockfish.make_moves_from_current_position(["g4d7", "a8b8", "f1d1"])
 ### Set position by Forsyth–Edwards Notation (FEN)
 
 If you'd like to first check if your fen is valid, call the is_fen_valid() function below.  
-Also, if you want to play Chess960, it's recommended you first update the "UCI_Chess960" engine parameter to be "true", before calling set_fen_position.
+Also, if you want to play Chess960, it's recommended you first update the "UCI_Chess960" engine parameter to be True, before calling set_fen_position.
 
 ```python
 stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
@@ -148,7 +148,7 @@ Time constraint is in milliseconds
 e2e4
 ```
 
-### Check is move correct with current position
+### Check if a move is legal in the current position
 
 ```python
 stockfish.is_move_correct('a2a3')
@@ -229,28 +229,28 @@ stockfish.does_current_engine_version_have_wdl_option()
 True
 ```
 
-### Set current engine's skill level (ignoring ELO rating)
+### Set the engine's skill level (ignoring ELO rating)
 
 ```python
 stockfish.set_skill_level(15)
 ```
 
-### Set current engine's ELO rating (ignoring skill level)
+### Set the engine's ELO rating (ignoring skill level)
 
 ```python
 stockfish.set_elo_rating(1350)
 ```
 
-### Set current engine's depth
+### Set the engine's depth
 
 ```python
 stockfish.set_depth(15)
 ```
 
-### Get current engine's parameters
+### Get the engine's current parameters
 
 ```python
-stockfish.get_parameters()
+stockfish.get_engine_parameters()
 ```
 
 ```text
@@ -259,15 +259,15 @@ stockfish.get_parameters()
     "Contempt": 0,
     "Min Split Depth": 0,
     "Threads": 1,
-    "Ponder": "false",
+    "Ponder": False,
     "Hash": 16,
     "MultiPV": 1,
     "Skill Level": 20,
     "Move Overhead": 10,
     "Minimum Thinking Time": 20,
     "Slow Mover": 100,
-    "UCI_Chess960": "false",
-    "UCI_LimitStrength": "false",
+    "UCI_Chess960": False,
+    "UCI_LimitStrength": False,
     "UCI_Elo": 1350
 }
 ```
@@ -278,7 +278,7 @@ stockfish.get_parameters()
 stockfish.reset_engine_parameters()
 ```
 
-### Get current board position in Forsyth–Edwards notation (FEN)
+### Get the current board position in Forsyth–Edwards notation (FEN)
 
 ```python
 stockfish.get_fen_position()
@@ -288,7 +288,7 @@ stockfish.get_fen_position()
 rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 ```
 
-### Get current board visual
+### Get the current board visual
 
 ```python
 stockfish.get_board_visual()
@@ -342,7 +342,7 @@ stockfish.get_board_visual(False)
   h   g   f   e   d   c   b   a
 ```
 
-### Get current board evaluation in centipawns or mate in x
+### Get the current board evaluation in centipawns or mate in x
 
 ```python
 stockfish.get_evaluation()
@@ -382,7 +382,7 @@ This will run the bench command with BenchmarkParameters.
 It is an additional custom non-UCI command, mainly for debugging.
 Do not use this command during a search!
 
-### Get current major version of stockfish engine
+### Get the major version of the stockfish engine being used
 
 E.g., if the engine being used is Stockfish 14.1 or Stockfish 14, then the function would return 14.
 Meanwhile, if a development build of the engine is being used (not an official release), then the function returns an

@@ -1,3 +1,10 @@
+*
+!*.*
+!*/
+!LICENSE
+
+/*.exe
+
 .DS_Store
 *.pyc
 /.idea/

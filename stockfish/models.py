@@ -37,15 +37,15 @@ class Stockfish:
             "Contempt": 0,
             "Min Split Depth": 0,
             "Threads": 1,
-            "Ponder": "false",
+            "Ponder": False,
             "Hash": 16,
             "MultiPV": 1,
             "Skill Level": 20,
             "Move Overhead": 10,
             "Minimum Thinking Time": 20,
             "Slow Mover": 100,
-            "UCI_Chess960": "false",
-            "UCI_LimitStrength": "false",
+            "UCI_Chess960": False,
+            "UCI_LimitStrength": False,
             "UCI_Elo": 1350,
         }
 
@@ -77,16 +77,27 @@ class Stockfish:
         self.update_engine_parameters(parameters)
 
         if self.does_current_engine_version_have_wdl_option():
-            self._set_option("UCI_ShowWDL", "true", False)
+            self._set_option("UCI_ShowWDL", True, False)
 
         self._prepare_for_new_position(True)
 
     def get_parameters(self) -> dict:
-        """Returns current board position.
+        """Returns the current engine parameters being used - *deprecated*."""
+
+        raise ValueError(
+            """The values for 'Ponder', 'UCI_Chess960', and 'UCI_LimitStrength' have been updated from
+               strings to bools in a new release of the python stockfish package. As a result, this
+               'get_parameters()' function has been deprecated, in an effort to avoid existing users
+               unknowingly getting bugs. It has been replaced with 'get_engine_parameters()'."""
+        )
+
+    def get_engine_parameters(self) -> dict:
+        """Returns the current engine parameters being used.
 
         Returns:
             Dictionary of current Stockfish engine's parameters.
         """
+
         return self._parameters
 
     def update_engine_parameters(self, new_param_valuesP: Optional[dict]) -> None:
@@ -110,6 +121,15 @@ class Stockfish:
                 if key not in self._parameters:
                     raise ValueError(f"'{key}' is not a key that exists.")
 
+                elif key in (
+                    "Ponder",
+                    "UCI_Chess960",
+                    "UCI_LimitStrength",
+                ) and not isinstance(new_param_values[key], bool):
+                    raise ValueError(
+                        f"The value for the '{key}' key has been updated from a string to a bool in a new release of the python stockfish package."
+                    )
+
         if ("Skill Level" in new_param_values) != (
             "UCI_Elo" in new_param_values
         ) and "UCI_LimitStrength" not in new_param_values:
@@ -117,9 +137,9 @@ class Stockfish:
             # not both), and that they didn't specify a new value for UCI_LimitStrength.
             # So, update UCI_LimitStrength, in case it's not the right value currently.
             if "Skill Level" in new_param_values:
-                new_param_values.update({"UCI_LimitStrength": "false"})
+                new_param_values.update({"UCI_LimitStrength": False})
             elif "UCI_Elo" in new_param_values:
-                new_param_values.update({"UCI_LimitStrength": "true"})
+                new_param_values.update({"UCI_LimitStrength": True})
 
         if "Threads" in new_param_values:
             # Recommended to set the hash param after threads.
@@ -172,7 +192,10 @@ class Stockfish:
     def _set_option(
         self, name: str, value: Any, update_parameters_attribute: bool = True
     ) -> None:
-        self._put(f"setoption name {name} value {value}")
+        str_rep_value = str(value)
+        if isinstance(value, bool):
+            str_rep_value = str_rep_value.lower()
+        self._put(f"setoption name {name} value {str_rep_value}")
         if update_parameters_attribute:
             self._parameters.update({name: value})
         self._is_ready()
@@ -320,7 +343,7 @@ class Stockfish:
             None
         """
         self.update_engine_parameters(
-            {"UCI_LimitStrength": "false", "Skill Level": skill_level}
+            {"UCI_LimitStrength": False, "Skill Level": skill_level}
         )
 
     def set_elo_rating(self, elo_rating: int = 1350) -> None:
@@ -333,7 +356,7 @@ class Stockfish:
             None
         """
         self.update_engine_parameters(
-            {"UCI_LimitStrength": "true", "UCI_Elo": elo_rating}
+            {"UCI_LimitStrength": True, "UCI_Elo": elo_rating}
         )
 
     def set_depth(self, depth: int = 15) -> None:
@@ -833,7 +856,7 @@ class Stockfish:
         starting_square_piece = self.get_what_is_on_square(move_value[:2])
         ending_square_piece = self.get_what_is_on_square(move_value[2:4])
         if ending_square_piece != None:
-            if self._parameters["UCI_Chess960"] == "false":
+            if not self._parameters["UCI_Chess960"]:
                 return Stockfish.Capture.DIRECT_CAPTURE
             else:
                 # Check for Chess960 castling:
