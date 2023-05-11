@@ -28,6 +28,7 @@ class Stockfish:
         parameters: Optional[dict] = None,
         num_nodes: int = 1000000,
         turn_perspective: bool = True,
+        debug_view: bool = False,
     ) -> None:
         """Initializes the Stockfish engine.
 
@@ -51,6 +52,7 @@ class Stockfish:
             "UCI_LimitStrength": False,
             "UCI_Elo": 1350,
         }
+        self._debug_view = debug_view
 
         self._path = path
         self._stockfish = subprocess.Popen(
@@ -83,6 +85,9 @@ class Stockfish:
             self._set_option("UCI_ShowWDL", True, False)
 
         self._prepare_for_new_position(True)
+
+    def set_debug_view(self, activate: bool) -> None:
+        self._debug_view = activate
 
     def get_engine_parameters(self) -> dict:
         """Returns the current engine parameters being used.
@@ -182,6 +187,8 @@ class Stockfish:
         if not self._stockfish.stdin:
             raise BrokenPipeError()
         if self._stockfish.poll() is None and not self._has_quit_command_been_sent:
+            if self._debug_view:
+                print(f">>> {command}\n")
             self._stockfish.stdin.write(f"{command}\n")
             self._stockfish.stdin.flush()
             if command == "quit":
@@ -192,7 +199,10 @@ class Stockfish:
             raise BrokenPipeError()
         if self._stockfish.poll() is not None:
             raise StockfishException("The Stockfish process has crashed")
-        return self._stockfish.stdout.readline().strip()
+        line = self._stockfish.stdout.readline().strip()
+        if self._debug_view:
+            print(line)
+        return line
 
     def _set_option(
         self, name: str, value: Any, update_parameters_attribute: bool = True
