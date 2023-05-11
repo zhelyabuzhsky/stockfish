@@ -23,6 +23,10 @@ $ sudo apt install stockfish
 $ brew install stockfish
 ```
 
+## API Documentation
+
+See [API Documentation](https://py-stockfish.github.io/stockfish/) for more information.
+
 ## Features and usage examples
 
 ### Initialize Stockfish class
