@@ -339,6 +339,9 @@ class TestStockfish:
         assert stockfish.get_engine_parameters() == expected_parameters
         stockfish.set_fen_position("4rkr1/4p1p1/8/8/8/8/8/4nK1R w K - 0 100")
         assert stockfish.get_best_move() == "f1h1"
+        stockfish.set_turn_perspective(False)
+        assert stockfish.get_evaluation() == {"type": "mate", "value": 2}
+        stockfish.set_turn_perspective()
         assert stockfish.get_evaluation() == {"type": "mate", "value": 2}
         assert stockfish.will_move_be_a_capture("f1h1") is Stockfish.Capture.NO_CAPTURE
         assert (
@@ -347,6 +350,9 @@ class TestStockfish:
         stockfish.update_engine_parameters({"UCI_Chess960": False})
         assert stockfish.get_engine_parameters() == old_parameters
         assert stockfish.get_best_move() == "f1g1"
+        stockfish.set_turn_perspective(False)
+        assert stockfish.get_evaluation() == {"type": "mate", "value": 2}
+        stockfish.set_turn_perspective()
         assert stockfish.get_evaluation() == {"type": "mate", "value": 2}
         assert stockfish.will_move_be_a_capture("f1g1") is Stockfish.Capture.NO_CAPTURE
 
@@ -493,6 +499,8 @@ class TestStockfish:
 
     def test_get_evaluation_stalemate(self, stockfish):
         stockfish.set_fen_position("1nb1kqn1/pppppppp/8/6r1/5b1K/6r1/8/8 w - - 2 2")
+        assert stockfish.get_evaluation() == {"type": "cp", "value": 0}
+        stockfish.set_turn_perspective(not stockfish.get_turn_perspective())
         assert stockfish.get_evaluation() == {"type": "cp", "value": 0}
 
     def test_set_depth(self, stockfish):
@@ -703,12 +711,15 @@ class TestStockfish:
     def test_turn_perspective(self, stockfish):
         stockfish.set_depth(15)
         stockfish.set_fen_position("8/2q2pk1/4b3/1p6/7P/Q1p3P1/2B2P2/6K1 b - - 3 50")
+        assert stockfish.get_turn_perspective()
         moves = stockfish.get_top_moves(1)
         assert moves[0]["Centipawn"] > 0
+        assert stockfish.get_evaluation()["value"] > 0
         stockfish.set_turn_perspective(False)
         assert stockfish.get_turn_perspective() is False
         moves = stockfish.get_top_moves(1)
         assert moves[0]["Centipawn"] < 0
+        assert stockfish.get_evaluation()["value"] < 0
 
     def test_turn_perspective_raises_type_error(self, stockfish):
         with pytest.raises(TypeError):

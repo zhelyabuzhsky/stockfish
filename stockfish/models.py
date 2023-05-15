@@ -687,9 +687,10 @@ class Stockfish:
         """
         evaluation = dict()
         fen_position = self.get_fen_position()
-        compare = 1 if "w" in fen_position else -1
-        # Stockfish shows advantage relative to current player. This function will instead
-        # use positive to represent advantage white, and negative for advantage black.
+        compare = 1 if self.get_turn_perspective() or ("w" in fen_position) else -1
+        # If the user wants the evaluation specified relative to who is to move, this will be done.
+        # Otherwise, the evaluation will be in terms of white's side (positive meaning advantage white,
+        # negative meaning advantage black).
         self._put(f"position {fen_position}")
         self._go()
         while True:

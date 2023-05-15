@@ -352,12 +352,16 @@ stockfish.get_board_visual(False)
 stockfish.get_evaluation()
 ```
 
-Positive is advantage white, negative is advantage black
+A dictionary is returned representing the evaluation. Two example return values:
 
 ```text
 {"type":"cp", "value":12}
+
 {"type":"mate", "value":-3}
 ```
+
+If stockfish.get_turn_perspective() is True, then the eval value is relative to the side to move.
+Otherwise, positive is advantage white, negative is advantage black.
 
 ### Run benchmark
 
