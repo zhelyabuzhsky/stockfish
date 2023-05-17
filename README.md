@@ -471,6 +471,10 @@ stockfish.set_debug_view(True)
 ```bash
 $ python setup.py test
 ```
+To skip some of the slower tests, run:
+```bash
+$ python setup.py skip_slow_tests
+```
 
 ## Security
 

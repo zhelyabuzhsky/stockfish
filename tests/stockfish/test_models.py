@@ -54,6 +54,7 @@ class TestStockfish:
         best_move = stockfish.get_best_move_time(1000)
         assert best_move in ("e2e3", "e2e4", "g1f3", "b1c3", "d2d4")
 
+    @pytest.mark.slow
     def test_get_best_move_remaining_time_first_move(self, stockfish):
         best_move = stockfish.get_best_move(wtime=1000)
         assert best_move in ("a2a3", "d2d4", "e2e4", "g1f3", "c2c4")
@@ -81,6 +82,7 @@ class TestStockfish:
         best_move = stockfish.get_best_move_time(1000)
         assert best_move in ("d2d4", "g1f3")
 
+    @pytest.mark.slow
     def test_get_best_move_remaining_time_not_first_move(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6"])
         best_move = stockfish.get_best_move(wtime=1000)
@@ -765,6 +767,7 @@ class TestStockfish:
             with pytest.raises(ValueError):
                 stockfish.make_moves_from_current_position([invalid_move])
 
+    @pytest.mark.slow
     def test_make_moves_transposition_table_speed(self, stockfish):
         """
         make_moves_from_current_position won't send the "ucinewgame" token to Stockfish, since it
@@ -837,12 +840,14 @@ class TestStockfish:
             with pytest.raises(RuntimeError):
                 stockfish.get_wdl_stats()
 
+    @pytest.mark.slow
     def test_benchmark_result_with_defaults(self, stockfish):
         params = stockfish.BenchmarkParameters()
         result = stockfish.benchmark(params)
         # result should contain the last line of a successful method call
         assert result.split(" ")[0] == "Nodes/second"
 
+    @pytest.mark.slow
     def test_benchmark_result_with_valid_options(self, stockfish):
         params = stockfish.BenchmarkParameters(
             ttSize=64, threads=2, limit=1000, limitType="movetime", evalType="classical"
@@ -851,6 +856,7 @@ class TestStockfish:
         # result should contain the last line of a successful method call
         assert result.split(" ")[0] == "Nodes/second"
 
+    @pytest.mark.slow
     def test_benchmark_result_with_invalid_options(self, stockfish):
         params = stockfish.BenchmarkParameters(
             ttSize=2049,
@@ -864,6 +870,7 @@ class TestStockfish:
         # result should contain the last line of a successful method call
         assert result.split(" ")[0] == "Nodes/second"
 
+    @pytest.mark.slow
     def test_benchmark_result_with_invalid_type(self, stockfish):
         params = {
             "ttSize": 16,
@@ -1016,6 +1023,7 @@ class TestStockfish:
         with pytest.raises(ValueError):
             stockfish.will_move_be_a_capture("c3c5")
 
+    @pytest.mark.slow
     @pytest.mark.parametrize(
         "fen",
         [
@@ -1043,6 +1051,7 @@ class TestStockfish:
         with pytest.raises(StockfishException):
             stockfish.get_evaluation()
 
+    @pytest.mark.slow
     def test_is_fen_valid(self, stockfish):
         old_params = stockfish.get_engine_parameters()
         old_info = stockfish.info

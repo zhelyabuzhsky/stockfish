@@ -1,7 +1,28 @@
 from setuptools import find_packages, setup
+from setuptools.command.test import test as TestCommand
+import sys
 
 with open("README.md", "r") as readme:
     long_description = readme.read()
+
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        import pytest
+
+        sys.exit(pytest.main(self.test_args))
+
+
+class PyTestSkipSlow(PyTest):
+    def finalize_options(self):
+        super(PyTestSkipSlow, self).finalize_options()
+        self.test_args.append("-m not slow")
+
 
 setup(
     name="stockfish",
@@ -34,4 +55,5 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: Implementation :: CPython",
     ],
+    cmdclass={"test": PyTest, "skip_slow_tests": PyTestSkipSlow},
 )
