@@ -13,6 +13,7 @@ from os import path
 from dataclasses import dataclass
 from enum import Enum
 import re
+import warnings
 
 
 class Stockfish:
@@ -237,6 +238,16 @@ class Stockfish:
             cmd += f" btime {btime}"
         self._put(cmd)
 
+    def _on_weaker_setting(self) -> bool:
+        return (
+            self._parameters["UCI_LimitStrength"]
+            or self._parameters["Skill Level"] < 20
+        )
+
+    def _weaker_setting_warning(self, message: str) -> None:
+        """Will issue a warning, referring to the function that calls this one."""
+        warnings.warn(message, stacklevel=3)
+
     def set_fen_position(
         self, fen_position: str, send_ucinewgame_token: bool = True
     ) -> None:
@@ -416,6 +427,17 @@ class Stockfish:
         self.update_engine_parameters(
             {"UCI_LimitStrength": True, "UCI_Elo": elo_rating}
         )
+
+    def resume_full_strength(self) -> None:
+        """Puts Stockfish back to full strength, if you've previously lowered the elo or skill level.
+
+        Returns:
+            `None`
+
+        Example:
+            >>> stockfish.reset_to_full_strength()
+        """
+        self.update_engine_parameters({"UCI_LimitStrength": False, "Skill Level": 20})
 
     def set_depth(self, depth: int = 15) -> None:
         """Sets current depth of Stockfish engine.
@@ -638,6 +660,12 @@ class Stockfish:
             raise RuntimeError(
                 "Your version of Stockfish isn't recent enough to have the UCI_ShowWDL option."
             )
+        if self._on_weaker_setting():
+            self._weaker_setting_warning(
+                """Note that even though you've set Stockfish to play on a weaker elo or skill level,"""
+                + """ get_wdl_stats will still return full strength Stockfish's wdl stats of the position."""
+            )
+
         self._go()
         lines = []
         while True:
@@ -680,19 +708,26 @@ class Stockfish:
                 # the last line SF outputs for the "uci" command.
 
     def get_evaluation(self) -> dict:
-        """Evaluates current position
+        """Searches to the specified depth and evaluates the current position
 
         Returns:
             A dictionary of the current advantage with "type" as "cp" (centipawns) or "mate" (mate in n moves)
         """
-        evaluation = dict()
-        fen_position = self.get_fen_position()
-        compare = 1 if self.get_turn_perspective() or ("w" in fen_position) else -1
+
+        if self._on_weaker_setting():
+            self._weaker_setting_warning(
+                """Note that even though you've set Stockfish to play on a weaker elo or skill level,"""
+                + """ get_evaluation will still return full strength Stockfish's evaluation of the position."""
+            )
+
+        compare = (
+            1 if self.get_turn_perspective() or ("w" in self.get_fen_position()) else -1
+        )
         # If the user wants the evaluation specified relative to who is to move, this will be done.
         # Otherwise, the evaluation will be in terms of white's side (positive meaning advantage white,
         # negative meaning advantage black).
-        self._put(f"position {fen_position}")
         self._go()
+        evaluation = dict()
         while True:
             text = self._read_line()
             splitted_text = text.split(" ")
@@ -705,6 +740,35 @@ class Stockfish:
                         }
             elif splitted_text[0] == "bestmove":
                 return evaluation
+
+    def get_static_eval(self) -> Optional[float]:
+        """Sends the 'eval' command to stockfish to get the static evaluation. The current position is
+           'directly' evaluated -- i.e., no search is involved.
+
+        Returns:
+            A float representing the static eval, unless one side is in check or checkmated,
+            in which case None is returned.
+        """
+
+        # Stockfish gives the static eval from white's perspective:
+        compare = (
+            1
+            if not self.get_turn_perspective() or ("w" in self.get_fen_position())
+            else -1
+        )
+        self._put("eval")
+        while True:
+            text = self._read_line()
+            if text.startswith("Final evaluation") or text.startswith(
+                "Total Evaluation"
+            ):
+                splitted_text = text.split()
+                eval = splitted_text[2]
+                if eval == "none":
+                    assert "(in check)" in text
+                    return None
+                else:
+                    return float(eval) * compare
 
     def get_top_moves(
         self,
@@ -742,12 +806,17 @@ class Stockfish:
         """
         if num_top_moves <= 0:
             raise ValueError("num_top_moves is not a positive number.")
-        # to get number of top moves, we use Stockfish's MultiPV option (ie. multiple principal variations)
+        if self._on_weaker_setting():
+            self._weaker_setting_warning(
+                """Note that even though you've set Stockfish to play on a weaker elo or skill level,"""
+                + """ get_top_moves will still return the top moves of full strength Stockfish."""
+            )
 
         # remember global values
         old_multipv = self._parameters["MultiPV"]
         old_num_nodes = self._num_nodes
 
+        # to get number of top moves, we use Stockfish's MultiPV option (i.e., multiple principal variations).
         # set MultiPV to num_top_moves requested
         if num_top_moves != self._parameters["MultiPV"]:
             self._set_option("MultiPV", num_top_moves)
