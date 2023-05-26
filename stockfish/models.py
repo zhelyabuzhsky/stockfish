@@ -1079,7 +1079,7 @@ class Stockfish:
                 A string which is the notation for a move, in a format that's used
                 by humans. E.g., stuff like Nf3, bxe5, etc.
         Returns:
-            A string representation the notation for this move, in the form that
+            A string representation of the notation for this move, in the form that
             SF uses. E.g., Nf3 might become g1f3.
         """
 

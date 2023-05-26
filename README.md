@@ -486,7 +486,7 @@ False
 ```
 
 ### Send the "ucinewgame" command to the Stockfish engine process. 
-The main effect this command has is clearing SF's transposition table, and for most use cases it's probably not worth doing this. Frequently sending this command can end up being a bottleneck on performance.
+The main effect this command has is clearing SF's transposition table, and for most use cases there's no need to do this. Frequently sending this command can end up being a bottleneck on performance.
 ```python
 stockfish.send_ucinewgame_command()
 ```
