@@ -1390,8 +1390,8 @@ class TestStockfish:
         )
         assert stockfish.get_num_pieces(rank_range=[7, 8], file_range=["e", "H"]) == 5
 
-    def test_get_parameters(self, stockfish):
-        params = stockfish.get_parameters()
+    def test_get_engine_parameters(self, stockfish):
+        params = stockfish.get_engine_parameters()
         params.update({"Skill Level": 10})
         assert params["Skill Level"] == 10
         assert stockfish._parameters["Skill Level"] == 20
