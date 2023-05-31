@@ -4,6 +4,7 @@
 !LICENSE
 
 /*.exe
+/Notes/
 
 .DS_Store
 *.pyc
