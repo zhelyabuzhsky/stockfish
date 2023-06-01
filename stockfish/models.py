@@ -258,7 +258,7 @@ class Stockfish:
 
         Returns:
             `None`
-        
+
         Example:
             >>> stockfish.set_fen_position("1nb1k1n1/pppppppp/8/6r1/5bqK/6r1/8/8 w - - 2 2")
         """

@@ -1,7 +1,7 @@
 import pytest
 from timeit import default_timer
 import time
-import warnings
+from typing import Optional, List
 
 from stockfish import Stockfish, StockfishException
 
@@ -1119,7 +1119,7 @@ class TestStockfish:
         old_info = stockfish.info
         old_depth = stockfish._depth
         old_fen = stockfish.get_fen_position()
-        correct_fens = [
+        correct_fens: List[Optional[str]] = [
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
             "r1bQkb1r/ppp2ppp/2p5/4Pn2/8/5N2/PPP2PPP/RNB2RK1 b kq - 0 8",
             "4k3/8/4K3/8/8/8/8/8 w - - 10 50",
@@ -1187,7 +1187,7 @@ class TestStockfish:
         assert stockfish._pick(line, "multipv") == "1"
         assert stockfish._pick(line, "wdl", 3) == "1000"
 
-    def test_convert_human_notation_to_sf_notation(self, stockfish):
+    def test_convert_human_notation_to_sf_notation(self, stockfish: Stockfish):
         stockfish.set_fen_position(
             "rnbbk1nr/pPP1pp1p/1p2B3/2PpPN1Q/3p1B2/1N2Pq2/P4PPP/R3K2R w KQkq d6 0 2"
         )
@@ -1240,7 +1240,7 @@ class TestStockfish:
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b - - 10 20",
         ],
     )
-    def test_get_num_pieces(self, stockfish, fen):
+    def test_get_num_pieces(self, stockfish: Stockfish, fen):
         stockfish.set_fen_position(fen)
         assert stockfish.get_num_pieces() == 32
         assert stockfish.get_num_pieces(file_range=["h", "H"]) == 4
@@ -1389,7 +1389,7 @@ class TestStockfish:
                 pieces_to_count=["K", Stockfish.Piece.BLACK_QUEEN, "L"]
             )
 
-    def test_get_num_pieces_custom_ranges(self, stockfish):
+    def test_get_num_pieces_custom_ranges(self, stockfish: Stockfish):
         stockfish.set_fen_position(
             "r4rk1/pp1bbpp1/1qp2n2/3p4/3PnN1p/1PNQ2P1/PB2PPBP/2R1R1K1 w q - 0 1"
         )
@@ -1405,7 +1405,7 @@ class TestStockfish:
         )
         assert stockfish.get_num_pieces(rank_range=[7, 8], file_range=["e", "H"]) == 5
 
-    def test_get_engine_parameters(self, stockfish):
+    def test_get_engine_parameters(self, stockfish: Stockfish):
         params = stockfish.get_engine_parameters()
         params.update({"Skill Level": 10})
         assert params["Skill Level"] == 10
