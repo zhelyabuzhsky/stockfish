@@ -238,22 +238,49 @@ class Stockfish:
                 raise ValueError(f"Cannot make move: {move}")
             self._put(f"position fen {self.get_fen_position()} moves {move}")
 
-    def get_board_visual(self, perspective_white: bool = True) -> str:
+    def get_board_visual(
+        self, perspective_white: bool = True, display_with_alphabets: bool = True
+    ) -> str:
         """Returns a visual representation of the current board position.
 
         Args:
             perspective_white:
               A bool that indicates whether the board should be displayed from the
               perspective of white (True: white, False: black)
+            display_with_alphabets:
+              A bool that indicates whether the board should be displayed with 2D chess piece
+              characters (True: without chess piece characters, False: with chess piece characters)
+              (example: "♔" instead of "K" for white king, "♚" instead of "k" for black king, etc.)
+
 
         Returns:
             String of visual representation of the chessboard with its pieces in current position.
         """
+        display = {
+            "": "",
+            "B": "♝",
+            "K": "♚",
+            "N": "♞",
+            "P": "♟",
+            "Q": "♛",
+            "R": "♜",
+            "b": "♗",
+            "k": "♔",
+            "n": "♘",
+            "p": "♙",
+            "q": "♕",
+            "r": "♖",
+        }
+
         self._put("d")
         board_rep_lines = []
         count_lines = 0
         while count_lines < 17:
             board_str = self._read_line()
+            if not display_with_alphabets:
+                board_str = " ".join(
+                    map(lambda x: display.get(x, x), board_str.split(" "))
+                )
             if "+" in board_str or "|" in board_str:
                 count_lines += 1
                 if perspective_white:
@@ -566,14 +593,18 @@ class Stockfish:
                         0,
                         {
                             "Move": current_line[current_line.index("pv") + 1],
-                            "Centipawn": int(current_line[current_line.index("cp") + 1])
-                            * multiplier
-                            if has_centipawn_value
-                            else None,
-                            "Mate": int(current_line[current_line.index("mate") + 1])
-                            * multiplier
-                            if has_mate_value
-                            else None,
+                            "Centipawn": (
+                                int(current_line[current_line.index("cp") + 1])
+                                * multiplier
+                                if has_centipawn_value
+                                else None
+                            ),
+                            "Mate": (
+                                int(current_line[current_line.index("mate") + 1])
+                                * multiplier
+                                if has_mate_value
+                                else None
+                            ),
                         },
                     )
             else:
