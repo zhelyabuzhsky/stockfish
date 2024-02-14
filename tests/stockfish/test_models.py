@@ -301,6 +301,112 @@ class TestStockfish:
         assert stockfish.get_evaluation() == {"type": "mate", "value": 2}
         assert stockfish.will_move_be_a_capture("f1g1") is Stockfish.Capture.NO_CAPTURE
 
+    def test_get_board_visual_piece_white(self, stockfish):
+        stockfish.set_position(["e2e4", "e7e6", "d2d4", "d7d5"])
+
+        if stockfish.get_stockfish_major_version() >= 12:
+            expected_result = (
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♖ | ♘ | ♗ | ♕ | ♔ | ♗ | ♘ | ♖ | 8\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♙ | ♙ | ♙ |   |   | ♙ | ♙ | ♙ | 7\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   |   | ♙ |   |   |   | 6\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   | ♙ |   |   |   |   | 5\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   | ♟ | ♟ |   |   |   | 4\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   |   |   |   |   |   | 3\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♟ | ♟ | ♟ |   |   | ♟ | ♟ | ♟ | 2\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♜ | ♞ | ♝ | ♛ | ♚ | ♝ | ♞ | ♜ | 1\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "  a   b   c   d   e   f   g   h\n"
+            )
+        else:
+            expected_result = (
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♖ | ♘ | ♗ | ♕ | ♔ | ♗ | ♘ | ♖ |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♙ | ♙ | ♙ |   |   | ♙ | ♙ | ♙ |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   |   | ♙ |   |   |   |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   | ♙ |   |   |   |   |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   | ♟ | ♟ |   |   |   |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   |   |   |   |   |   |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♟ | ♟ | ♟ |   |   | ♟ | ♟ | ♟ |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♜ | ♞ | ♝ | ♛ | ♚ | ♝ | ♞ | ♜ |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+            )
+
+        assert stockfish.get_board_visual(True, False) == expected_result
+
+        stockfish._put("d")
+        stockfish._read_line()  # skip a line
+        assert "+---+---+---+" in stockfish._read_line()
+        # Tests that the previous call to get_board_visual left no remaining lines to be read. This means
+        # the second line read after stockfish._put("d") now will be the +---+---+---+ of the new outputted board.
+
+    def test_get_board_visual_piece_black(self, stockfish):
+        stockfish.set_position(["e2e4", "e7e6", "d2d4", "d7d5"])
+
+        if stockfish.get_stockfish_major_version() >= 12:
+            expected_result = (
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♜ | ♞ | ♝ | ♚ | ♛ | ♝ | ♞ | ♜ | 1\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♟ | ♟ | ♟ |   |   | ♟ | ♟ | ♟ | 2\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   |   |   |   |   |   | 3\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   | ♟ | ♟ |   |   |   | 4\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   |   | ♙ |   |   |   | 5\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   | ♙ |   |   |   |   | 6\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♙ | ♙ | ♙ |   |   | ♙ | ♙ | ♙ | 7\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♖ | ♘ | ♗ | ♔ | ♕ | ♗ | ♘ | ♖ | 8\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "  h   g   f   e   d   c   b   a\n"
+            )
+        else:
+            expected_result = (
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♜ | ♞ | ♝ | ♚ | ♛ | ♝ | ♞ | ♜ |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♟ | ♟ | ♟ |   |   | ♟ | ♟ | ♟ |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   |   |   |   |   |   |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   | ♟ | ♟ |   |   |   |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   |   | ♙ |   |   |   |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "|   |   |   | ♙ |   |   |   |   |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♙ | ♙ | ♙ |   |   | ♙ | ♙ | ♙ |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+                "| ♖ | ♘ | ♗ | ♔ | ♕ | ♗ | ♘ | ♖ |\n"
+                "+---+---+---+---+---+---+---+---+\n"
+            )
+
+        assert stockfish.get_board_visual(False, False) == expected_result
+
+        stockfish._put("d")
+        stockfish._read_line()  # skip a line
+        assert "+---+---+---+" in stockfish._read_line()
+        # Tests that the previous call to get_board_visual left no remaining lines to be read. This means
+        # the second line read after stockfish._put("d") now will be the +---+---+---+ of the new outputted board.
+
     def test_get_board_visual_white(self, stockfish):
         stockfish.set_position(["e2e4", "e7e6", "d2d4", "d7d5"])
         if stockfish.get_stockfish_major_version() >= 12:
@@ -875,7 +981,6 @@ class TestStockfish:
         "fen",
         [
             "2k2q2/8/8/8/8/8/8/2Q2K2 w - - 0 1",
-            "8/8/8/3k4/3K4/8/8/8 b - - 0 1",
             "1q2nB2/pP1k2KP/NN1Q1qP1/8/1P1p4/4p1br/3R4/6n1 w - - 0 1",
             "3rk1n1/ppp3pp/8/8/8/8/PPP5/1KR1R3 w - - 0 1",
         ],
@@ -885,12 +990,7 @@ class TestStockfish:
         # involve a king being attacked while it's the opponent's turn.
         old_del_counter = Stockfish._del_counter
         assert Stockfish._is_fen_syntax_valid(fen)
-        if (
-            fen == "8/8/8/3k4/3K4/8/8/8 b - - 0 1"
-            and stockfish.get_stockfish_major_version() >= 15
-        ):
-            # Since for that FEN, SF 15 actually outputs a best move without crashing (unlike SF 14 and earlier).
-            return
+
         assert not stockfish.is_fen_valid(fen)
         assert Stockfish._del_counter == old_del_counter + 2
 
